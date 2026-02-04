@@ -1,0 +1,1 @@
+/usr/bin/c++  -stdlib=libc++ -O2 -g -DNDEBUG -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names "CMakeFiles/stdlib_pch_exec.dir/build-support/empty-main.cc.o" -o ns3.46-stdlib_pch_exec-default   -L/Users/savanisawaikar/network-monitoring/ns-3.46/build/lib

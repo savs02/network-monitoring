@@ -1,0 +1,21 @@
+{
+  "distribution": "weibull",
+  "parameters": {
+    "inferred_mean": 8.863602104081634,
+    "inferred_std": 3.755266727723055
+  },
+  "num_samples": 980,
+  "statistics": {
+    "mean": 8.863602104081634,
+    "std": 3.755266727723055,
+    "min": 0.951072,
+    "max": 21.8575,
+    "median": 8.53316,
+    "q25": 6.1157699999999995,
+    "q75": 11.5343
+  },
+  "weibull_params": {
+    "shape": 2.534033969502219,
+    "scale": 9.99119150646387
+  }
+}

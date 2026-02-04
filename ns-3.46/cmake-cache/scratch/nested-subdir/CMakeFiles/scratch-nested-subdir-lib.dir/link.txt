@@ -1,0 +1,2 @@
+/usr/bin/ar qc /Users/savanisawaikar/network-monitoring/ns-3.46/build/lib/libscratch-nested-subdir-lib.a "CMakeFiles/scratch-nested-subdir-lib.dir/lib/scratch-nested-subdir-library-source.cc.o"
+/usr/bin/ranlib /Users/savanisawaikar/network-monitoring/ns-3.46/build/lib/libscratch-nested-subdir-lib.a

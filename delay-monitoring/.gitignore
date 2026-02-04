@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.ipynb_checkpoints/
+
+# Results 
+results/*.csv
+results/*.pcap
+*.dat
+*.tr
+
+!results/.gitkeep
+!results/README.md
+
+# NS-3 build artifacts 
+*.o
+*.so
+build/
+
+# OS
+.DS_Store
+*.swp
+*~

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/Users/savanisawaikar/network-monitoring/ns-3.46/./ns3", line 2109, in <module>
+    main()
+  File "/Users/savanisawaikar/network-monitoring/ns-3.46/./ns3", line 2056, in main
+    raise Exception("Couldn't find the specified program: %s" % target_to_run)
+Exception: Couldn't find the specified program: single-hop

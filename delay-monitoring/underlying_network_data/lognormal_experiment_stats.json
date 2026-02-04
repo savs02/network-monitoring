@@ -1,0 +1,21 @@
+{
+  "distribution": "lognormal",
+  "parameters": {
+    "inferred_mean": 10.29711262244898,
+    "inferred_std": 2.1326116249302194
+  },
+  "num_samples": 980,
+  "statistics": {
+    "mean": 10.29711262244898,
+    "std": 2.1326116249302194,
+    "min": 5.03756,
+    "max": 18.8403,
+    "median": 10.04335,
+    "q25": 8.81981,
+    "q75": 11.555824999999999
+  },
+  "lognormal_params": {
+    "mu": 2.3111073412872076,
+    "sigma": 0.20313877791996013
+  }
+}
