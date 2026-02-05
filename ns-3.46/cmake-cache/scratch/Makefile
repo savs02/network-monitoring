@@ -218,6 +218,30 @@ scratch_subdir_scratch-subdir/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f scratch/CMakeFiles/scratch_subdir_scratch-subdir.dir/build.make scratch/CMakeFiles/scratch_subdir_scratch-subdir.dir/build
 .PHONY : scratch_subdir_scratch-subdir/fast
 
+delay-monitoring/binning-monitor.o: delay-monitoring/binning-monitor.cc.o
+.PHONY : delay-monitoring/binning-monitor.o
+
+# target to build an object file
+delay-monitoring/binning-monitor.cc.o:
+	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/build.make scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/delay-monitoring/binning-monitor.cc.o
+.PHONY : delay-monitoring/binning-monitor.cc.o
+
+delay-monitoring/binning-monitor.i: delay-monitoring/binning-monitor.cc.i
+.PHONY : delay-monitoring/binning-monitor.i
+
+# target to preprocess a source file
+delay-monitoring/binning-monitor.cc.i:
+	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/build.make scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/delay-monitoring/binning-monitor.cc.i
+.PHONY : delay-monitoring/binning-monitor.cc.i
+
+delay-monitoring/binning-monitor.s: delay-monitoring/binning-monitor.cc.s
+.PHONY : delay-monitoring/binning-monitor.s
+
+# target to generate assembly for a file
+delay-monitoring/binning-monitor.cc.s:
+	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/build.make scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/delay-monitoring/binning-monitor.cc.s
+.PHONY : delay-monitoring/binning-monitor.cc.s
+
 delay-monitoring/single-hop-underlying-network.o: delay-monitoring/single-hop-underlying-network.cc.o
 .PHONY : delay-monitoring/single-hop-underlying-network.o
 
@@ -378,6 +402,9 @@ help:
 	@echo "... scratch_myfirst"
 	@echo "... scratch_scratch-simulator"
 	@echo "... scratch_subdir_scratch-subdir"
+	@echo "... delay-monitoring/binning-monitor.o"
+	@echo "... delay-monitoring/binning-monitor.i"
+	@echo "... delay-monitoring/binning-monitor.s"
 	@echo "... delay-monitoring/single-hop-underlying-network.o"
 	@echo "... delay-monitoring/single-hop-underlying-network.i"
 	@echo "... delay-monitoring/single-hop-underlying-network.s"

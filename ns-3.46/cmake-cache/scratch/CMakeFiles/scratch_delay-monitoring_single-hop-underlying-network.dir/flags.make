@@ -10,6 +10,8 @@ CXX_FLAGSarm64 =  -stdlib=libc++ -O2 -g -DNDEBUG -std=c++2b -arch arm64 -fPIE   
 
 CXX_FLAGS =  -stdlib=libc++ -O2 -g -DNDEBUG -std=c++2b -arch arm64 -fPIE   -fcolor-diagnostics -Xclang -fno-pch-timestamp -Wall -Wpedantic
 
+# PCH options: scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/delay-monitoring/binning-monitor.cc.o_OPTIONS = -Winvalid-pch;-Xclang;-include-pch;-Xclang;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx.pch;-Xclang;-include;-Xclang;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx
+
 # PCH options: scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/delay-monitoring/single-hop-underlying-network.cc.o_OPTIONS = -Winvalid-pch;-Xclang;-include-pch;-Xclang;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx.pch;-Xclang;-include;-Xclang;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx
 
 # PCH options: scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/delay-monitoring/variable-delay-application.cc.o_OPTIONS = -Winvalid-pch;-Xclang;-include-pch;-Xclang;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx.pch;-Xclang;-include;-Xclang;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx

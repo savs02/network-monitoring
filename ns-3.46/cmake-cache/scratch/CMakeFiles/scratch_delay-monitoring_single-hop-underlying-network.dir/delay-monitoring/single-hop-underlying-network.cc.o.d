@@ -1637,4 +1637,5 @@ scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/de
   /Users/savanisawaikar/network-monitoring/ns-3.46/src/point-to-point/model/point-to-point-net-device.h \
   /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/ppp-header.h \
   /Users/savanisawaikar/network-monitoring/ns-3.46/src/point-to-point/model/ppp-header.h \
-  /Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/variable-delay-application.h
+  /Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/variable-delay-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/binning-monitor.h
