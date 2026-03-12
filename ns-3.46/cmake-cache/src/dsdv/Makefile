@@ -176,20 +176,6 @@ dsdv/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsdv/CMakeFiles/dsdv.dir/build.make src/dsdv/CMakeFiles/dsdv.dir/build
 .PHONY : dsdv/fast
 
-# Convenience name for target.
-src/dsdv/CMakeFiles/dsdv-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/dsdv/CMakeFiles/dsdv-test.dir/rule
-.PHONY : src/dsdv/CMakeFiles/dsdv-test.dir/rule
-
-# Convenience name for target.
-dsdv-test: src/dsdv/CMakeFiles/dsdv-test.dir/rule
-.PHONY : dsdv-test
-
-# fast build rule for target.
-dsdv-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsdv/CMakeFiles/dsdv-test.dir/build.make src/dsdv/CMakeFiles/dsdv-test.dir/build
-.PHONY : dsdv-test/fast
-
 helper/dsdv-helper.o: helper/dsdv-helper.cc.o
 .PHONY : helper/dsdv-helper.o
 
@@ -310,30 +296,6 @@ model/dsdv-rtable.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsdv/CMakeFiles/dsdv.dir/build.make src/dsdv/CMakeFiles/dsdv.dir/model/dsdv-rtable.cc.s
 .PHONY : model/dsdv-rtable.cc.s
 
-test/dsdv-testcase.o: test/dsdv-testcase.cc.o
-.PHONY : test/dsdv-testcase.o
-
-# target to build an object file
-test/dsdv-testcase.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsdv/CMakeFiles/dsdv-test.dir/build.make src/dsdv/CMakeFiles/dsdv-test.dir/test/dsdv-testcase.cc.o
-.PHONY : test/dsdv-testcase.cc.o
-
-test/dsdv-testcase.i: test/dsdv-testcase.cc.i
-.PHONY : test/dsdv-testcase.i
-
-# target to preprocess a source file
-test/dsdv-testcase.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsdv/CMakeFiles/dsdv-test.dir/build.make src/dsdv/CMakeFiles/dsdv-test.dir/test/dsdv-testcase.cc.i
-.PHONY : test/dsdv-testcase.cc.i
-
-test/dsdv-testcase.s: test/dsdv-testcase.cc.s
-.PHONY : test/dsdv-testcase.s
-
-# target to generate assembly for a file
-test/dsdv-testcase.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsdv/CMakeFiles/dsdv-test.dir/build.make src/dsdv/CMakeFiles/dsdv-test.dir/test/dsdv-testcase.cc.s
-.PHONY : test/dsdv-testcase.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -347,7 +309,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... dsdv"
-	@echo "... dsdv-test"
 	@echo "... helper/dsdv-helper.o"
 	@echo "... helper/dsdv-helper.i"
 	@echo "... helper/dsdv-helper.s"
@@ -363,9 +324,6 @@ help:
 	@echo "... model/dsdv-rtable.o"
 	@echo "... model/dsdv-rtable.i"
 	@echo "... model/dsdv-rtable.s"
-	@echo "... test/dsdv-testcase.o"
-	@echo "... test/dsdv-testcase.i"
-	@echo "... test/dsdv-testcase.s"
 .PHONY : help
 
 

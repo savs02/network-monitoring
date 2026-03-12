@@ -565,7 +565,7 @@ NS3_STATIC:BOOL=OFF
 NS3_TAP:BOOL=ON
 
 //Enable tests to be built
-NS3_TESTS:BOOL=ON
+NS3_TESTS:BOOL=OFF
 
 //Enable the Vcpkg C++ library manager support
 NS3_VCPKG:BOOL=OFF
@@ -653,8 +653,6 @@ openflow_library_internal_openflow:FILEPATH=openflow_library_internal_openflow-N
 # INTERNAL cache entries
 ########################
 
-//ADVANCED property for variable: CCACHE
-CCACHE-ADVANCED:INTERNAL=1
 //Result of TRY_COMPILE
 CLANG_LIBCPP_WORKS:INTERNAL=TRUE
 //Result of TRY_COMPILE
@@ -715,8 +713,6 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
-//ADVANCED property for variable: CMAKE_FORMAT_PROGRAM
-CMAKE_FORMAT_PROGRAM-ADVANCED:INTERNAL=1
 //Name of generator.
 CMAKE_GENERATOR:INTERNAL=Unix Makefiles
 //Generator instance identifier.
@@ -785,7 +781,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=95
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=94
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -840,35 +836,15 @@ COMPILER_HAS_DEPRECATED_ATTR:INTERNAL=1
 COMPILER_HAS_HIDDEN_INLINE_VISIBILITY:INTERNAL=1
 //Test COMPILER_HAS_HIDDEN_VISIBILITY
 COMPILER_HAS_HIDDEN_VISIBILITY:INTERNAL=1
-//ADVANCED property for variable: CONVERT
-CONVERT-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: DIA
 DIA-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: DOT
-DOT-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: DOXYGEN
-DOXYGEN-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: DVIPNG
-DVIPNG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: EIGEN3_INCLUDE_DIR
 EIGEN3_INCLUDE_DIR-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: ENABLE_DPDKDEVNET
-ENABLE_DPDKDEVNET-ADVANCED:INTERNAL=1
 ENABLE_DPDKDEVNET:INTERNAL=False
-//ADVANCED property for variable: ENABLE_EMUNETDEV
-ENABLE_EMUNETDEV-ADVANCED:INTERNAL=1
 ENABLE_EMUNETDEV:INTERNAL=False
-//ADVANCED property for variable: ENABLE_FDNETDEV
-ENABLE_FDNETDEV-ADVANCED:INTERNAL=1
 ENABLE_FDNETDEV:INTERNAL=False
-//ADVANCED property for variable: ENABLE_NETMAP_EMU
-ENABLE_NETMAP_EMU-ADVANCED:INTERNAL=1
 ENABLE_NETMAP_EMU:INTERNAL=False
-//ADVANCED property for variable: ENABLE_TAPNETDEV
-ENABLE_TAPNETDEV-ADVANCED:INTERNAL=1
 ENABLE_TAPNETDEV:INTERNAL=False
-//ADVANCED property for variable: EPSTOPDF
-EPSTOPDF-ADVANCED:INTERNAL=1
 //Details about finding Git
 FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[/opt/homebrew/bin/git][v2.47.1()]
 //Details about finding Python3
@@ -955,34 +931,22 @@ HAVE___UINT128_T:INTERNAL=1
 HarfBuzz_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: HarfBuzz_LIBRARY
 HarfBuzz_LIBRARY-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: LATEXMK
-LATEXMK-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LIBXML2_INCLUDE_DIR
 LIBXML2_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LIBXML2_LIBRARY
 LIBXML2_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LIBXML2_XMLLINT_EXECUTABLE
 LIBXML2_XMLLINT_EXECUTABLE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: LLD
-LLD-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: MOLD
-MOLD-ADVANCED:INTERNAL=1
 //ON if Brite is found in NS3_WITH_BRITE
 NS3_BRITE:INTERNAL=OFF
-//ADVANCED property for variable: NS3_BRITE_REASON
-NS3_BRITE_REASON-ADVANCED:INTERNAL=1
 NS3_BRITE_REASON:INTERNAL=Missing headers: "Brite.h" and missing libraries: "brite"
 //ON if Click is found in NS3_WITH_CLICK
 NS3_CLICK:INTERNAL=OFF
-//ADVANCED property for variable: NS3_CLICK_REASON
-NS3_CLICK_REASON-ADVANCED:INTERNAL=1
 NS3_CLICK_REASON:INTERNAL=Missing headers: "simclick.h" and missing libraries: "nsclick;click"
 //STRINGS property for variable: NS3_INT64X64
 NS3_INT64X64-STRINGS:INTERNAL=INT128;CAIRO;DOUBLE
 //ON if Openflow is found in NS3_WITH_OPENFLOW
 NS3_OPENFLOW:INTERNAL=OFF
-//ADVANCED property for variable: NS3_OPENFLOW_REASON
-NS3_OPENFLOW_REASON-ADVANCED:INTERNAL=1
 NS3_OPENFLOW_REASON:INTERNAL=Missing headers: "openflow.h" and missing libraries: "openflow"
 PC_HARFBUZZ_CFLAGS:INTERNAL=
 PC_HARFBUZZ_CFLAGS_I:INTERNAL=
@@ -1005,32 +969,18 @@ PC_HARFBUZZ_STATIC_LIBS_L:INTERNAL=
 PC_HARFBUZZ_STATIC_LIBS_OTHER:INTERNAL=
 PC_HARFBUZZ_STATIC_LIBS_PATHS:INTERNAL=
 PC_HARFBUZZ_VERSION:INTERNAL=
-//ADVANCED property for variable: PDFLATEX
-PDFLATEX-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PKG_CONFIG_ARGN
 PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
 PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: PYTHON3
-PYTHON3-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ProcessorCount_cmd_sysctl
 ProcessorCount_cmd_sysctl-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: SPHINX_EXECUTABLE
-SPHINX_EXECUTABLE-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: SPHINX_OUTPUT_HTML
-SPHINX_OUTPUT_HTML-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: SPHINX_OUTPUT_MAN
-SPHINX_OUTPUT_MAN-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: SPHINX_WARNINGS_AS_ERRORS
-SPHINX_WARNINGS_AS_ERRORS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: SQLite3_INCLUDE_DIR
 SQLite3_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: SQLite3_LIBRARY
 SQLite3_LIBRARY-ADVANCED:INTERNAL=1
 //Test STACKTRACE_LIBRARY_ENABLED
 STACKTRACE_LIBRARY_ENABLED:INTERNAL=
-//ADVANCED property for variable: VALGRIND
-VALGRIND-ADVANCED:INTERNAL=1
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
 //Compiler reason failure
@@ -1045,278 +995,94 @@ _Python3_INTERPRETER_SIGNATURE:INTERNAL=e1ba756c0efa4ce95761537909c76734
 //NumPy reason failure
 _Python3_NumPy_REASON_FAILURE:INTERNAL=
 __pkg_config_checked_PC_HARFBUZZ:INTERNAL=1
-//ADVANCED property for variable: brite_header_internal_Brite.h
-brite_header_internal_Brite.h-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: brite_library_internal_brite
-brite_library_internal_brite-ADVANCED:INTERNAL=1
 build_profile:INTERNAL=default
 build_profile_suffix:INTERNAL=-default
-//ADVANCED property for variable: click_header_internal_simclick.h
-click_header_internal_simclick.h-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: click_library_internal_click
-click_library_internal_click-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: click_library_internal_nsclick
-click_library_internal_nsclick-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: libantenna
-libantenna-ADVANCED:INTERNAL=1
 libantenna:INTERNAL=antenna
-//ADVANCED property for variable: libantenna-obj
-libantenna-obj-ADVANCED:INTERNAL=1
 libantenna-obj:INTERNAL=antenna-obj
-//ADVANCED property for variable: libaodv
-libaodv-ADVANCED:INTERNAL=1
 libaodv:INTERNAL=aodv
-//ADVANCED property for variable: libaodv-obj
-libaodv-obj-ADVANCED:INTERNAL=1
 libaodv-obj:INTERNAL=aodv-obj
-//ADVANCED property for variable: libapplications
-libapplications-ADVANCED:INTERNAL=1
 libapplications:INTERNAL=applications
-//ADVANCED property for variable: libapplications-obj
-libapplications-obj-ADVANCED:INTERNAL=1
 libapplications-obj:INTERNAL=applications-obj
-//ADVANCED property for variable: libbridge
-libbridge-ADVANCED:INTERNAL=1
 libbridge:INTERNAL=bridge
-//ADVANCED property for variable: libbridge-obj
-libbridge-obj-ADVANCED:INTERNAL=1
 libbridge-obj:INTERNAL=bridge-obj
-//ADVANCED property for variable: libbrite
-libbrite-ADVANCED:INTERNAL=1
 libbrite:INTERNAL=brite
-//ADVANCED property for variable: libbrite-obj
-libbrite-obj-ADVANCED:INTERNAL=1
 libbrite-obj:INTERNAL=brite-obj
-//ADVANCED property for variable: libbuildings
-libbuildings-ADVANCED:INTERNAL=1
 libbuildings:INTERNAL=buildings
-//ADVANCED property for variable: libbuildings-obj
-libbuildings-obj-ADVANCED:INTERNAL=1
 libbuildings-obj:INTERNAL=buildings-obj
-//ADVANCED property for variable: libclick
-libclick-ADVANCED:INTERNAL=1
 libclick:INTERNAL=click
-//ADVANCED property for variable: libclick-obj
-libclick-obj-ADVANCED:INTERNAL=1
 libclick-obj:INTERNAL=click-obj
-//ADVANCED property for variable: libconfig-store
-libconfig-store-ADVANCED:INTERNAL=1
 libconfig-store:INTERNAL=config-store
-//ADVANCED property for variable: libconfig-store-obj
-libconfig-store-obj-ADVANCED:INTERNAL=1
 libconfig-store-obj:INTERNAL=config-store-obj
-//ADVANCED property for variable: libcore
-libcore-ADVANCED:INTERNAL=1
 libcore:INTERNAL=core
-//ADVANCED property for variable: libcore-obj
-libcore-obj-ADVANCED:INTERNAL=1
 libcore-obj:INTERNAL=core-obj
-//ADVANCED property for variable: libcsma
-libcsma-ADVANCED:INTERNAL=1
 libcsma:INTERNAL=csma
-//ADVANCED property for variable: libcsma-layout
-libcsma-layout-ADVANCED:INTERNAL=1
 libcsma-layout:INTERNAL=csma-layout
-//ADVANCED property for variable: libcsma-layout-obj
-libcsma-layout-obj-ADVANCED:INTERNAL=1
 libcsma-layout-obj:INTERNAL=csma-layout-obj
-//ADVANCED property for variable: libcsma-obj
-libcsma-obj-ADVANCED:INTERNAL=1
 libcsma-obj:INTERNAL=csma-obj
-//ADVANCED property for variable: libdsdv
-libdsdv-ADVANCED:INTERNAL=1
 libdsdv:INTERNAL=dsdv
-//ADVANCED property for variable: libdsdv-obj
-libdsdv-obj-ADVANCED:INTERNAL=1
 libdsdv-obj:INTERNAL=dsdv-obj
-//ADVANCED property for variable: libdsr
-libdsr-ADVANCED:INTERNAL=1
 libdsr:INTERNAL=dsr
-//ADVANCED property for variable: libdsr-obj
-libdsr-obj-ADVANCED:INTERNAL=1
 libdsr-obj:INTERNAL=dsr-obj
-//ADVANCED property for variable: libenergy
-libenergy-ADVANCED:INTERNAL=1
 libenergy:INTERNAL=energy
-//ADVANCED property for variable: libenergy-obj
-libenergy-obj-ADVANCED:INTERNAL=1
 libenergy-obj:INTERNAL=energy-obj
-//ADVANCED property for variable: libfd-net-device
-libfd-net-device-ADVANCED:INTERNAL=1
 libfd-net-device:INTERNAL=fd-net-device
-//ADVANCED property for variable: libfd-net-device-obj
-libfd-net-device-obj-ADVANCED:INTERNAL=1
 libfd-net-device-obj:INTERNAL=fd-net-device-obj
-//ADVANCED property for variable: libflow-monitor
-libflow-monitor-ADVANCED:INTERNAL=1
 libflow-monitor:INTERNAL=flow-monitor
-//ADVANCED property for variable: libflow-monitor-obj
-libflow-monitor-obj-ADVANCED:INTERNAL=1
 libflow-monitor-obj:INTERNAL=flow-monitor-obj
-//ADVANCED property for variable: libinternet
-libinternet-ADVANCED:INTERNAL=1
 libinternet:INTERNAL=internet
-//ADVANCED property for variable: libinternet-apps
-libinternet-apps-ADVANCED:INTERNAL=1
 libinternet-apps:INTERNAL=internet-apps
-//ADVANCED property for variable: libinternet-apps-obj
-libinternet-apps-obj-ADVANCED:INTERNAL=1
 libinternet-apps-obj:INTERNAL=internet-apps-obj
-//ADVANCED property for variable: libinternet-obj
-libinternet-obj-ADVANCED:INTERNAL=1
 libinternet-obj:INTERNAL=internet-obj
-//ADVANCED property for variable: liblr-wpan
-liblr-wpan-ADVANCED:INTERNAL=1
 liblr-wpan:INTERNAL=lr-wpan
-//ADVANCED property for variable: liblr-wpan-obj
-liblr-wpan-obj-ADVANCED:INTERNAL=1
 liblr-wpan-obj:INTERNAL=lr-wpan-obj
-//ADVANCED property for variable: liblte
-liblte-ADVANCED:INTERNAL=1
 liblte:INTERNAL=lte
-//ADVANCED property for variable: liblte-obj
-liblte-obj-ADVANCED:INTERNAL=1
 liblte-obj:INTERNAL=lte-obj
-//ADVANCED property for variable: libmesh
-libmesh-ADVANCED:INTERNAL=1
 libmesh:INTERNAL=mesh
-//ADVANCED property for variable: libmesh-obj
-libmesh-obj-ADVANCED:INTERNAL=1
 libmesh-obj:INTERNAL=mesh-obj
-//ADVANCED property for variable: libmobility
-libmobility-ADVANCED:INTERNAL=1
 libmobility:INTERNAL=mobility
-//ADVANCED property for variable: libmobility-obj
-libmobility-obj-ADVANCED:INTERNAL=1
 libmobility-obj:INTERNAL=mobility-obj
-//ADVANCED property for variable: libmpi
-libmpi-ADVANCED:INTERNAL=1
 libmpi:INTERNAL=mpi
-//ADVANCED property for variable: libmpi-obj
-libmpi-obj-ADVANCED:INTERNAL=1
 libmpi-obj:INTERNAL=mpi-obj
-//ADVANCED property for variable: libnetanim
-libnetanim-ADVANCED:INTERNAL=1
 libnetanim:INTERNAL=netanim
-//ADVANCED property for variable: libnetanim-obj
-libnetanim-obj-ADVANCED:INTERNAL=1
 libnetanim-obj:INTERNAL=netanim-obj
-//ADVANCED property for variable: libnetwork
-libnetwork-ADVANCED:INTERNAL=1
 libnetwork:INTERNAL=network
-//ADVANCED property for variable: libnetwork-obj
-libnetwork-obj-ADVANCED:INTERNAL=1
 libnetwork-obj:INTERNAL=network-obj
-//ADVANCED property for variable: libnix-vector-routing
-libnix-vector-routing-ADVANCED:INTERNAL=1
 libnix-vector-routing:INTERNAL=nix-vector-routing
-//ADVANCED property for variable: libnix-vector-routing-obj
-libnix-vector-routing-obj-ADVANCED:INTERNAL=1
 libnix-vector-routing-obj:INTERNAL=nix-vector-routing-obj
-//ADVANCED property for variable: libolsr
-libolsr-ADVANCED:INTERNAL=1
 libolsr:INTERNAL=olsr
-//ADVANCED property for variable: libolsr-obj
-libolsr-obj-ADVANCED:INTERNAL=1
 libolsr-obj:INTERNAL=olsr-obj
-//ADVANCED property for variable: libopenflow
-libopenflow-ADVANCED:INTERNAL=1
 libopenflow:INTERNAL=openflow
-//ADVANCED property for variable: libopenflow-obj
-libopenflow-obj-ADVANCED:INTERNAL=1
 libopenflow-obj:INTERNAL=openflow-obj
-//ADVANCED property for variable: libpoint-to-point
-libpoint-to-point-ADVANCED:INTERNAL=1
 libpoint-to-point:INTERNAL=point-to-point
-//ADVANCED property for variable: libpoint-to-point-layout
-libpoint-to-point-layout-ADVANCED:INTERNAL=1
 libpoint-to-point-layout:INTERNAL=point-to-point-layout
-//ADVANCED property for variable: libpoint-to-point-layout-obj
-libpoint-to-point-layout-obj-ADVANCED:INTERNAL=1
 libpoint-to-point-layout-obj:INTERNAL=point-to-point-layout-obj
-//ADVANCED property for variable: libpoint-to-point-obj
-libpoint-to-point-obj-ADVANCED:INTERNAL=1
 libpoint-to-point-obj:INTERNAL=point-to-point-obj
-//ADVANCED property for variable: libpropagation
-libpropagation-ADVANCED:INTERNAL=1
 libpropagation:INTERNAL=propagation
-//ADVANCED property for variable: libpropagation-obj
-libpropagation-obj-ADVANCED:INTERNAL=1
 libpropagation-obj:INTERNAL=propagation-obj
-//ADVANCED property for variable: libsixlowpan
-libsixlowpan-ADVANCED:INTERNAL=1
 libsixlowpan:INTERNAL=sixlowpan
-//ADVANCED property for variable: libsixlowpan-obj
-libsixlowpan-obj-ADVANCED:INTERNAL=1
 libsixlowpan-obj:INTERNAL=sixlowpan-obj
-//ADVANCED property for variable: libspectrum
-libspectrum-ADVANCED:INTERNAL=1
 libspectrum:INTERNAL=spectrum
-//ADVANCED property for variable: libspectrum-obj
-libspectrum-obj-ADVANCED:INTERNAL=1
 libspectrum-obj:INTERNAL=spectrum-obj
-//ADVANCED property for variable: libstats
-libstats-ADVANCED:INTERNAL=1
 libstats:INTERNAL=stats
-//ADVANCED property for variable: libstats-obj
-libstats-obj-ADVANCED:INTERNAL=1
 libstats-obj:INTERNAL=stats-obj
-//ADVANCED property for variable: libtap-bridge
-libtap-bridge-ADVANCED:INTERNAL=1
 libtap-bridge:INTERNAL=tap-bridge
-//ADVANCED property for variable: libtap-bridge-obj
-libtap-bridge-obj-ADVANCED:INTERNAL=1
 libtap-bridge-obj:INTERNAL=tap-bridge-obj
-//ADVANCED property for variable: libtest
-libtest-ADVANCED:INTERNAL=1
 libtest:INTERNAL=test
-//ADVANCED property for variable: libtest-obj
-libtest-obj-ADVANCED:INTERNAL=1
 libtest-obj:INTERNAL=test-obj
-//ADVANCED property for variable: libtopology-read
-libtopology-read-ADVANCED:INTERNAL=1
 libtopology-read:INTERNAL=topology-read
-//ADVANCED property for variable: libtopology-read-obj
-libtopology-read-obj-ADVANCED:INTERNAL=1
 libtopology-read-obj:INTERNAL=topology-read-obj
-//ADVANCED property for variable: libtraffic-control
-libtraffic-control-ADVANCED:INTERNAL=1
 libtraffic-control:INTERNAL=traffic-control
-//ADVANCED property for variable: libtraffic-control-obj
-libtraffic-control-obj-ADVANCED:INTERNAL=1
 libtraffic-control-obj:INTERNAL=traffic-control-obj
-//ADVANCED property for variable: libuan
-libuan-ADVANCED:INTERNAL=1
 libuan:INTERNAL=uan
-//ADVANCED property for variable: libuan-obj
-libuan-obj-ADVANCED:INTERNAL=1
 libuan-obj:INTERNAL=uan-obj
-//ADVANCED property for variable: libvirtual-net-device
-libvirtual-net-device-ADVANCED:INTERNAL=1
 libvirtual-net-device:INTERNAL=virtual-net-device
-//ADVANCED property for variable: libvirtual-net-device-obj
-libvirtual-net-device-obj-ADVANCED:INTERNAL=1
 libvirtual-net-device-obj:INTERNAL=virtual-net-device-obj
-//ADVANCED property for variable: libvisualizer
-libvisualizer-ADVANCED:INTERNAL=1
 libvisualizer:INTERNAL=visualizer
-//ADVANCED property for variable: libvisualizer-obj
-libvisualizer-obj-ADVANCED:INTERNAL=1
 libvisualizer-obj:INTERNAL=visualizer-obj
-//ADVANCED property for variable: libwifi
-libwifi-ADVANCED:INTERNAL=1
 libwifi:INTERNAL=wifi
-//ADVANCED property for variable: libwifi-obj
-libwifi-obj-ADVANCED:INTERNAL=1
 libwifi-obj:INTERNAL=wifi-obj
-//ADVANCED property for variable: libzigbee
-libzigbee-ADVANCED:INTERNAL=1
 libzigbee:INTERNAL=zigbee
-//ADVANCED property for variable: libzigbee-obj
-libzigbee-obj-ADVANCED:INTERNAL=1
 libzigbee-obj:INTERNAL=zigbee-obj
-//ADVANCED property for variable: ns3-all-enabled-modules
-ns3-all-enabled-modules-ADVANCED:INTERNAL=1
 //list with all enabled modules
 ns3-all-enabled-modules:INTERNAL=antenna;aodv;applications;bridge;brite;buildings;click;config-store;core;csma;csma-layout;dsdv;dsr;energy;fd-net-device;flow-monitor;internet;internet-apps;lr-wpan;lte;mesh;mobility;mpi;netanim;network;nix-vector-routing;olsr;openflow;point-to-point;point-to-point-layout;propagation;sixlowpan;spectrum;stats;tap-bridge;test;topology-read;traffic-control;uan;virtual-net-device;visualizer;wifi;zigbee;
 //ADVANCED property for variable: ns3-contrib-libs
@@ -1330,11 +1096,11 @@ ns3-example-folders:INTERNAL=wireless;udp-client-server;udp;tutorial;traffic-con
 //ADVANCED property for variable: ns3-execs
 ns3-execs-ADVANCED:INTERNAL=1
 //list of c++ executables
-ns3-execs:INTERNAL=/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/perf/ns3.46-perf-io-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/ns3.46-print-introspected-doxygen-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/ns3.46-bench-packets-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/ns3.46-bench-scheduler-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/ns3.46-test-runner-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/subdir/ns3.46-scratch-subdir-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/nested-subdir/ns3.46-scratch-nested-subdir-executable-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/delay-monitoring/ns3.46-single-hop-underlying-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/ns3.46-scratch-simulator-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/ns3.46-myfirst-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-multicast-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-eht-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-eht-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-wired-bridging-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-vht-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-txop-aggregation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-timing-attributes-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-tcp-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spectrum-saturation-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spectrum-per-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spectrum-per-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spatial-reuse-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-sleep-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-infra-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-ht-hidden-stations-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-adhoc-grid-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-adhoc-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-rate-adaptation-distance-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-power-adaptation-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-power-adaptation-distance-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-error-models-comparison-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-vht-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-ht-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-he-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-multirate-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-multi-tos-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-mixed-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ht-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-hidden-terminal-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-he-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-dsss-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-clear-channel-cmu-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-blockack-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-backward-compatibility-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ap-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-aggregation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-adhoc-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-80211n-mimo-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-80211e-txop-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-mixed-wired-wireless-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/udp-client-server/ns3.46-udp-trace-client-server-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/udp-client-server/ns3.46-udp-client-server-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/udp/ns3.46-udp-echo-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-seventh-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-sixth-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-fifth-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-fourth-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-third-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-second-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-first-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-hello-simulator-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-cobalt-vs-codel-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-tbf-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-red-vs-nlred-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-red-vs-fengadaptive-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-queue-discs-benchmark-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-traffic-control-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-dctcp-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-linux-reno-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-pacing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-variants-comparison-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-pcap-nanosec-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-bulk-send-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-bbr-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-star-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-star-server-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-large-transfer-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/stats/ns3.46-wifi-example-sim-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-options-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-options-ipv4-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-bound-tcp-static-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-bound-static-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-multicast-flooding-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-global-routing-multi-switch-plus-router-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-rip-simple-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-ripng-simple-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-manet-routing-compare-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-routing-ping6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-mixed-global-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-alternate-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-global-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-global-injection-slash32-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-global-routing-slash32-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-static-routing-slash32-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-dynamic-global-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/realtime/ns3.46-realtime-udp-echo-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/naming/ns3.46-object-names-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/matrix-topology/ns3.46-matrix-topology-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-fragmentation-ipv6-PMTU-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-wsn-ping6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-test-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-radvd-two-prefix-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-radvd-one-prefix-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-ping6-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-loose-routing-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-icmpv6-redirect-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-fragmentation-ipv6-two-MTU-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-fragmentation-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/error-model/ns3.46-simple-error-model-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/energy/ns3.46-energy-model-with-harvesting-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/energy/ns3.46-energy-model-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/channel-models/ns3.46-three-gpp-v2v-channel-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-aps-data-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-routing-grid-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-association-join-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-direct-join-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-co-trace-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-phy-rx-trace-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-bianchi-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-phy-configuration-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-trans-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-manager-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-test-interference-helper-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-phy-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/virtual-net-device/examples/ns3.46-virtual-net-device-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-6lowpan-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-raw-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-ipv6-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-ipv4-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-rc-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-cw-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-fqcodel-l4s-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-pie-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-codel-vs-pfifo-asymmetric-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-codel-vs-pfifo-basic-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-pfifo-vs-red-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-adaptive-red-tests-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-red-vs-ared-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-red-tests-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/topology-read/examples/ns3.46-topology-example-sim-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-file-helper-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-file-aggregator-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-gnuplot-helper-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-gnuplot-aggregator-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-double-probe-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-gnuplot-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-time-probe-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-three-gpp-ntn-channel-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-three-gpp-two-ray-channel-calibration-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-three-gpp-channel-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-tv-trans-regional-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-tv-trans-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-adhoc-aloha-ideal-phy-with-microwave-oven-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-adhoc-aloha-ideal-phy-matrix-propagation-loss-model-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-adhoc-aloha-ideal-phy-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-ping-lr-wpan-mesh-under-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-ping-lr-wpan-beacon-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-ping-lr-wpan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-sixlowpan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/propagation/examples/ns3.46-jakes-propagation-model-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/propagation/examples/ns3.46-main-propagation-loss-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/point-to-point/examples/ns3.46-main-attribute-value-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/olsr/examples/ns3.46-simple-point-to-point-olsr-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/olsr/examples/ns3.46-olsr-hna-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nix-double-wifi-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nms-p2p-nix-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nix-simple-multi-address-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nix-simple-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-lollipop-comparisons-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-packet-socket-apps-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-main-packet-tag-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-main-packet-header-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-bit-serializer-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-uan-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-wireless-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-resources-counters-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-colors-link-description-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-star-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-grid-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-dumbbell-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-reference-point-group-mobility-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-mobility-trace-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-main-grid-topology-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-ns2-mobility-trace-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-main-random-walk-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-main-random-topology-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-constant-mobility-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-bonnmotion-ns2-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mesh/examples/ns3.46-mesh-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-x2-handover-measures-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-x2-handover-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-uplink-power-control-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-simple-epc-backhaul-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-simple-epc-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-simple-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-rlc-traces-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-rem-sector-antenna-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-rem-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-radio-link-failure-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-profiling-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-pathloss-traces-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-ipv6-ue-ue-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-ipv6-ue-rh-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-ipv6-addr-conf-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-intercell-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-frequency-reuse-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-fading-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-dual-stripe-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-distributed-ffr-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-deactivate-bearer-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-cqi-threshold-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-cc-helper-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-per-plot-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-bootstrap-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-error-model-plot-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-error-distance-plot-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-orphan-scan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-active-scan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-ed-scan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-phy-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-packet-print-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-beacon-mode-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-data-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-ping-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-traceroute-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-dhcp6-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-dhcp-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet/examples/ns3.46-neighbor-cache-dynamic-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet/examples/ns3.46-neighbor-cache-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet/examples/ns3.46-main-simple-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-basic-energy-model-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-rv-battery-model-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-generic-battery-wifiradio-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-generic-battery-discharge-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/dsr/examples/ns3.46-dsr-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/dsdv/examples/ns3.46-dsdv-manet-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma-layout/examples/ns3.46-csma-star-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-ping-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-raw-ip-socket-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-multicast-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-packet-socket-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-broadcast-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-one-subnet-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-log-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-empirical-random-variable-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-test-sync-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-random-variable-stream-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-test-string-value-formatting-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-system-path-examples-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-simulator-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-show-progress-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-random-variable-stream-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-random-variable-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-log-time-format-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-ptr-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-callback-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-length-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-hash-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-fatal-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-command-line-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-assert-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/config-store/examples/ns3.46-config-store-save-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/buildings/examples/ns3.46-outdoor-random-walk-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/buildings/examples/ns3.46-outdoor-group-mobility-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/buildings/examples/ns3.46-buildings-pathloss-profiler-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/bridge/examples/ns3.46-csma-bridge-one-hop-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/bridge/examples/ns3.46-csma-bridge-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/applications/examples/ns3.46-three-gpp-http-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/aodv/examples/ns3.46-aodv-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/antenna/examples/ns3.46-adjacency-matrix-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/ns3.46-stdlib_pch_exec-default;
+ns3-execs:INTERNAL=/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/perf/ns3.46-perf-io-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/ns3.46-print-introspected-doxygen-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/ns3.46-bench-packets-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/utils/ns3.46-bench-scheduler-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/subdir/ns3.46-scratch-subdir-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/nested-subdir/ns3.46-scratch-nested-subdir-executable-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/delay-monitoring/ns3.46-single-hop-underlying-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/ns3.46-scratch-simulator-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/scratch/ns3.46-myfirst-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-multicast-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-eht-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-eht-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-wired-bridging-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-vht-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-txop-aggregation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-timing-attributes-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-tcp-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spectrum-saturation-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spectrum-per-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spectrum-per-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-spatial-reuse-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-sleep-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-infra-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-ht-hidden-stations-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-adhoc-grid-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-simple-adhoc-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-rate-adaptation-distance-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-power-adaptation-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-power-adaptation-distance-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-error-models-comparison-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-vht-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-ht-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ofdm-he-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-multirate-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-multi-tos-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-mixed-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ht-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-hidden-terminal-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-he-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-dsss-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-clear-channel-cmu-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-blockack-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-backward-compatibility-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-ap-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-aggregation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-adhoc-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-80211n-mimo-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-wifi-80211e-txop-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/wireless/ns3.46-mixed-wired-wireless-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/udp-client-server/ns3.46-udp-trace-client-server-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/udp-client-server/ns3.46-udp-client-server-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/udp/ns3.46-udp-echo-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-seventh-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-sixth-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-fifth-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-fourth-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-third-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-second-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-first-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tutorial/ns3.46-hello-simulator-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-cobalt-vs-codel-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-tbf-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-red-vs-nlred-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-red-vs-fengadaptive-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-queue-discs-benchmark-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/traffic-control/ns3.46-traffic-control-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-dctcp-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-validation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-linux-reno-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-pacing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-variants-comparison-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-pcap-nanosec-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-bulk-send-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-bbr-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-star-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-star-server-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/tcp/ns3.46-tcp-large-transfer-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/stats/ns3.46-wifi-example-sim-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-options-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-options-ipv4-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-bound-tcp-static-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/socket/ns3.46-socket-bound-static-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-multicast-flooding-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-global-routing-multi-switch-plus-router-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-rip-simple-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-ripng-simple-network-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-manet-routing-compare-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-routing-ping6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-mixed-global-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-alternate-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-simple-global-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-global-injection-slash32-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-global-routing-slash32-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-static-routing-slash32-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/routing/ns3.46-dynamic-global-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/realtime/ns3.46-realtime-udp-echo-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/naming/ns3.46-object-names-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/matrix-topology/ns3.46-matrix-topology-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-fragmentation-ipv6-PMTU-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-wsn-ping6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-test-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-radvd-two-prefix-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-radvd-one-prefix-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-ping6-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-loose-routing-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-icmpv6-redirect-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-fragmentation-ipv6-two-MTU-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/ipv6/ns3.46-fragmentation-ipv6-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/error-model/ns3.46-simple-error-model-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/energy/ns3.46-energy-model-with-harvesting-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/energy/ns3.46-energy-model-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/examples/channel-models/ns3.46-three-gpp-v2v-channel-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-aps-data-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-routing-grid-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-routing-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-association-join-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/zigbee/examples/ns3.46-zigbee-nwk-direct-join-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-co-trace-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-phy-rx-trace-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-bianchi-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-phy-configuration-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-trans-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-manager-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-test-interference-helper-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/wifi/examples/ns3.46-wifi-phy-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/virtual-net-device/examples/ns3.46-virtual-net-device-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-6lowpan-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-raw-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-ipv6-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-ipv4-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-rc-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/uan/examples/ns3.46-uan-cw-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-fqcodel-l4s-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-pie-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-codel-vs-pfifo-asymmetric-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-codel-vs-pfifo-basic-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-pfifo-vs-red-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-adaptive-red-tests-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-red-vs-ared-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/traffic-control/examples/ns3.46-red-tests-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/topology-read/examples/ns3.46-topology-example-sim-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-file-helper-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-file-aggregator-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-gnuplot-helper-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-gnuplot-aggregator-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-double-probe-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-gnuplot-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/stats/examples/ns3.46-time-probe-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-three-gpp-ntn-channel-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-three-gpp-two-ray-channel-calibration-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-three-gpp-channel-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-tv-trans-regional-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-tv-trans-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-adhoc-aloha-ideal-phy-with-microwave-oven-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-adhoc-aloha-ideal-phy-matrix-propagation-loss-model-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/spectrum/examples/ns3.46-adhoc-aloha-ideal-phy-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-ping-lr-wpan-mesh-under-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-ping-lr-wpan-beacon-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-ping-lr-wpan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/sixlowpan/examples/ns3.46-example-sixlowpan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/propagation/examples/ns3.46-jakes-propagation-model-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/propagation/examples/ns3.46-main-propagation-loss-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/point-to-point/examples/ns3.46-main-attribute-value-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/olsr/examples/ns3.46-simple-point-to-point-olsr-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/olsr/examples/ns3.46-olsr-hna-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nix-double-wifi-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nms-p2p-nix-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nix-simple-multi-address-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/nix-vector-routing/examples/ns3.46-nix-simple-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-lollipop-comparisons-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-packet-socket-apps-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-main-packet-tag-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-main-packet-header-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/network/examples/ns3.46-bit-serializer-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-uan-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-wireless-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-resources-counters-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-colors-link-description-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-star-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-grid-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/netanim/examples/ns3.46-dumbbell-animation-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-reference-point-group-mobility-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-mobility-trace-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-main-grid-topology-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-ns2-mobility-trace-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-main-random-walk-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-main-random-topology-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-constant-mobility-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mobility/examples/ns3.46-bonnmotion-ns2-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/mesh/examples/ns3.46-mesh-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-x2-handover-measures-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-x2-handover-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-uplink-power-control-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-simple-epc-backhaul-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-simple-epc-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-simple-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-rlc-traces-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-rem-sector-antenna-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-rem-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-radio-link-failure-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-profiling-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-pathloss-traces-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-ipv6-ue-ue-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-ipv6-ue-rh-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-ipv6-addr-conf-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-intercell-interference-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-frequency-reuse-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-fading-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-dual-stripe-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-distributed-ffr-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-deactivate-bearer-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-cqi-threshold-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lte/examples/ns3.46-lena-cc-helper-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-per-plot-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-bootstrap-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-error-model-plot-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-error-distance-plot-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-orphan-scan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-active-scan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-ed-scan-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-phy-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-packet-print-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-beacon-mode-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/lr-wpan/examples/ns3.46-lr-wpan-data-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-ping-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-traceroute-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-dhcp6-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet-apps/examples/ns3.46-dhcp-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet/examples/ns3.46-neighbor-cache-dynamic-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet/examples/ns3.46-neighbor-cache-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/internet/examples/ns3.46-main-simple-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-basic-energy-model-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-rv-battery-model-test-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-generic-battery-wifiradio-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/energy/examples/ns3.46-generic-battery-discharge-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/dsr/examples/ns3.46-dsr-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/dsdv/examples/ns3.46-dsdv-manet-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma-layout/examples/ns3.46-csma-star-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-ping-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-raw-ip-socket-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-multicast-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-packet-socket-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-broadcast-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/csma/examples/ns3.46-csma-one-subnet-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-log-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-empirical-random-variable-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-test-sync-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-random-variable-stream-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-test-string-value-formatting-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-system-path-examples-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-simulator-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-show-progress-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-random-variable-stream-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-random-variable-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-sample-log-time-format-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-ptr-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-main-callback-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-length-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-hash-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-fatal-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-command-line-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/core/examples/ns3.46-assert-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/config-store/examples/ns3.46-config-store-save-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/buildings/examples/ns3.46-outdoor-random-walk-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/buildings/examples/ns3.46-outdoor-group-mobility-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/buildings/examples/ns3.46-buildings-pathloss-profiler-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/bridge/examples/ns3.46-csma-bridge-one-hop-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/bridge/examples/ns3.46-csma-bridge-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/applications/examples/ns3.46-three-gpp-http-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/aodv/examples/ns3.46-aodv-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/build/src/antenna/examples/ns3.46-adjacency-matrix-example-default;/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/ns3.46-stdlib_pch_exec-default;
 //ADVANCED property for variable: ns3-execs-clean
 ns3-execs-clean-ADVANCED:INTERNAL=1
 //list of c++ executables without version prefix and build suffix
-ns3-execs-clean:INTERNAL=perf-io;print-introspected-doxygen;bench-packets;bench-scheduler;test-runner;scratch_subdir_scratch-subdir;scratch_nested-subdir_scratch-nested-subdir-executable;scratch_delay-monitoring_single-hop-underlying-network;scratch_scratch-simulator;scratch_myfirst;wifi-multicast;wifi-eht-network;wifi-ofdm-eht-validation;wifi-wired-bridging;wifi-vht-network;wifi-txop-aggregation;wifi-timing-attributes;wifi-tcp;wifi-spectrum-saturation-example;wifi-spectrum-per-interference;wifi-spectrum-per-example;wifi-spatial-reuse;wifi-sleep;wifi-simple-interference;wifi-simple-infra;wifi-simple-ht-hidden-stations;wifi-simple-adhoc-grid;wifi-simple-adhoc;wifi-rate-adaptation-distance;wifi-power-adaptation-interference;wifi-power-adaptation-distance;wifi-error-models-comparison;wifi-ofdm-vht-validation;wifi-ofdm-validation;wifi-ofdm-ht-validation;wifi-ofdm-he-validation;wifi-multirate;wifi-multi-tos;wifi-mixed-network;wifi-ht-network;wifi-hidden-terminal;wifi-he-network;wifi-dsss-validation;wifi-clear-channel-cmu;wifi-blockack;wifi-backward-compatibility;wifi-ap;wifi-aggregation;wifi-adhoc;wifi-80211n-mimo;wifi-80211e-txop;mixed-wired-wireless;udp-trace-client-server;udp-client-server;udp-echo;seventh;sixth;fifth;fourth;third;second;first;hello-simulator;cobalt-vs-codel;tbf-example;red-vs-nlred;red-vs-fengadaptive;queue-discs-benchmark;traffic-control-example;dctcp-example;tcp-validation;tcp-linux-reno;tcp-pacing;tcp-variants-comparison;tcp-pcap-nanosec-example;tcp-bulk-send;tcp-bbr-example;star;tcp-star-server;tcp-large-transfer;wifi-example-sim;socket-options-ipv6;socket-options-ipv4;socket-bound-tcp-static-routing;socket-bound-static-routing;simple-multicast-flooding;global-routing-multi-switch-plus-router;rip-simple-network;ripng-simple-network;manet-routing-compare;simple-routing-ping6;mixed-global-routing;simple-alternate-routing;simple-global-routing;global-injection-slash32;global-routing-slash32;static-routing-slash32;dynamic-global-routing;realtime-udp-echo;object-names;matrix-topology;fragmentation-ipv6-PMTU;wsn-ping6;test-ipv6;radvd-two-prefix;radvd-one-prefix;ping6-example;loose-routing-ipv6;icmpv6-redirect;fragmentation-ipv6-two-MTU;fragmentation-ipv6;simple-error-model;energy-model-with-harvesting-example;energy-model-example;three-gpp-v2v-channel-example;zigbee-aps-data;zigbee-nwk-routing-grid;zigbee-nwk-routing;zigbee-nwk-association-join;zigbee-nwk-direct-join;wifi-co-trace-example;wifi-phy-rx-trace-example;wifi-bianchi;wifi-phy-configuration;wifi-trans-example;wifi-manager-example;wifi-test-interference-helper;wifi-phy-test;virtual-net-device-example;uan-6lowpan-example;uan-raw-example;uan-ipv6-example;uan-ipv4-example;uan-rc-example;uan-cw-example;fqcodel-l4s-example;pie-example;codel-vs-pfifo-asymmetric;codel-vs-pfifo-basic-test;pfifo-vs-red;adaptive-red-tests;red-vs-ared;red-tests;topology-example-sim;file-helper-example;file-aggregator-example;gnuplot-helper-example;gnuplot-aggregator-example;double-probe-example;gnuplot-example;time-probe-example;three-gpp-ntn-channel-example;three-gpp-two-ray-channel-calibration;three-gpp-channel-example;tv-trans-regional-example;tv-trans-example;adhoc-aloha-ideal-phy-with-microwave-oven;adhoc-aloha-ideal-phy-matrix-propagation-loss-model;adhoc-aloha-ideal-phy;example-ping-lr-wpan-mesh-under;example-ping-lr-wpan-beacon;example-ping-lr-wpan;example-sixlowpan;jakes-propagation-model-example;main-propagation-loss;main-attribute-value;simple-point-to-point-olsr;olsr-hna;nix-double-wifi;nms-p2p-nix;nix-simple-multi-address;nix-simple;lollipop-comparisons;packet-socket-apps;main-packet-tag;main-packet-header;bit-serializer;uan-animation;wireless-animation;resources-counters;colors-link-description;star-animation;grid-animation;dumbbell-animation;reference-point-group-mobility-example;mobility-trace-example;main-grid-topology;ns2-mobility-trace;main-random-walk;main-random-topology;constant-mobility-example;bonnmotion-ns2-example;mesh-example;lena-x2-handover-measures;lena-x2-handover;lena-uplink-power-control;lena-simple-epc-backhaul;lena-simple-epc;lena-simple;lena-rlc-traces;lena-rem-sector-antenna;lena-rem;lena-radio-link-failure;lena-profiling;lena-pathloss-traces;lena-ipv6-ue-ue;lena-ipv6-ue-rh;lena-ipv6-addr-conf;lena-intercell-interference;lena-frequency-reuse;lena-fading;lena-dual-stripe;lena-distributed-ffr;lena-deactivate-bearer;lena-cqi-threshold;lena-cc-helper;lr-wpan-per-plot;lr-wpan-bootstrap;lr-wpan-error-model-plot;lr-wpan-error-distance-plot;lr-wpan-orphan-scan;lr-wpan-active-scan;lr-wpan-ed-scan;lr-wpan-phy-test;lr-wpan-packet-print;lr-wpan-beacon-mode;lr-wpan-data;ping-example;traceroute-example;dhcp6-example;dhcp-example;neighbor-cache-dynamic;neighbor-cache-example;main-simple;basic-energy-model-test;rv-battery-model-test;generic-battery-wifiradio-example;generic-battery-discharge-example;dsr-example;dsdv-manet;csma-star;csma-ping;csma-raw-ip-socket;csma-multicast;csma-packet-socket;csma-broadcast;csma-one-subnet;log-example;empirical-random-variable-example;main-test-sync;main-random-variable-stream;test-string-value-formatting;system-path-examples;sample-simulator;sample-show-progress;sample-random-variable-stream;sample-random-variable;sample-log-time-format;main-ptr;main-callback;length-example;hash-example;fatal-example;command-line-example;assert-example;config-store-save;outdoor-random-walk-example;outdoor-group-mobility-example;buildings-pathloss-profiler;csma-bridge-one-hop;csma-bridge;three-gpp-http-example;aodv-example;adjacency-matrix-example;stdlib_pch_exec;
+ns3-execs-clean:INTERNAL=perf-io;print-introspected-doxygen;bench-packets;bench-scheduler;scratch_subdir_scratch-subdir;scratch_nested-subdir_scratch-nested-subdir-executable;scratch_delay-monitoring_single-hop-underlying-network;scratch_scratch-simulator;scratch_myfirst;wifi-multicast;wifi-eht-network;wifi-ofdm-eht-validation;wifi-wired-bridging;wifi-vht-network;wifi-txop-aggregation;wifi-timing-attributes;wifi-tcp;wifi-spectrum-saturation-example;wifi-spectrum-per-interference;wifi-spectrum-per-example;wifi-spatial-reuse;wifi-sleep;wifi-simple-interference;wifi-simple-infra;wifi-simple-ht-hidden-stations;wifi-simple-adhoc-grid;wifi-simple-adhoc;wifi-rate-adaptation-distance;wifi-power-adaptation-interference;wifi-power-adaptation-distance;wifi-error-models-comparison;wifi-ofdm-vht-validation;wifi-ofdm-validation;wifi-ofdm-ht-validation;wifi-ofdm-he-validation;wifi-multirate;wifi-multi-tos;wifi-mixed-network;wifi-ht-network;wifi-hidden-terminal;wifi-he-network;wifi-dsss-validation;wifi-clear-channel-cmu;wifi-blockack;wifi-backward-compatibility;wifi-ap;wifi-aggregation;wifi-adhoc;wifi-80211n-mimo;wifi-80211e-txop;mixed-wired-wireless;udp-trace-client-server;udp-client-server;udp-echo;seventh;sixth;fifth;fourth;third;second;first;hello-simulator;cobalt-vs-codel;tbf-example;red-vs-nlred;red-vs-fengadaptive;queue-discs-benchmark;traffic-control-example;dctcp-example;tcp-validation;tcp-linux-reno;tcp-pacing;tcp-variants-comparison;tcp-pcap-nanosec-example;tcp-bulk-send;tcp-bbr-example;star;tcp-star-server;tcp-large-transfer;wifi-example-sim;socket-options-ipv6;socket-options-ipv4;socket-bound-tcp-static-routing;socket-bound-static-routing;simple-multicast-flooding;global-routing-multi-switch-plus-router;rip-simple-network;ripng-simple-network;manet-routing-compare;simple-routing-ping6;mixed-global-routing;simple-alternate-routing;simple-global-routing;global-injection-slash32;global-routing-slash32;static-routing-slash32;dynamic-global-routing;realtime-udp-echo;object-names;matrix-topology;fragmentation-ipv6-PMTU;wsn-ping6;test-ipv6;radvd-two-prefix;radvd-one-prefix;ping6-example;loose-routing-ipv6;icmpv6-redirect;fragmentation-ipv6-two-MTU;fragmentation-ipv6;simple-error-model;energy-model-with-harvesting-example;energy-model-example;three-gpp-v2v-channel-example;zigbee-aps-data;zigbee-nwk-routing-grid;zigbee-nwk-routing;zigbee-nwk-association-join;zigbee-nwk-direct-join;wifi-co-trace-example;wifi-phy-rx-trace-example;wifi-bianchi;wifi-phy-configuration;wifi-trans-example;wifi-manager-example;wifi-test-interference-helper;wifi-phy-test;virtual-net-device-example;uan-6lowpan-example;uan-raw-example;uan-ipv6-example;uan-ipv4-example;uan-rc-example;uan-cw-example;fqcodel-l4s-example;pie-example;codel-vs-pfifo-asymmetric;codel-vs-pfifo-basic-test;pfifo-vs-red;adaptive-red-tests;red-vs-ared;red-tests;topology-example-sim;file-helper-example;file-aggregator-example;gnuplot-helper-example;gnuplot-aggregator-example;double-probe-example;gnuplot-example;time-probe-example;three-gpp-ntn-channel-example;three-gpp-two-ray-channel-calibration;three-gpp-channel-example;tv-trans-regional-example;tv-trans-example;adhoc-aloha-ideal-phy-with-microwave-oven;adhoc-aloha-ideal-phy-matrix-propagation-loss-model;adhoc-aloha-ideal-phy;example-ping-lr-wpan-mesh-under;example-ping-lr-wpan-beacon;example-ping-lr-wpan;example-sixlowpan;jakes-propagation-model-example;main-propagation-loss;main-attribute-value;simple-point-to-point-olsr;olsr-hna;nix-double-wifi;nms-p2p-nix;nix-simple-multi-address;nix-simple;lollipop-comparisons;packet-socket-apps;main-packet-tag;main-packet-header;bit-serializer;uan-animation;wireless-animation;resources-counters;colors-link-description;star-animation;grid-animation;dumbbell-animation;reference-point-group-mobility-example;mobility-trace-example;main-grid-topology;ns2-mobility-trace;main-random-walk;main-random-topology;constant-mobility-example;bonnmotion-ns2-example;mesh-example;lena-x2-handover-measures;lena-x2-handover;lena-uplink-power-control;lena-simple-epc-backhaul;lena-simple-epc;lena-simple;lena-rlc-traces;lena-rem-sector-antenna;lena-rem;lena-radio-link-failure;lena-profiling;lena-pathloss-traces;lena-ipv6-ue-ue;lena-ipv6-ue-rh;lena-ipv6-addr-conf;lena-intercell-interference;lena-frequency-reuse;lena-fading;lena-dual-stripe;lena-distributed-ffr;lena-deactivate-bearer;lena-cqi-threshold;lena-cc-helper;lr-wpan-per-plot;lr-wpan-bootstrap;lr-wpan-error-model-plot;lr-wpan-error-distance-plot;lr-wpan-orphan-scan;lr-wpan-active-scan;lr-wpan-ed-scan;lr-wpan-phy-test;lr-wpan-packet-print;lr-wpan-beacon-mode;lr-wpan-data;ping-example;traceroute-example;dhcp6-example;dhcp-example;neighbor-cache-dynamic;neighbor-cache-example;main-simple;basic-energy-model-test;rv-battery-model-test;generic-battery-wifiradio-example;generic-battery-discharge-example;dsr-example;dsdv-manet;csma-star;csma-ping;csma-raw-ip-socket;csma-multicast;csma-packet-socket;csma-broadcast;csma-one-subnet;log-example;empirical-random-variable-example;main-test-sync;main-random-variable-stream;test-string-value-formatting;system-path-examples;sample-simulator;sample-show-progress;sample-random-variable-stream;sample-random-variable;sample-log-time-format;main-ptr;main-callback;length-example;hash-example;fatal-example;command-line-example;assert-example;config-store-save;outdoor-random-walk-example;outdoor-group-mobility-example;buildings-pathloss-profiler;csma-bridge-one-hop;csma-bridge;three-gpp-http-example;aodv-example;adjacency-matrix-example;stdlib_pch_exec;
 //ADVANCED property for variable: ns3-execs-py
 ns3-execs-py-ADVANCED:INTERNAL=1
 //list of python scripts
@@ -1350,44 +1116,10 @@ ns3-libs:INTERNAL=zigbee;wifi;virtual-net-device;uan;traffic-control;topology-re
 //ADVANCED property for variable: ns3-libs-tests
 ns3-libs-tests-ADVANCED:INTERNAL=1
 //list of test libraries
-ns3-libs-tests:INTERNAL=zigbee-test;wifi-test;uan-test;traffic-control-test;topology-read-test;stats-test;spectrum-test;sixlowpan-test;propagation-test;point-to-point-test;olsr-test;nix-vector-routing-test;network-test;netanim-test;mobility-test;mesh-test;lte-test;lr-wpan-test;internet-apps-test;internet-test;energy-test;dsr-test;dsdv-test;core-test;buildings-test;applications-test;aodv-test;antenna-test;
+ns3-libs-tests:INTERNAL=
 //ADVANCED property for variable: ns3-optional-visualizer-lib
 ns3-optional-visualizer-lib-ADVANCED:INTERNAL=1
 //visualizer library name
 ns3-optional-visualizer-lib:INTERNAL=
-//ADVANCED property for variable: openflow_header_internal_openflow.h
-openflow_header_internal_openflow.h-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: openflow_library_internal_openflow
-openflow_library_internal_openflow-ADVANCED:INTERNAL=1
-//ADVANCED property for variable: stacktrace_flags
-stacktrace_flags-ADVANCED:INTERNAL=1
 stacktrace_flags:INTERNAL=
-testantenna:INTERNAL=antenna-test
-testaodv:INTERNAL=aodv-test
-testapplications:INTERNAL=applications-test
-testbuildings:INTERNAL=buildings-test
-testcore:INTERNAL=core-test
-testdsdv:INTERNAL=dsdv-test
-testdsr:INTERNAL=dsr-test
-testenergy:INTERNAL=energy-test
-testinternet:INTERNAL=internet-test
-testinternet-apps:INTERNAL=internet-apps-test
-testlr-wpan:INTERNAL=lr-wpan-test
-testlte:INTERNAL=lte-test
-testmesh:INTERNAL=mesh-test
-testmobility:INTERNAL=mobility-test
-testnetanim:INTERNAL=netanim-test
-testnetwork:INTERNAL=network-test
-testnix-vector-routing:INTERNAL=nix-vector-routing-test
-testolsr:INTERNAL=olsr-test
-testpoint-to-point:INTERNAL=point-to-point-test
-testpropagation:INTERNAL=propagation-test
-testsixlowpan:INTERNAL=sixlowpan-test
-testspectrum:INTERNAL=spectrum-test
-teststats:INTERNAL=stats-test
-testtopology-read:INTERNAL=topology-read-test
-testtraffic-control:INTERNAL=traffic-control-test
-testuan:INTERNAL=uan-test
-testwifi:INTERNAL=wifi-test
-testzigbee:INTERNAL=zigbee-test
 

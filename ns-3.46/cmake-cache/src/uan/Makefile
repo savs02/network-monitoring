@@ -176,20 +176,6 @@ uan/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan.dir/build.make src/uan/CMakeFiles/uan.dir/build
 .PHONY : uan/fast
 
-# Convenience name for target.
-src/uan/CMakeFiles/uan-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/uan/CMakeFiles/uan-test.dir/rule
-.PHONY : src/uan/CMakeFiles/uan-test.dir/rule
-
-# Convenience name for target.
-uan-test: src/uan/CMakeFiles/uan-test.dir/rule
-.PHONY : uan-test
-
-# fast build rule for target.
-uan-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/build
-.PHONY : uan-test/fast
-
 helper/acoustic-modem-energy-model-helper.o: helper/acoustic-modem-energy-model-helper.cc.o
 .PHONY : helper/acoustic-modem-energy-model-helper.o
 
@@ -742,54 +728,6 @@ model/uan-tx-mode.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan.dir/build.make src/uan/CMakeFiles/uan.dir/model/uan-tx-mode.cc.s
 .PHONY : model/uan-tx-mode.cc.s
 
-test/uan-energy-model-test.o: test/uan-energy-model-test.cc.o
-.PHONY : test/uan-energy-model-test.o
-
-# target to build an object file
-test/uan-energy-model-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/test/uan-energy-model-test.cc.o
-.PHONY : test/uan-energy-model-test.cc.o
-
-test/uan-energy-model-test.i: test/uan-energy-model-test.cc.i
-.PHONY : test/uan-energy-model-test.i
-
-# target to preprocess a source file
-test/uan-energy-model-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/test/uan-energy-model-test.cc.i
-.PHONY : test/uan-energy-model-test.cc.i
-
-test/uan-energy-model-test.s: test/uan-energy-model-test.cc.s
-.PHONY : test/uan-energy-model-test.s
-
-# target to generate assembly for a file
-test/uan-energy-model-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/test/uan-energy-model-test.cc.s
-.PHONY : test/uan-energy-model-test.cc.s
-
-test/uan-test.o: test/uan-test.cc.o
-.PHONY : test/uan-test.o
-
-# target to build an object file
-test/uan-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/test/uan-test.cc.o
-.PHONY : test/uan-test.cc.o
-
-test/uan-test.i: test/uan-test.cc.i
-.PHONY : test/uan-test.i
-
-# target to preprocess a source file
-test/uan-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/test/uan-test.cc.i
-.PHONY : test/uan-test.cc.i
-
-test/uan-test.s: test/uan-test.cc.s
-.PHONY : test/uan-test.s
-
-# target to generate assembly for a file
-test/uan-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/test/uan-test.cc.s
-.PHONY : test/uan-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -803,7 +741,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... uan"
-	@echo "... uan-test"
 	@echo "... helper/acoustic-modem-energy-model-helper.o"
 	@echo "... helper/acoustic-modem-energy-model-helper.i"
 	@echo "... helper/acoustic-modem-energy-model-helper.s"
@@ -873,12 +810,6 @@ help:
 	@echo "... model/uan-tx-mode.o"
 	@echo "... model/uan-tx-mode.i"
 	@echo "... model/uan-tx-mode.s"
-	@echo "... test/uan-energy-model-test.o"
-	@echo "... test/uan-energy-model-test.i"
-	@echo "... test/uan-energy-model-test.s"
-	@echo "... test/uan-test.o"
-	@echo "... test/uan-test.i"
-	@echo "... test/uan-test.s"
 .PHONY : help
 
 

@@ -176,20 +176,6 @@ netanim/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/netanim/CMakeFiles/netanim.dir/build.make src/netanim/CMakeFiles/netanim.dir/build
 .PHONY : netanim/fast
 
-# Convenience name for target.
-src/netanim/CMakeFiles/netanim-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/netanim/CMakeFiles/netanim-test.dir/rule
-.PHONY : src/netanim/CMakeFiles/netanim-test.dir/rule
-
-# Convenience name for target.
-netanim-test: src/netanim/CMakeFiles/netanim-test.dir/rule
-.PHONY : netanim-test
-
-# fast build rule for target.
-netanim-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/netanim/CMakeFiles/netanim-test.dir/build.make src/netanim/CMakeFiles/netanim-test.dir/build
-.PHONY : netanim-test/fast
-
 model/animation-interface.o: model/animation-interface.cc.o
 .PHONY : model/animation-interface.o
 
@@ -214,30 +200,6 @@ model/animation-interface.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/netanim/CMakeFiles/netanim.dir/build.make src/netanim/CMakeFiles/netanim.dir/model/animation-interface.cc.s
 .PHONY : model/animation-interface.cc.s
 
-test/netanim-test.o: test/netanim-test.cc.o
-.PHONY : test/netanim-test.o
-
-# target to build an object file
-test/netanim-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/netanim/CMakeFiles/netanim-test.dir/build.make src/netanim/CMakeFiles/netanim-test.dir/test/netanim-test.cc.o
-.PHONY : test/netanim-test.cc.o
-
-test/netanim-test.i: test/netanim-test.cc.i
-.PHONY : test/netanim-test.i
-
-# target to preprocess a source file
-test/netanim-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/netanim/CMakeFiles/netanim-test.dir/build.make src/netanim/CMakeFiles/netanim-test.dir/test/netanim-test.cc.i
-.PHONY : test/netanim-test.cc.i
-
-test/netanim-test.s: test/netanim-test.cc.s
-.PHONY : test/netanim-test.s
-
-# target to generate assembly for a file
-test/netanim-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/netanim/CMakeFiles/netanim-test.dir/build.make src/netanim/CMakeFiles/netanim-test.dir/test/netanim-test.cc.s
-.PHONY : test/netanim-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -251,13 +213,9 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... netanim"
-	@echo "... netanim-test"
 	@echo "... model/animation-interface.o"
 	@echo "... model/animation-interface.i"
 	@echo "... model/animation-interface.s"
-	@echo "... test/netanim-test.o"
-	@echo "... test/netanim-test.i"
-	@echo "... test/netanim-test.s"
 .PHONY : help
 
 

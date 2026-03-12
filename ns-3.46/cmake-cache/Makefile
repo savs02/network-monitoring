@@ -202,45 +202,6 @@ check-version/fast:
 .PHONY : check-version/fast
 
 #=============================================================================
-# Target rules for targets named test-runner-examples-as-tests
-
-# Build rule for target.
-test-runner-examples-as-tests: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test-runner-examples-as-tests
-.PHONY : test-runner-examples-as-tests
-
-# fast build rule for target.
-test-runner-examples-as-tests/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test-runner-examples-as-tests.dir/build.make CMakeFiles/test-runner-examples-as-tests.dir/build
-.PHONY : test-runner-examples-as-tests/fast
-
-#=============================================================================
-# Target rules for targets named all-test-targets
-
-# Build rule for target.
-all-test-targets: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all-test-targets
-.PHONY : all-test-targets
-
-# fast build rule for target.
-all-test-targets/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/all-test-targets.dir/build.make CMakeFiles/all-test-targets.dir/build
-.PHONY : all-test-targets/fast
-
-#=============================================================================
-# Target rules for targets named run_test_py
-
-# Build rule for target.
-run_test_py: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_test_py
-.PHONY : run_test_py
-
-# fast build rule for target.
-run_test_py/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_test_py.dir/build.make CMakeFiles/run_test_py.dir/build
-.PHONY : run_test_py/fast
-
-#=============================================================================
 # Target rules for targets named run-print-introspected-doxygen
 
 # Build rule for target.
@@ -891,19 +852,6 @@ antenna/fast:
 .PHONY : antenna/fast
 
 #=============================================================================
-# Target rules for targets named antenna-test
-
-# Build rule for target.
-antenna-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 antenna-test
-.PHONY : antenna-test
-
-# fast build rule for target.
-antenna-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/build
-.PHONY : antenna-test/fast
-
-#=============================================================================
 # Target rules for targets named adjacency-matrix-example
 
 # Build rule for target.
@@ -930,19 +878,6 @@ aodv/fast:
 .PHONY : aodv/fast
 
 #=============================================================================
-# Target rules for targets named aodv-test
-
-# Build rule for target.
-aodv-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 aodv-test
-.PHONY : aodv-test
-
-# fast build rule for target.
-aodv-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/aodv/CMakeFiles/aodv-test.dir/build.make src/aodv/CMakeFiles/aodv-test.dir/build
-.PHONY : aodv-test/fast
-
-#=============================================================================
 # Target rules for targets named aodv-example
 
 # Build rule for target.
@@ -967,19 +902,6 @@ applications: cmake_check_build_system
 applications/fast:
 	$(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications.dir/build.make src/applications/CMakeFiles/applications.dir/build
 .PHONY : applications/fast
-
-#=============================================================================
-# Target rules for targets named applications-test
-
-# Build rule for target.
-applications-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 applications-test
-.PHONY : applications-test
-
-# fast build rule for target.
-applications-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/build
-.PHONY : applications-test/fast
 
 #=============================================================================
 # Target rules for targets named three-gpp-http-example
@@ -1045,19 +967,6 @@ buildings: cmake_check_build_system
 buildings/fast:
 	$(MAKE) $(MAKESILENT) -f src/buildings/CMakeFiles/buildings.dir/build.make src/buildings/CMakeFiles/buildings.dir/build
 .PHONY : buildings/fast
-
-#=============================================================================
-# Target rules for targets named buildings-test
-
-# Build rule for target.
-buildings-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 buildings-test
-.PHONY : buildings-test
-
-# fast build rule for target.
-buildings-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/buildings/CMakeFiles/buildings-test.dir/build.make src/buildings/CMakeFiles/buildings-test.dir/build
-.PHONY : buildings-test/fast
 
 #=============================================================================
 # Target rules for targets named buildings-pathloss-profiler
@@ -1136,19 +1045,6 @@ core: cmake_check_build_system
 core/fast:
 	$(MAKE) $(MAKESILENT) -f src/core/CMakeFiles/core.dir/build.make src/core/CMakeFiles/core.dir/build
 .PHONY : core/fast
-
-#=============================================================================
-# Target rules for targets named core-test
-
-# Build rule for target.
-core-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 core-test
-.PHONY : core-test
-
-# fast build rule for target.
-core-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/core/CMakeFiles/core-test.dir/build.make src/core/CMakeFiles/core-test.dir/build
-.PHONY : core-test/fast
 
 #=============================================================================
 # Target rules for targets named assert-example
@@ -1515,19 +1411,6 @@ dsdv/fast:
 .PHONY : dsdv/fast
 
 #=============================================================================
-# Target rules for targets named dsdv-test
-
-# Build rule for target.
-dsdv-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 dsdv-test
-.PHONY : dsdv-test
-
-# fast build rule for target.
-dsdv-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/dsdv/CMakeFiles/dsdv-test.dir/build.make src/dsdv/CMakeFiles/dsdv-test.dir/build
-.PHONY : dsdv-test/fast
-
-#=============================================================================
 # Target rules for targets named dsdv-manet
 
 # Build rule for target.
@@ -1554,19 +1437,6 @@ dsr/fast:
 .PHONY : dsr/fast
 
 #=============================================================================
-# Target rules for targets named dsr-test
-
-# Build rule for target.
-dsr-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 dsr-test
-.PHONY : dsr-test
-
-# fast build rule for target.
-dsr-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/dsr/CMakeFiles/dsr-test.dir/build.make src/dsr/CMakeFiles/dsr-test.dir/build
-.PHONY : dsr-test/fast
-
-#=============================================================================
 # Target rules for targets named dsr-example
 
 # Build rule for target.
@@ -1591,19 +1461,6 @@ energy: cmake_check_build_system
 energy/fast:
 	$(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy.dir/build.make src/energy/CMakeFiles/energy.dir/build
 .PHONY : energy/fast
-
-#=============================================================================
-# Target rules for targets named energy-test
-
-# Build rule for target.
-energy-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 energy-test
-.PHONY : energy-test
-
-# fast build rule for target.
-energy-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/build
-.PHONY : energy-test/fast
 
 #=============================================================================
 # Target rules for targets named generic-battery-discharge-example
@@ -1684,19 +1541,6 @@ internet/fast:
 .PHONY : internet/fast
 
 #=============================================================================
-# Target rules for targets named internet-test
-
-# Build rule for target.
-internet-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 internet-test
-.PHONY : internet-test
-
-# fast build rule for target.
-internet-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/internet/CMakeFiles/internet-test.dir/build.make src/internet/CMakeFiles/internet-test.dir/build
-.PHONY : internet-test/fast
-
-#=============================================================================
 # Target rules for targets named main-simple
 
 # Build rule for target.
@@ -1747,19 +1591,6 @@ internet-apps: cmake_check_build_system
 internet-apps/fast:
 	$(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps.dir/build.make src/internet-apps/CMakeFiles/internet-apps.dir/build
 .PHONY : internet-apps/fast
-
-#=============================================================================
-# Target rules for targets named internet-apps-test
-
-# Build rule for target.
-internet-apps-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 internet-apps-test
-.PHONY : internet-apps-test
-
-# fast build rule for target.
-internet-apps-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/build
-.PHONY : internet-apps-test/fast
 
 #=============================================================================
 # Target rules for targets named dhcp-example
@@ -1825,19 +1656,6 @@ lr-wpan: cmake_check_build_system
 lr-wpan/fast:
 	$(MAKE) $(MAKESILENT) -f src/lr-wpan/CMakeFiles/lr-wpan.dir/build.make src/lr-wpan/CMakeFiles/lr-wpan.dir/build
 .PHONY : lr-wpan/fast
-
-#=============================================================================
-# Target rules for targets named lr-wpan-test
-
-# Build rule for target.
-lr-wpan-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 lr-wpan-test
-.PHONY : lr-wpan-test
-
-# fast build rule for target.
-lr-wpan-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/lr-wpan/CMakeFiles/lr-wpan-test.dir/build.make src/lr-wpan/CMakeFiles/lr-wpan-test.dir/build
-.PHONY : lr-wpan-test/fast
 
 #=============================================================================
 # Target rules for targets named lr-wpan-data
@@ -1994,19 +1812,6 @@ lte: cmake_check_build_system
 lte/fast:
 	$(MAKE) $(MAKESILENT) -f src/lte/CMakeFiles/lte.dir/build.make src/lte/CMakeFiles/lte.dir/build
 .PHONY : lte/fast
-
-#=============================================================================
-# Target rules for targets named lte-test
-
-# Build rule for target.
-lte-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 lte-test
-.PHONY : lte-test
-
-# fast build rule for target.
-lte-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/lte/CMakeFiles/lte-test.dir/build.make src/lte/CMakeFiles/lte-test.dir/build
-.PHONY : lte-test/fast
 
 #=============================================================================
 # Target rules for targets named lena-cc-helper
@@ -2321,19 +2126,6 @@ mesh/fast:
 .PHONY : mesh/fast
 
 #=============================================================================
-# Target rules for targets named mesh-test
-
-# Build rule for target.
-mesh-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mesh-test
-.PHONY : mesh-test
-
-# fast build rule for target.
-mesh-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/mesh/CMakeFiles/mesh-test.dir/build.make src/mesh/CMakeFiles/mesh-test.dir/build
-.PHONY : mesh-test/fast
-
-#=============================================================================
 # Target rules for targets named mesh-example
 
 # Build rule for target.
@@ -2358,19 +2150,6 @@ mobility: cmake_check_build_system
 mobility/fast:
 	$(MAKE) $(MAKESILENT) -f src/mobility/CMakeFiles/mobility.dir/build.make src/mobility/CMakeFiles/mobility.dir/build
 .PHONY : mobility/fast
-
-#=============================================================================
-# Target rules for targets named mobility-test
-
-# Build rule for target.
-mobility-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 mobility-test
-.PHONY : mobility-test
-
-# fast build rule for target.
-mobility-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/mobility/CMakeFiles/mobility-test.dir/build.make src/mobility/CMakeFiles/mobility-test.dir/build
-.PHONY : mobility-test/fast
 
 #=============================================================================
 # Target rules for targets named bonnmotion-ns2-example
@@ -2490,19 +2269,6 @@ netanim/fast:
 .PHONY : netanim/fast
 
 #=============================================================================
-# Target rules for targets named netanim-test
-
-# Build rule for target.
-netanim-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 netanim-test
-.PHONY : netanim-test
-
-# fast build rule for target.
-netanim-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/netanim/CMakeFiles/netanim-test.dir/build.make src/netanim/CMakeFiles/netanim-test.dir/build
-.PHONY : netanim-test/fast
-
-#=============================================================================
 # Target rules for targets named dumbbell-animation
 
 # Build rule for target.
@@ -2607,19 +2373,6 @@ network/fast:
 .PHONY : network/fast
 
 #=============================================================================
-# Target rules for targets named network-test
-
-# Build rule for target.
-network-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 network-test
-.PHONY : network-test
-
-# fast build rule for target.
-network-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/network/CMakeFiles/network-test.dir/build.make src/network/CMakeFiles/network-test.dir/build
-.PHONY : network-test/fast
-
-#=============================================================================
 # Target rules for targets named bit-serializer
 
 # Build rule for target.
@@ -2698,19 +2451,6 @@ nix-vector-routing/fast:
 .PHONY : nix-vector-routing/fast
 
 #=============================================================================
-# Target rules for targets named nix-vector-routing-test
-
-# Build rule for target.
-nix-vector-routing-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 nix-vector-routing-test
-.PHONY : nix-vector-routing-test
-
-# fast build rule for target.
-nix-vector-routing-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/build.make src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/build
-.PHONY : nix-vector-routing-test/fast
-
-#=============================================================================
 # Target rules for targets named nix-simple
 
 # Build rule for target.
@@ -2776,19 +2516,6 @@ olsr/fast:
 .PHONY : olsr/fast
 
 #=============================================================================
-# Target rules for targets named olsr-test
-
-# Build rule for target.
-olsr-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 olsr-test
-.PHONY : olsr-test
-
-# fast build rule for target.
-olsr-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/olsr/CMakeFiles/olsr-test.dir/build.make src/olsr/CMakeFiles/olsr-test.dir/build
-.PHONY : olsr-test/fast
-
-#=============================================================================
 # Target rules for targets named olsr-hna
 
 # Build rule for target.
@@ -2826,19 +2553,6 @@ point-to-point: cmake_check_build_system
 point-to-point/fast:
 	$(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point.dir/build.make src/point-to-point/CMakeFiles/point-to-point.dir/build
 .PHONY : point-to-point/fast
-
-#=============================================================================
-# Target rules for targets named point-to-point-test
-
-# Build rule for target.
-point-to-point-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 point-to-point-test
-.PHONY : point-to-point-test
-
-# fast build rule for target.
-point-to-point-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point-test.dir/build.make src/point-to-point/CMakeFiles/point-to-point-test.dir/build
-.PHONY : point-to-point-test/fast
 
 #=============================================================================
 # Target rules for targets named main-attribute-value
@@ -2880,19 +2594,6 @@ propagation/fast:
 .PHONY : propagation/fast
 
 #=============================================================================
-# Target rules for targets named propagation-test
-
-# Build rule for target.
-propagation-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 propagation-test
-.PHONY : propagation-test
-
-# fast build rule for target.
-propagation-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/propagation/CMakeFiles/propagation-test.dir/build.make src/propagation/CMakeFiles/propagation-test.dir/build
-.PHONY : propagation-test/fast
-
-#=============================================================================
 # Target rules for targets named main-propagation-loss
 
 # Build rule for target.
@@ -2930,19 +2631,6 @@ sixlowpan: cmake_check_build_system
 sixlowpan/fast:
 	$(MAKE) $(MAKESILENT) -f src/sixlowpan/CMakeFiles/sixlowpan.dir/build.make src/sixlowpan/CMakeFiles/sixlowpan.dir/build
 .PHONY : sixlowpan/fast
-
-#=============================================================================
-# Target rules for targets named sixlowpan-test
-
-# Build rule for target.
-sixlowpan-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 sixlowpan-test
-.PHONY : sixlowpan-test
-
-# fast build rule for target.
-sixlowpan-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/sixlowpan/CMakeFiles/sixlowpan-test.dir/build.make src/sixlowpan/CMakeFiles/sixlowpan-test.dir/build
-.PHONY : sixlowpan-test/fast
 
 #=============================================================================
 # Target rules for targets named example-sixlowpan
@@ -3008,19 +2696,6 @@ spectrum: cmake_check_build_system
 spectrum/fast:
 	$(MAKE) $(MAKESILENT) -f src/spectrum/CMakeFiles/spectrum.dir/build.make src/spectrum/CMakeFiles/spectrum.dir/build
 .PHONY : spectrum/fast
-
-#=============================================================================
-# Target rules for targets named spectrum-test
-
-# Build rule for target.
-spectrum-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 spectrum-test
-.PHONY : spectrum-test
-
-# fast build rule for target.
-spectrum-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/spectrum/CMakeFiles/spectrum-test.dir/build.make src/spectrum/CMakeFiles/spectrum-test.dir/build
-.PHONY : spectrum-test/fast
 
 #=============================================================================
 # Target rules for targets named adhoc-aloha-ideal-phy
@@ -3140,19 +2815,6 @@ stats/fast:
 .PHONY : stats/fast
 
 #=============================================================================
-# Target rules for targets named stats-test
-
-# Build rule for target.
-stats-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 stats-test
-.PHONY : stats-test
-
-# fast build rule for target.
-stats-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/stats/CMakeFiles/stats-test.dir/build.make src/stats/CMakeFiles/stats-test.dir/build
-.PHONY : stats-test/fast
-
-#=============================================================================
 # Target rules for targets named time-probe-example
 
 # Build rule for target.
@@ -3244,19 +2906,6 @@ file-helper-example/fast:
 .PHONY : file-helper-example/fast
 
 #=============================================================================
-# Target rules for targets named test
-
-# Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test
-.PHONY : test
-
-# fast build rule for target.
-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/test/CMakeFiles/test.dir/build.make src/test/CMakeFiles/test.dir/build
-.PHONY : test/fast
-
-#=============================================================================
 # Target rules for targets named topology-read
 
 # Build rule for target.
@@ -3268,19 +2917,6 @@ topology-read: cmake_check_build_system
 topology-read/fast:
 	$(MAKE) $(MAKESILENT) -f src/topology-read/CMakeFiles/topology-read.dir/build.make src/topology-read/CMakeFiles/topology-read.dir/build
 .PHONY : topology-read/fast
-
-#=============================================================================
-# Target rules for targets named topology-read-test
-
-# Build rule for target.
-topology-read-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 topology-read-test
-.PHONY : topology-read-test
-
-# fast build rule for target.
-topology-read-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/topology-read/CMakeFiles/topology-read-test.dir/build.make src/topology-read/CMakeFiles/topology-read-test.dir/build
-.PHONY : topology-read-test/fast
 
 #=============================================================================
 # Target rules for targets named topology-example-sim
@@ -3307,19 +2943,6 @@ traffic-control: cmake_check_build_system
 traffic-control/fast:
 	$(MAKE) $(MAKESILENT) -f src/traffic-control/CMakeFiles/traffic-control.dir/build.make src/traffic-control/CMakeFiles/traffic-control.dir/build
 .PHONY : traffic-control/fast
-
-#=============================================================================
-# Target rules for targets named traffic-control-test
-
-# Build rule for target.
-traffic-control-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 traffic-control-test
-.PHONY : traffic-control-test
-
-# fast build rule for target.
-traffic-control-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/traffic-control/CMakeFiles/traffic-control-test.dir/build.make src/traffic-control/CMakeFiles/traffic-control-test.dir/build
-.PHONY : traffic-control-test/fast
 
 #=============================================================================
 # Target rules for targets named red-tests
@@ -3439,19 +3062,6 @@ uan/fast:
 .PHONY : uan/fast
 
 #=============================================================================
-# Target rules for targets named uan-test
-
-# Build rule for target.
-uan-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 uan-test
-.PHONY : uan-test
-
-# fast build rule for target.
-uan-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/uan/CMakeFiles/uan-test.dir/build.make src/uan/CMakeFiles/uan-test.dir/build
-.PHONY : uan-test/fast
-
-#=============================================================================
 # Target rules for targets named uan-cw-example
 
 # Build rule for target.
@@ -3569,19 +3179,6 @@ wifi/fast:
 .PHONY : wifi/fast
 
 #=============================================================================
-# Target rules for targets named wifi-test
-
-# Build rule for target.
-wifi-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 wifi-test
-.PHONY : wifi-test
-
-# fast build rule for target.
-wifi-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/wifi/CMakeFiles/wifi-test.dir/build.make src/wifi/CMakeFiles/wifi-test.dir/build
-.PHONY : wifi-test/fast
-
-#=============================================================================
 # Target rules for targets named wifi-phy-test
 
 # Build rule for target.
@@ -3697,19 +3294,6 @@ zigbee: cmake_check_build_system
 zigbee/fast:
 	$(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee.dir/build.make src/zigbee/CMakeFiles/zigbee.dir/build
 .PHONY : zigbee/fast
-
-#=============================================================================
-# Target rules for targets named zigbee-test
-
-# Build rule for target.
-zigbee-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 zigbee-test
-.PHONY : zigbee-test
-
-# fast build rule for target.
-zigbee-test/fast:
-	$(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/build
-.PHONY : zigbee-test/fast
 
 #=============================================================================
 # Target rules for targets named zigbee-nwk-direct-join
@@ -5220,19 +4804,6 @@ scratch_nested-subdir_scratch-nested-subdir-executable/fast:
 .PHONY : scratch_nested-subdir_scratch-nested-subdir-executable/fast
 
 #=============================================================================
-# Target rules for targets named test-runner
-
-# Build rule for target.
-test-runner: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test-runner
-.PHONY : test-runner
-
-# fast build rule for target.
-test-runner/fast:
-	$(MAKE) $(MAKESILENT) -f utils/CMakeFiles/test-runner.dir/build.make utils/CMakeFiles/test-runner.dir/build
-.PHONY : test-runner/fast
-
-#=============================================================================
 # Target rules for targets named bench-scheduler
 
 # Build rule for target.
@@ -5362,7 +4933,6 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... all-test-targets"
 	@echo "... assemble-introspected-command-line"
 	@echo "... check-version"
 	@echo "... copy_all_headers"
@@ -5370,14 +4940,12 @@ help:
 	@echo "... doxygen-no-build"
 	@echo "... run-introspected-command-line"
 	@echo "... run-print-introspected-doxygen"
-	@echo "... run_test_py"
 	@echo "... sphinx"
 	@echo "... sphinx_contributing"
 	@echo "... sphinx_installation"
 	@echo "... sphinx_manual"
 	@echo "... sphinx_models"
 	@echo "... sphinx_tutorial"
-	@echo "... test-runner-examples-as-tests"
 	@echo "... uninstall"
 	@echo "... uninstall_pkgconfig_antenna"
 	@echo "... uninstall_pkgconfig_aodv"
@@ -5421,12 +4989,9 @@ help:
 	@echo "... adhoc-aloha-ideal-phy-with-microwave-oven"
 	@echo "... adjacency-matrix-example"
 	@echo "... antenna"
-	@echo "... antenna-test"
 	@echo "... aodv"
 	@echo "... aodv-example"
-	@echo "... aodv-test"
 	@echo "... applications"
-	@echo "... applications-test"
 	@echo "... assert-example"
 	@echo "... basic-energy-model-test"
 	@echo "... bench-packets"
@@ -5436,7 +5001,6 @@ help:
 	@echo "... bridge"
 	@echo "... buildings"
 	@echo "... buildings-pathloss-profiler"
-	@echo "... buildings-test"
 	@echo "... cobalt-vs-codel"
 	@echo "... codel-vs-pfifo-asymmetric"
 	@echo "... codel-vs-pfifo-basic-test"
@@ -5446,7 +5010,6 @@ help:
 	@echo "... config-store-save"
 	@echo "... constant-mobility-example"
 	@echo "... core"
-	@echo "... core-test"
 	@echo "... csma"
 	@echo "... csma-bridge"
 	@echo "... csma-bridge-one-hop"
@@ -5464,17 +5027,14 @@ help:
 	@echo "... double-probe-example"
 	@echo "... dsdv"
 	@echo "... dsdv-manet"
-	@echo "... dsdv-test"
 	@echo "... dsr"
 	@echo "... dsr-example"
-	@echo "... dsr-test"
 	@echo "... dumbbell-animation"
 	@echo "... dynamic-global-routing"
 	@echo "... empirical-random-variable-example"
 	@echo "... energy"
 	@echo "... energy-model-example"
 	@echo "... energy-model-with-harvesting-example"
-	@echo "... energy-test"
 	@echo "... example-ping-lr-wpan"
 	@echo "... example-ping-lr-wpan-beacon"
 	@echo "... example-ping-lr-wpan-mesh-under"
@@ -5504,8 +5064,6 @@ help:
 	@echo "... icmpv6-redirect"
 	@echo "... internet"
 	@echo "... internet-apps"
-	@echo "... internet-apps-test"
-	@echo "... internet-test"
 	@echo "... jakes-propagation-model-example"
 	@echo "... lena-cc-helper"
 	@echo "... lena-cqi-threshold"
@@ -5546,9 +5104,7 @@ help:
 	@echo "... lr-wpan-packet-print"
 	@echo "... lr-wpan-per-plot"
 	@echo "... lr-wpan-phy-test"
-	@echo "... lr-wpan-test"
 	@echo "... lte"
-	@echo "... lte-test"
 	@echo "... main-attribute-value"
 	@echo "... main-callback"
 	@echo "... main-grid-topology"
@@ -5565,29 +5121,23 @@ help:
 	@echo "... matrix-topology"
 	@echo "... mesh"
 	@echo "... mesh-example"
-	@echo "... mesh-test"
 	@echo "... mixed-global-routing"
 	@echo "... mixed-wired-wireless"
 	@echo "... mobility"
-	@echo "... mobility-test"
 	@echo "... mobility-trace-example"
 	@echo "... neighbor-cache-dynamic"
 	@echo "... neighbor-cache-example"
 	@echo "... netanim"
-	@echo "... netanim-test"
 	@echo "... network"
-	@echo "... network-test"
 	@echo "... nix-double-wifi"
 	@echo "... nix-simple"
 	@echo "... nix-simple-multi-address"
 	@echo "... nix-vector-routing"
-	@echo "... nix-vector-routing-test"
 	@echo "... nms-p2p-nix"
 	@echo "... ns2-mobility-trace"
 	@echo "... object-names"
 	@echo "... olsr"
 	@echo "... olsr-hna"
-	@echo "... olsr-test"
 	@echo "... outdoor-group-mobility-example"
 	@echo "... outdoor-random-walk-example"
 	@echo "... packet-socket-apps"
@@ -5598,10 +5148,8 @@ help:
 	@echo "... ping6-example"
 	@echo "... point-to-point"
 	@echo "... point-to-point-layout"
-	@echo "... point-to-point-test"
 	@echo "... print-introspected-doxygen"
 	@echo "... propagation"
-	@echo "... propagation-test"
 	@echo "... queue-discs-benchmark"
 	@echo "... radvd-one-prefix"
 	@echo "... radvd-two-prefix"
@@ -5635,19 +5183,16 @@ help:
 	@echo "... simple-point-to-point-olsr"
 	@echo "... simple-routing-ping6"
 	@echo "... sixlowpan"
-	@echo "... sixlowpan-test"
 	@echo "... sixth"
 	@echo "... socket-bound-static-routing"
 	@echo "... socket-bound-tcp-static-routing"
 	@echo "... socket-options-ipv4"
 	@echo "... socket-options-ipv6"
 	@echo "... spectrum"
-	@echo "... spectrum-test"
 	@echo "... star"
 	@echo "... star-animation"
 	@echo "... static-routing-slash32"
 	@echo "... stats"
-	@echo "... stats-test"
 	@echo "... stdlib_pch-default"
 	@echo "... stdlib_pch_exec"
 	@echo "... system-path-examples"
@@ -5661,9 +5206,7 @@ help:
 	@echo "... tcp-star-server"
 	@echo "... tcp-validation"
 	@echo "... tcp-variants-comparison"
-	@echo "... test"
 	@echo "... test-ipv6"
-	@echo "... test-runner"
 	@echo "... test-string-value-formatting"
 	@echo "... third"
 	@echo "... three-gpp-channel-example"
@@ -5674,11 +5217,9 @@ help:
 	@echo "... time-probe-example"
 	@echo "... topology-example-sim"
 	@echo "... topology-read"
-	@echo "... topology-read-test"
 	@echo "... traceroute-example"
 	@echo "... traffic-control"
 	@echo "... traffic-control-example"
-	@echo "... traffic-control-test"
 	@echo "... tv-trans-example"
 	@echo "... tv-trans-regional-example"
 	@echo "... uan"
@@ -5689,7 +5230,6 @@ help:
 	@echo "... uan-ipv6-example"
 	@echo "... uan-raw-example"
 	@echo "... uan-rc-example"
-	@echo "... uan-test"
 	@echo "... udp-client-server"
 	@echo "... udp-echo"
 	@echo "... udp-trace-client-server"
@@ -5740,7 +5280,6 @@ help:
 	@echo "... wifi-spectrum-per-interference"
 	@echo "... wifi-spectrum-saturation-example"
 	@echo "... wifi-tcp"
-	@echo "... wifi-test"
 	@echo "... wifi-test-interference-helper"
 	@echo "... wifi-timing-attributes"
 	@echo "... wifi-trans-example"
@@ -5755,7 +5294,6 @@ help:
 	@echo "... zigbee-nwk-direct-join"
 	@echo "... zigbee-nwk-routing"
 	@echo "... zigbee-nwk-routing-grid"
-	@echo "... zigbee-test"
 	@echo "... build-support/empty-main.o"
 	@echo "... build-support/empty-main.i"
 	@echo "... build-support/empty-main.s"

@@ -176,20 +176,6 @@ dsr/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsr/CMakeFiles/dsr.dir/build.make src/dsr/CMakeFiles/dsr.dir/build
 .PHONY : dsr/fast
 
-# Convenience name for target.
-src/dsr/CMakeFiles/dsr-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/dsr/CMakeFiles/dsr-test.dir/rule
-.PHONY : src/dsr/CMakeFiles/dsr-test.dir/rule
-
-# Convenience name for target.
-dsr-test: src/dsr/CMakeFiles/dsr-test.dir/rule
-.PHONY : dsr-test
-
-# fast build rule for target.
-dsr-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsr/CMakeFiles/dsr-test.dir/build.make src/dsr/CMakeFiles/dsr-test.dir/build
-.PHONY : dsr-test/fast
-
 helper/dsr-helper.o: helper/dsr-helper.cc.o
 .PHONY : helper/dsr-helper.o
 
@@ -526,30 +512,6 @@ model/dsr-rsendbuff.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsr/CMakeFiles/dsr.dir/build.make src/dsr/CMakeFiles/dsr.dir/model/dsr-rsendbuff.cc.s
 .PHONY : model/dsr-rsendbuff.cc.s
 
-test/dsr-test-suite.o: test/dsr-test-suite.cc.o
-.PHONY : test/dsr-test-suite.o
-
-# target to build an object file
-test/dsr-test-suite.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsr/CMakeFiles/dsr-test.dir/build.make src/dsr/CMakeFiles/dsr-test.dir/test/dsr-test-suite.cc.o
-.PHONY : test/dsr-test-suite.cc.o
-
-test/dsr-test-suite.i: test/dsr-test-suite.cc.i
-.PHONY : test/dsr-test-suite.i
-
-# target to preprocess a source file
-test/dsr-test-suite.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsr/CMakeFiles/dsr-test.dir/build.make src/dsr/CMakeFiles/dsr-test.dir/test/dsr-test-suite.cc.i
-.PHONY : test/dsr-test-suite.cc.i
-
-test/dsr-test-suite.s: test/dsr-test-suite.cc.s
-.PHONY : test/dsr-test-suite.s
-
-# target to generate assembly for a file
-test/dsr-test-suite.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/dsr/CMakeFiles/dsr-test.dir/build.make src/dsr/CMakeFiles/dsr-test.dir/test/dsr-test-suite.cc.s
-.PHONY : test/dsr-test-suite.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -563,7 +525,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... dsr"
-	@echo "... dsr-test"
 	@echo "... helper/dsr-helper.o"
 	@echo "... helper/dsr-helper.i"
 	@echo "... helper/dsr-helper.s"
@@ -606,9 +567,6 @@ help:
 	@echo "... model/dsr-rsendbuff.o"
 	@echo "... model/dsr-rsendbuff.i"
 	@echo "... model/dsr-rsendbuff.s"
-	@echo "... test/dsr-test-suite.o"
-	@echo "... test/dsr-test-suite.i"
-	@echo "... test/dsr-test-suite.s"
 .PHONY : help
 
 

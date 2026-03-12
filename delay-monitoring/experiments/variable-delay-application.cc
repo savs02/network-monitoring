@@ -17,7 +17,11 @@ VariableDelaySender::GetTypeId()
     static TypeId tid = TypeId("ns3::VariableDelaySender")
         .SetParent<Application>()
         .SetGroupName("Applications")
-        .AddConstructor<VariableDelaySender>();
+        .AddConstructor<VariableDelaySender>()
+        .AddTraceSource("Tx",
+                        "A packet has been transmitted",
+                        MakeTraceSourceAccessor(&VariableDelaySender::m_txTrace),
+                        "ns3::Packet::AddressTracedCallback");
     return tid;
 }
 
@@ -29,7 +33,9 @@ VariableDelaySender::VariableDelaySender()
       m_maxPackets(100),
       m_packetsSent(0),
       m_interval(MilliSeconds(100)),
-      m_delayRv(nullptr)
+      m_delayRv(nullptr),
+      m_intervalRv(nullptr),
+      m_delayMonitor(nullptr)
 {
 }
 
@@ -58,6 +64,12 @@ VariableDelaySender::SetDelayRandomVariable(Ptr<RandomVariableStream> delay)
 }
 
 void
+VariableDelaySender::SetIntervalRandomVariable(Ptr<RandomVariableStream> interval)
+{
+    m_intervalRv = interval;
+}
+
+void
 VariableDelaySender::SetPacketSize(uint32_t packetSize)
 {
     m_packetSize = packetSize;
@@ -73,6 +85,12 @@ void
 VariableDelaySender::SetInterval(Time interval)
 {
     m_interval = interval;
+}
+
+void
+VariableDelaySender::SetDelayMonitor(DelayMonitor* monitor)
+{
+    m_delayMonitor = monitor;
 }
 
 void
@@ -105,7 +123,7 @@ VariableDelaySender::StopApplication()
 }
 
 void
-VariableDelaySender::ScheduleTransmit(Time dt) // schedules SendPacket() to be called after dt time 
+VariableDelaySender::ScheduleTransmit(Time dt)
 {
     m_sendEvent = Simulator::Schedule(dt, &VariableDelaySender::SendPacket, this);
 }
@@ -118,17 +136,32 @@ VariableDelaySender::SendPacket()
         return;
     }
     
+    // sample the network delay from the distribution
     double sampledDelay = 0.0;
     if (m_delayRv)
     {
         sampledDelay = m_delayRv->GetValue();
         if (sampledDelay < 0) sampledDelay = 0;
     }
-    
+
     NS_LOG_INFO("Packet " << m_packetsSent << ": sampled delay = " << sampledDelay << " ms");
+
+    // record the sample directly — this is the baseline non-binning monitor
+    if (m_delayMonitor)
+    {
+        m_delayMonitor->RecordDelay(m_packetsSent, sampledDelay);
+    }
     
+    // create packet
     Ptr<Packet> packet = Create<Packet>(m_packetSize);
     
+    // fire Tx trace NOW - this is the ingress timestamp
+    Address peerAddr = InetSocketAddress(m_peerAddress, m_peerPort);
+    m_txTrace(packet, peerAddr);
+    
+    NS_LOG_INFO("Packet " << m_packetsSent << " entered ingress at t=" << Simulator::Now().GetSeconds() << "s");
+    
+    // schedule the actual network delivery after the sampled delay
     Time delayTime = MilliSeconds(sampledDelay);
     uint32_t currentPacket = m_packetsSent;
     
@@ -136,7 +169,7 @@ VariableDelaySender::SendPacket()
         int sent = m_socket->Send(packet);
         if (sent > 0)
         {
-            NS_LOG_INFO("Packet " << currentPacket << " sent at t=" << Simulator::Now().GetSeconds() << "s");
+            NS_LOG_INFO("Packet " << currentPacket << " exited network at t=" << Simulator::Now().GetSeconds() << "s");
         }
         else
         {
@@ -146,9 +179,21 @@ VariableDelaySender::SendPacket()
     
     m_packetsSent++;
     
+    // schedule next packet - use random interval if set, otherwise fixed
     if (m_packetsSent < m_maxPackets)
     {
-        ScheduleTransmit(m_interval);
+        Time nextInterval;
+        if (m_intervalRv)
+        {
+            double sampledInterval = m_intervalRv->GetValue();
+            if (sampledInterval < 0.01) sampledInterval = 0.01;  // minimum 0.01ms
+            nextInterval = MilliSeconds(sampledInterval);
+        }
+        else
+        {
+            nextInterval = m_interval;
+        }
+        ScheduleTransmit(nextInterval);
     }
 }
 
@@ -160,7 +205,11 @@ VariableDelayReceiver::GetTypeId()
     static TypeId tid = TypeId("ns3::VariableDelayReceiver")
         .SetParent<Application>()
         .SetGroupName("Applications")
-        .AddConstructor<VariableDelayReceiver>();
+        .AddConstructor<VariableDelayReceiver>()
+        .AddTraceSource("Rx",
+                        "A packet has been received",
+                        MakeTraceSourceAccessor(&VariableDelayReceiver::m_rxTrace),
+                        "ns3::Packet::AddressTracedCallback");
     return tid;
 }
 
@@ -232,9 +281,13 @@ VariableDelayReceiver::HandleRead(Ptr<Socket> socket)
     {
         if (packet->GetSize() > 0)
         {
+            // fire Rx trace - this is the egress timestamp
+            m_rxTrace(packet, from);
+            
             NS_LOG_INFO("Received packet #" << m_received 
                        << " (" << packet->GetSize() << " bytes)"
-                       << " at t=" << Simulator::Now().GetSeconds() << "s");
+                       << " at egress t=" << Simulator::Now().GetSeconds() << "s");
+            
             m_received++;
         }
     }

@@ -199,11 +199,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/src/test/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache/src/topology-read/cmake_install.cmake")
 endif()
 

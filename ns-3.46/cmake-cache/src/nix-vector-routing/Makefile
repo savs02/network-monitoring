@@ -176,20 +176,6 @@ nix-vector-routing/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/nix-vector-routing/CMakeFiles/nix-vector-routing.dir/build.make src/nix-vector-routing/CMakeFiles/nix-vector-routing.dir/build
 .PHONY : nix-vector-routing/fast
 
-# Convenience name for target.
-src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/rule
-.PHONY : src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/rule
-
-# Convenience name for target.
-nix-vector-routing-test: src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/rule
-.PHONY : nix-vector-routing-test
-
-# fast build rule for target.
-nix-vector-routing-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/build.make src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/build
-.PHONY : nix-vector-routing-test/fast
-
 helper/nix-vector-helper.o: helper/nix-vector-helper.cc.o
 .PHONY : helper/nix-vector-helper.o
 
@@ -238,30 +224,6 @@ model/nix-vector-routing.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/nix-vector-routing/CMakeFiles/nix-vector-routing.dir/build.make src/nix-vector-routing/CMakeFiles/nix-vector-routing.dir/model/nix-vector-routing.cc.s
 .PHONY : model/nix-vector-routing.cc.s
 
-test/nix-test.o: test/nix-test.cc.o
-.PHONY : test/nix-test.o
-
-# target to build an object file
-test/nix-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/build.make src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/test/nix-test.cc.o
-.PHONY : test/nix-test.cc.o
-
-test/nix-test.i: test/nix-test.cc.i
-.PHONY : test/nix-test.i
-
-# target to preprocess a source file
-test/nix-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/build.make src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/test/nix-test.cc.i
-.PHONY : test/nix-test.cc.i
-
-test/nix-test.s: test/nix-test.cc.s
-.PHONY : test/nix-test.s
-
-# target to generate assembly for a file
-test/nix-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/build.make src/nix-vector-routing/CMakeFiles/nix-vector-routing-test.dir/test/nix-test.cc.s
-.PHONY : test/nix-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -275,16 +237,12 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... nix-vector-routing"
-	@echo "... nix-vector-routing-test"
 	@echo "... helper/nix-vector-helper.o"
 	@echo "... helper/nix-vector-helper.i"
 	@echo "... helper/nix-vector-helper.s"
 	@echo "... model/nix-vector-routing.o"
 	@echo "... model/nix-vector-routing.i"
 	@echo "... model/nix-vector-routing.s"
-	@echo "... test/nix-test.o"
-	@echo "... test/nix-test.i"
-	@echo "... test/nix-test.s"
 .PHONY : help
 
 

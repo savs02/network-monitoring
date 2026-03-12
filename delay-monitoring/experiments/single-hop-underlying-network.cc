@@ -10,6 +10,20 @@
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
 #include "variable-delay-application.h"
+#include "delay-monitor.h"
+
+// binning monitor kept for reference but not used in this experiment
+// #include "binning-monitor.h"
+// DoubleTimeBinMonitor* g_ingressMonitor = nullptr;
+// DoubleTimeBinMonitor* g_egressMonitor = nullptr;
+// void PacketDeparture(Ptr<const Packet> packet, const Address& address)
+// {
+//     if (g_ingressMonitor) g_ingressMonitor->RecordPacket(Simulator::Now());
+// }
+// void PacketArrival(Ptr<const Packet> packet, const Address& address)
+// {
+//     if (g_egressMonitor) g_egressMonitor->RecordPacket(Simulator::Now());
+// }
 
 using namespace ns3;
 
@@ -20,7 +34,7 @@ main(int argc, char* argv[])
 {
     // set up and defaults 
 
-    std::string delayDist = "lognormal";
+    std::string delayDist = "normal";
     
     double lognormal_mu = 2.3;
     double lognormal_sigma = 0.2;
@@ -28,10 +42,17 @@ main(int argc, char* argv[])
     double weibull_scale = 10.0;
     double weibull_shape = 2.0;
     
-    double normal_mean = 10.0;
+    double normal_mean = 40.0;
     double normal_variance = 4.0;
     
     uint32_t numPackets = 100;
+
+    // interval distribution parameters
+    double intervalMean = 1.0; // mean inter-packet time in ms (exponential)
+
+    // binning monitor parameters (kept for reference, not used)
+    // bool enableMonitoring = false;
+    // double binWidth = 5.0;
     
     CommandLine cmd(__FILE__);
     cmd.AddValue("delayDist", "Delay distribution: lognormal, weibull, normal", delayDist);
@@ -42,6 +63,9 @@ main(int argc, char* argv[])
     cmd.AddValue("normal_mean", "Normal mean parameter", normal_mean);
     cmd.AddValue("normal_variance", "Normal variance parameter", normal_variance);
     cmd.AddValue("numPackets", "Number of packets to send", numPackets);
+    cmd.AddValue("intervalMean", "Mean inter-packet interval in ms (exponential)", intervalMean);
+    // cmd.AddValue("enableMonitoring", "Enable binning monitoring", enableMonitoring);
+    // cmd.AddValue("binWidth", "Bin width in ms", binWidth);
     cmd.Parse(argc, argv);
 
     Time::SetResolution(Time::NS);
@@ -49,6 +73,10 @@ main(int argc, char* argv[])
     LogComponentEnable("VariableDelayApplication", LOG_LEVEL_INFO);
 
     NS_LOG_INFO("=== Two-Node Network: " << delayDist << ", " << numPackets << " packets ===");
+    NS_LOG_INFO("Inter-packet interval: Exponential with mean " << intervalMean << "ms");
+
+    // baseline delay monitor: records each sampled delay directly from the sender
+    DelayMonitor delayMonitor;
 
     // set up the simple network topology
 
@@ -95,30 +123,54 @@ main(int argc, char* argv[])
         NS_FATAL_ERROR("Unknown distribution: " << delayDist);
     }
 
+    // configure interval distribution (exponential for Poisson arrivals)
+    Ptr<ExponentialRandomVariable> intervalRv = CreateObject<ExponentialRandomVariable>();
+    intervalRv->SetAttribute("Mean", DoubleValue(intervalMean));
+
     uint16_t port = 9;
     
     // receiver on egress node
     Ptr<VariableDelayReceiver> receiver = CreateObject<VariableDelayReceiver>();
     receiver->SetPort(port);
     nodes.Get(1)->AddApplication(receiver);
-    receiver->SetStartTime(Seconds(1.0));
+    receiver->SetStartTime(Seconds(0.0));
     receiver->SetStopTime(Seconds(100.0));
+    
+    // binning egress trace (not used)
+    // receiver->TraceConnectWithoutContext("Rx", MakeCallback(&PacketArrival));
 
-    // sender on ingress node after sampling from dist
+    // sender on ingress node
     Ptr<VariableDelaySender> sender = CreateObject<VariableDelaySender>();
     sender->SetRemote(interfaces.GetAddress(1), port);
     sender->SetDelayRandomVariable(delayRv);
+    sender->SetIntervalRandomVariable(intervalRv);
     sender->SetPacketSize(1024);
     sender->SetMaxPackets(numPackets);
-    sender->SetInterval(MilliSeconds(100));
+    sender->SetDelayMonitor(&delayMonitor);
     nodes.Get(0)->AddApplication(sender);
-    sender->SetStartTime(Seconds(2.0));
+    sender->SetStartTime(Seconds(0.01));
     sender->SetStopTime(Seconds(100.0));
+
+    // binning ingress trace (not used)
+    // sender->TraceConnectWithoutContext("Tx", MakeCallback(&PacketDeparture));
 
     // run and clean up
 
     Simulator::Run();
     NS_LOG_INFO("Simulation complete. Packets received: " << receiver->GetReceived());
+
+    // export delay samples — filename includes distribution name for easy identification
+    std::string outputFile = "../delay-monitoring/results/delay_samples_" + delayDist + ".csv";
+    delayMonitor.ExportToCSV(outputFile);
+
+    // binning monitor export (not used)
+    // g_ingressMonitor->PrintSummary();
+    // g_egressMonitor->PrintSummary();
+    // g_ingressMonitor->ExportToFile("../delay-monitoring/results/ingress_bins");
+    // g_egressMonitor->ExportToFile("../delay-monitoring/results/egress_bins");
+    // delete g_ingressMonitor;
+    // delete g_egressMonitor;
+
     Simulator::Destroy();
     
     return 0;

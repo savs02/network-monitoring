@@ -176,20 +176,6 @@ applications/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications.dir/build.make src/applications/CMakeFiles/applications.dir/build
 .PHONY : applications/fast
 
-# Convenience name for target.
-src/applications/CMakeFiles/applications-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/applications/CMakeFiles/applications-test.dir/rule
-.PHONY : src/applications/CMakeFiles/applications-test.dir/rule
-
-# Convenience name for target.
-applications-test: src/applications/CMakeFiles/applications-test.dir/rule
-.PHONY : applications-test
-
-# fast build rule for target.
-applications-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/build
-.PHONY : applications-test/fast
-
 helper/bulk-send-helper.o: helper/bulk-send-helper.cc.o
 .PHONY : helper/bulk-send-helper.o
 
@@ -790,78 +776,6 @@ model/udp-trace-client.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications.dir/build.make src/applications/CMakeFiles/applications.dir/model/udp-trace-client.cc.s
 .PHONY : model/udp-trace-client.cc.s
 
-test/bulk-send-application-test-suite.o: test/bulk-send-application-test-suite.cc.o
-.PHONY : test/bulk-send-application-test-suite.o
-
-# target to build an object file
-test/bulk-send-application-test-suite.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/bulk-send-application-test-suite.cc.o
-.PHONY : test/bulk-send-application-test-suite.cc.o
-
-test/bulk-send-application-test-suite.i: test/bulk-send-application-test-suite.cc.i
-.PHONY : test/bulk-send-application-test-suite.i
-
-# target to preprocess a source file
-test/bulk-send-application-test-suite.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/bulk-send-application-test-suite.cc.i
-.PHONY : test/bulk-send-application-test-suite.cc.i
-
-test/bulk-send-application-test-suite.s: test/bulk-send-application-test-suite.cc.s
-.PHONY : test/bulk-send-application-test-suite.s
-
-# target to generate assembly for a file
-test/bulk-send-application-test-suite.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/bulk-send-application-test-suite.cc.s
-.PHONY : test/bulk-send-application-test-suite.cc.s
-
-test/three-gpp-http-client-server-test.o: test/three-gpp-http-client-server-test.cc.o
-.PHONY : test/three-gpp-http-client-server-test.o
-
-# target to build an object file
-test/three-gpp-http-client-server-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/three-gpp-http-client-server-test.cc.o
-.PHONY : test/three-gpp-http-client-server-test.cc.o
-
-test/three-gpp-http-client-server-test.i: test/three-gpp-http-client-server-test.cc.i
-.PHONY : test/three-gpp-http-client-server-test.i
-
-# target to preprocess a source file
-test/three-gpp-http-client-server-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/three-gpp-http-client-server-test.cc.i
-.PHONY : test/three-gpp-http-client-server-test.cc.i
-
-test/three-gpp-http-client-server-test.s: test/three-gpp-http-client-server-test.cc.s
-.PHONY : test/three-gpp-http-client-server-test.s
-
-# target to generate assembly for a file
-test/three-gpp-http-client-server-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/three-gpp-http-client-server-test.cc.s
-.PHONY : test/three-gpp-http-client-server-test.cc.s
-
-test/udp-client-server-test.o: test/udp-client-server-test.cc.o
-.PHONY : test/udp-client-server-test.o
-
-# target to build an object file
-test/udp-client-server-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/udp-client-server-test.cc.o
-.PHONY : test/udp-client-server-test.cc.o
-
-test/udp-client-server-test.i: test/udp-client-server-test.cc.i
-.PHONY : test/udp-client-server-test.i
-
-# target to preprocess a source file
-test/udp-client-server-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/udp-client-server-test.cc.i
-.PHONY : test/udp-client-server-test.cc.i
-
-test/udp-client-server-test.s: test/udp-client-server-test.cc.s
-.PHONY : test/udp-client-server-test.s
-
-# target to generate assembly for a file
-test/udp-client-server-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/applications/CMakeFiles/applications-test.dir/build.make src/applications/CMakeFiles/applications-test.dir/test/udp-client-server-test.cc.s
-.PHONY : test/udp-client-server-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -875,7 +789,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... applications"
-	@echo "... applications-test"
 	@echo "... helper/bulk-send-helper.o"
 	@echo "... helper/bulk-send-helper.i"
 	@echo "... helper/bulk-send-helper.s"
@@ -951,15 +864,6 @@ help:
 	@echo "... model/udp-trace-client.o"
 	@echo "... model/udp-trace-client.i"
 	@echo "... model/udp-trace-client.s"
-	@echo "... test/bulk-send-application-test-suite.o"
-	@echo "... test/bulk-send-application-test-suite.i"
-	@echo "... test/bulk-send-application-test-suite.s"
-	@echo "... test/three-gpp-http-client-server-test.o"
-	@echo "... test/three-gpp-http-client-server-test.i"
-	@echo "... test/three-gpp-http-client-server-test.s"
-	@echo "... test/udp-client-server-test.o"
-	@echo "... test/udp-client-server-test.i"
-	@echo "... test/udp-client-server-test.s"
 .PHONY : help
 
 

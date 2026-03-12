@@ -176,20 +176,6 @@ internet-apps/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps.dir/build.make src/internet-apps/CMakeFiles/internet-apps.dir/build
 .PHONY : internet-apps/fast
 
-# Convenience name for target.
-src/internet-apps/CMakeFiles/internet-apps-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/internet-apps/CMakeFiles/internet-apps-test.dir/rule
-.PHONY : src/internet-apps/CMakeFiles/internet-apps-test.dir/rule
-
-# Convenience name for target.
-internet-apps-test: src/internet-apps/CMakeFiles/internet-apps-test.dir/rule
-.PHONY : internet-apps-test
-
-# fast build rule for target.
-internet-apps-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/build
-.PHONY : internet-apps-test/fast
-
 helper/dhcp-helper.o: helper/dhcp-helper.cc.o
 .PHONY : helper/dhcp-helper.o
 
@@ -622,102 +608,6 @@ model/v4traceroute.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps.dir/build.make src/internet-apps/CMakeFiles/internet-apps.dir/model/v4traceroute.cc.s
 .PHONY : model/v4traceroute.cc.s
 
-test/dhcp-test.o: test/dhcp-test.cc.o
-.PHONY : test/dhcp-test.o
-
-# target to build an object file
-test/dhcp-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/dhcp-test.cc.o
-.PHONY : test/dhcp-test.cc.o
-
-test/dhcp-test.i: test/dhcp-test.cc.i
-.PHONY : test/dhcp-test.i
-
-# target to preprocess a source file
-test/dhcp-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/dhcp-test.cc.i
-.PHONY : test/dhcp-test.cc.i
-
-test/dhcp-test.s: test/dhcp-test.cc.s
-.PHONY : test/dhcp-test.s
-
-# target to generate assembly for a file
-test/dhcp-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/dhcp-test.cc.s
-.PHONY : test/dhcp-test.cc.s
-
-test/dhcp6-test.o: test/dhcp6-test.cc.o
-.PHONY : test/dhcp6-test.o
-
-# target to build an object file
-test/dhcp6-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/dhcp6-test.cc.o
-.PHONY : test/dhcp6-test.cc.o
-
-test/dhcp6-test.i: test/dhcp6-test.cc.i
-.PHONY : test/dhcp6-test.i
-
-# target to preprocess a source file
-test/dhcp6-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/dhcp6-test.cc.i
-.PHONY : test/dhcp6-test.cc.i
-
-test/dhcp6-test.s: test/dhcp6-test.cc.s
-.PHONY : test/dhcp6-test.s
-
-# target to generate assembly for a file
-test/dhcp6-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/dhcp6-test.cc.s
-.PHONY : test/dhcp6-test.cc.s
-
-test/ipv6-radvd-test.o: test/ipv6-radvd-test.cc.o
-.PHONY : test/ipv6-radvd-test.o
-
-# target to build an object file
-test/ipv6-radvd-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/ipv6-radvd-test.cc.o
-.PHONY : test/ipv6-radvd-test.cc.o
-
-test/ipv6-radvd-test.i: test/ipv6-radvd-test.cc.i
-.PHONY : test/ipv6-radvd-test.i
-
-# target to preprocess a source file
-test/ipv6-radvd-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/ipv6-radvd-test.cc.i
-.PHONY : test/ipv6-radvd-test.cc.i
-
-test/ipv6-radvd-test.s: test/ipv6-radvd-test.cc.s
-.PHONY : test/ipv6-radvd-test.s
-
-# target to generate assembly for a file
-test/ipv6-radvd-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/ipv6-radvd-test.cc.s
-.PHONY : test/ipv6-radvd-test.cc.s
-
-test/ping-test.o: test/ping-test.cc.o
-.PHONY : test/ping-test.o
-
-# target to build an object file
-test/ping-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/ping-test.cc.o
-.PHONY : test/ping-test.cc.o
-
-test/ping-test.i: test/ping-test.cc.i
-.PHONY : test/ping-test.i
-
-# target to preprocess a source file
-test/ping-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/ping-test.cc.i
-.PHONY : test/ping-test.cc.i
-
-test/ping-test.s: test/ping-test.cc.s
-.PHONY : test/ping-test.s
-
-# target to generate assembly for a file
-test/ping-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/internet-apps/CMakeFiles/internet-apps-test.dir/build.make src/internet-apps/CMakeFiles/internet-apps-test.dir/test/ping-test.cc.s
-.PHONY : test/ping-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -731,7 +621,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... internet-apps"
-	@echo "... internet-apps-test"
 	@echo "... helper/dhcp-helper.o"
 	@echo "... helper/dhcp-helper.i"
 	@echo "... helper/dhcp-helper.s"
@@ -786,18 +675,6 @@ help:
 	@echo "... model/v4traceroute.o"
 	@echo "... model/v4traceroute.i"
 	@echo "... model/v4traceroute.s"
-	@echo "... test/dhcp-test.o"
-	@echo "... test/dhcp-test.i"
-	@echo "... test/dhcp-test.s"
-	@echo "... test/dhcp6-test.o"
-	@echo "... test/dhcp6-test.i"
-	@echo "... test/dhcp6-test.s"
-	@echo "... test/ipv6-radvd-test.o"
-	@echo "... test/ipv6-radvd-test.i"
-	@echo "... test/ipv6-radvd-test.s"
-	@echo "... test/ping-test.o"
-	@echo "... test/ping-test.i"
-	@echo "... test/ping-test.s"
 .PHONY : help
 
 

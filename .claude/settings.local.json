@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./ns3 build:*)",
+      "Bash(./ns3 run:*)",
+      "Bash(python3 plot_delay_distributions.py)"
+    ]
+  }
+}

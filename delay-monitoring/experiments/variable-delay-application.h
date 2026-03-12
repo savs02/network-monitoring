@@ -7,6 +7,7 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/traced-callback.h"
 #include "ns3/ipv4-address.h"
+#include "delay-monitor.h"
 
 namespace ns3 {
 
@@ -19,9 +20,11 @@ public:
     
     void SetRemote(Ipv4Address ip, uint16_t port);
     void SetDelayRandomVariable(Ptr<RandomVariableStream> delay);
+    void SetIntervalRandomVariable(Ptr<RandomVariableStream> interval);
     void SetPacketSize(uint32_t packetSize);
     void SetMaxPackets(uint32_t maxPackets);
     void SetInterval(Time interval);
+    void SetDelayMonitor(DelayMonitor* monitor);
 
 protected:
     virtual void DoDispose() override;
@@ -41,6 +44,11 @@ private:
     Time m_interval;
     EventId m_sendEvent;
     Ptr<RandomVariableStream> m_delayRv;
+    Ptr<RandomVariableStream> m_intervalRv;
+    DelayMonitor* m_delayMonitor; // nullable: only records if set
+    
+    // trace source for transmitted packets
+    TracedCallback<Ptr<const Packet>, const Address&> m_txTrace;
 };
 
 class VariableDelayReceiver : public Application
@@ -64,8 +72,11 @@ private:
     Ptr<Socket> m_socket;
     uint16_t m_port;
     uint32_t m_received;
+    
+    // trace source for received packets
+    TracedCallback<Ptr<const Packet>, const Address&> m_rxTrace;
 };
 
-} // namespace ns3
+} 
 
 #endif

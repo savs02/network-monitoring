@@ -176,20 +176,6 @@ zigbee/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee.dir/build.make src/zigbee/CMakeFiles/zigbee.dir/build
 .PHONY : zigbee/fast
 
-# Convenience name for target.
-src/zigbee/CMakeFiles/zigbee-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/zigbee/CMakeFiles/zigbee-test.dir/rule
-.PHONY : src/zigbee/CMakeFiles/zigbee-test.dir/rule
-
-# Convenience name for target.
-zigbee-test: src/zigbee/CMakeFiles/zigbee-test.dir/rule
-.PHONY : zigbee-test
-
-# fast build rule for target.
-zigbee-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/build
-.PHONY : zigbee-test/fast
-
 helper/zigbee-helper.o: helper/zigbee-helper.cc.o
 .PHONY : helper/zigbee-helper.o
 
@@ -478,54 +464,6 @@ model/zigbee-stack.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee.dir/build.make src/zigbee/CMakeFiles/zigbee.dir/model/zigbee-stack.cc.s
 .PHONY : model/zigbee-stack.cc.s
 
-test/zigbee-aps-data-test.o: test/zigbee-aps-data-test.cc.o
-.PHONY : test/zigbee-aps-data-test.o
-
-# target to build an object file
-test/zigbee-aps-data-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/test/zigbee-aps-data-test.cc.o
-.PHONY : test/zigbee-aps-data-test.cc.o
-
-test/zigbee-aps-data-test.i: test/zigbee-aps-data-test.cc.i
-.PHONY : test/zigbee-aps-data-test.i
-
-# target to preprocess a source file
-test/zigbee-aps-data-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/test/zigbee-aps-data-test.cc.i
-.PHONY : test/zigbee-aps-data-test.cc.i
-
-test/zigbee-aps-data-test.s: test/zigbee-aps-data-test.cc.s
-.PHONY : test/zigbee-aps-data-test.s
-
-# target to generate assembly for a file
-test/zigbee-aps-data-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/test/zigbee-aps-data-test.cc.s
-.PHONY : test/zigbee-aps-data-test.cc.s
-
-test/zigbee-rreq-test.o: test/zigbee-rreq-test.cc.o
-.PHONY : test/zigbee-rreq-test.o
-
-# target to build an object file
-test/zigbee-rreq-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/test/zigbee-rreq-test.cc.o
-.PHONY : test/zigbee-rreq-test.cc.o
-
-test/zigbee-rreq-test.i: test/zigbee-rreq-test.cc.i
-.PHONY : test/zigbee-rreq-test.i
-
-# target to preprocess a source file
-test/zigbee-rreq-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/test/zigbee-rreq-test.cc.i
-.PHONY : test/zigbee-rreq-test.cc.i
-
-test/zigbee-rreq-test.s: test/zigbee-rreq-test.cc.s
-.PHONY : test/zigbee-rreq-test.s
-
-# target to generate assembly for a file
-test/zigbee-rreq-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/zigbee/CMakeFiles/zigbee-test.dir/build.make src/zigbee/CMakeFiles/zigbee-test.dir/test/zigbee-rreq-test.cc.s
-.PHONY : test/zigbee-rreq-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -539,7 +477,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... zigbee"
-	@echo "... zigbee-test"
 	@echo "... helper/zigbee-helper.o"
 	@echo "... helper/zigbee-helper.i"
 	@echo "... helper/zigbee-helper.s"
@@ -576,12 +513,6 @@ help:
 	@echo "... model/zigbee-stack.o"
 	@echo "... model/zigbee-stack.i"
 	@echo "... model/zigbee-stack.s"
-	@echo "... test/zigbee-aps-data-test.o"
-	@echo "... test/zigbee-aps-data-test.i"
-	@echo "... test/zigbee-aps-data-test.s"
-	@echo "... test/zigbee-rreq-test.o"
-	@echo "... test/zigbee-rreq-test.i"
-	@echo "... test/zigbee-rreq-test.s"
 .PHONY : help
 
 

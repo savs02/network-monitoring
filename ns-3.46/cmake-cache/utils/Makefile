@@ -163,20 +163,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-utils/CMakeFiles/test-runner.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 utils/CMakeFiles/test-runner.dir/rule
-.PHONY : utils/CMakeFiles/test-runner.dir/rule
-
-# Convenience name for target.
-test-runner: utils/CMakeFiles/test-runner.dir/rule
-.PHONY : test-runner
-
-# fast build rule for target.
-test-runner/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f utils/CMakeFiles/test-runner.dir/build.make utils/CMakeFiles/test-runner.dir/build
-.PHONY : test-runner/fast
-
-# Convenience name for target.
 utils/CMakeFiles/bench-scheduler.dir/rule:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 utils/CMakeFiles/bench-scheduler.dir/rule
 .PHONY : utils/CMakeFiles/bench-scheduler.dir/rule
@@ -328,30 +314,6 @@ print-introspected-doxygen.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f utils/CMakeFiles/print-introspected-doxygen.dir/build.make utils/CMakeFiles/print-introspected-doxygen.dir/print-introspected-doxygen.cc.s
 .PHONY : print-introspected-doxygen.cc.s
 
-test-runner.o: test-runner.cc.o
-.PHONY : test-runner.o
-
-# target to build an object file
-test-runner.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f utils/CMakeFiles/test-runner.dir/build.make utils/CMakeFiles/test-runner.dir/test-runner.cc.o
-.PHONY : test-runner.cc.o
-
-test-runner.i: test-runner.cc.i
-.PHONY : test-runner.i
-
-# target to preprocess a source file
-test-runner.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f utils/CMakeFiles/test-runner.dir/build.make utils/CMakeFiles/test-runner.dir/test-runner.cc.i
-.PHONY : test-runner.cc.i
-
-test-runner.s: test-runner.cc.s
-.PHONY : test-runner.s
-
-# target to generate assembly for a file
-test-runner.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f utils/CMakeFiles/test-runner.dir/build.make utils/CMakeFiles/test-runner.dir/test-runner.cc.s
-.PHONY : test-runner.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -368,7 +330,6 @@ help:
 	@echo "... bench-scheduler"
 	@echo "... perf-io"
 	@echo "... print-introspected-doxygen"
-	@echo "... test-runner"
 	@echo "... bench-packets.o"
 	@echo "... bench-packets.i"
 	@echo "... bench-packets.s"
@@ -381,9 +342,6 @@ help:
 	@echo "... print-introspected-doxygen.o"
 	@echo "... print-introspected-doxygen.i"
 	@echo "... print-introspected-doxygen.s"
-	@echo "... test-runner.o"
-	@echo "... test-runner.i"
-	@echo "... test-runner.s"
 .PHONY : help
 
 

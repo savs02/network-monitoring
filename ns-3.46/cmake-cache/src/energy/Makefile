@@ -176,20 +176,6 @@ energy/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy.dir/build.make src/energy/CMakeFiles/energy.dir/build
 .PHONY : energy/fast
 
-# Convenience name for target.
-src/energy/CMakeFiles/energy-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/energy/CMakeFiles/energy-test.dir/rule
-.PHONY : src/energy/CMakeFiles/energy-test.dir/rule
-
-# Convenience name for target.
-energy-test: src/energy/CMakeFiles/energy-test.dir/rule
-.PHONY : energy-test
-
-# fast build rule for target.
-energy-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/build
-.PHONY : energy-test/fast
-
 helper/basic-energy-harvester-helper.o: helper/basic-energy-harvester-helper.cc.o
 .PHONY : helper/basic-energy-harvester-helper.o
 
@@ -622,54 +608,6 @@ model/simple-device-energy-model.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy.dir/build.make src/energy/CMakeFiles/energy.dir/model/simple-device-energy-model.cc.s
 .PHONY : model/simple-device-energy-model.cc.s
 
-test/basic-energy-harvester-test.o: test/basic-energy-harvester-test.cc.o
-.PHONY : test/basic-energy-harvester-test.o
-
-# target to build an object file
-test/basic-energy-harvester-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/test/basic-energy-harvester-test.cc.o
-.PHONY : test/basic-energy-harvester-test.cc.o
-
-test/basic-energy-harvester-test.i: test/basic-energy-harvester-test.cc.i
-.PHONY : test/basic-energy-harvester-test.i
-
-# target to preprocess a source file
-test/basic-energy-harvester-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/test/basic-energy-harvester-test.cc.i
-.PHONY : test/basic-energy-harvester-test.cc.i
-
-test/basic-energy-harvester-test.s: test/basic-energy-harvester-test.cc.s
-.PHONY : test/basic-energy-harvester-test.s
-
-# target to generate assembly for a file
-test/basic-energy-harvester-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/test/basic-energy-harvester-test.cc.s
-.PHONY : test/basic-energy-harvester-test.cc.s
-
-test/generic-battery-test.o: test/generic-battery-test.cc.o
-.PHONY : test/generic-battery-test.o
-
-# target to build an object file
-test/generic-battery-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/test/generic-battery-test.cc.o
-.PHONY : test/generic-battery-test.cc.o
-
-test/generic-battery-test.i: test/generic-battery-test.cc.i
-.PHONY : test/generic-battery-test.i
-
-# target to preprocess a source file
-test/generic-battery-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/test/generic-battery-test.cc.i
-.PHONY : test/generic-battery-test.cc.i
-
-test/generic-battery-test.s: test/generic-battery-test.cc.s
-.PHONY : test/generic-battery-test.s
-
-# target to generate assembly for a file
-test/generic-battery-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/energy/CMakeFiles/energy-test.dir/build.make src/energy/CMakeFiles/energy-test.dir/test/generic-battery-test.cc.s
-.PHONY : test/generic-battery-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -683,7 +621,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... energy"
-	@echo "... energy-test"
 	@echo "... helper/basic-energy-harvester-helper.o"
 	@echo "... helper/basic-energy-harvester-helper.i"
 	@echo "... helper/basic-energy-harvester-helper.s"
@@ -738,12 +675,6 @@ help:
 	@echo "... model/simple-device-energy-model.o"
 	@echo "... model/simple-device-energy-model.i"
 	@echo "... model/simple-device-energy-model.s"
-	@echo "... test/basic-energy-harvester-test.o"
-	@echo "... test/basic-energy-harvester-test.i"
-	@echo "... test/basic-energy-harvester-test.s"
-	@echo "... test/generic-battery-test.o"
-	@echo "... test/generic-battery-test.i"
-	@echo "... test/generic-battery-test.s"
 .PHONY : help
 
 

@@ -176,20 +176,6 @@ point-to-point/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point.dir/build.make src/point-to-point/CMakeFiles/point-to-point.dir/build
 .PHONY : point-to-point/fast
 
-# Convenience name for target.
-src/point-to-point/CMakeFiles/point-to-point-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/point-to-point/CMakeFiles/point-to-point-test.dir/rule
-.PHONY : src/point-to-point/CMakeFiles/point-to-point-test.dir/rule
-
-# Convenience name for target.
-point-to-point-test: src/point-to-point/CMakeFiles/point-to-point-test.dir/rule
-.PHONY : point-to-point-test
-
-# fast build rule for target.
-point-to-point-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point-test.dir/build.make src/point-to-point/CMakeFiles/point-to-point-test.dir/build
-.PHONY : point-to-point-test/fast
-
 helper/point-to-point-helper.o: helper/point-to-point-helper.cc.o
 .PHONY : helper/point-to-point-helper.o
 
@@ -286,30 +272,6 @@ model/ppp-header.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point.dir/build.make src/point-to-point/CMakeFiles/point-to-point.dir/model/ppp-header.cc.s
 .PHONY : model/ppp-header.cc.s
 
-test/point-to-point-test.o: test/point-to-point-test.cc.o
-.PHONY : test/point-to-point-test.o
-
-# target to build an object file
-test/point-to-point-test.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point-test.dir/build.make src/point-to-point/CMakeFiles/point-to-point-test.dir/test/point-to-point-test.cc.o
-.PHONY : test/point-to-point-test.cc.o
-
-test/point-to-point-test.i: test/point-to-point-test.cc.i
-.PHONY : test/point-to-point-test.i
-
-# target to preprocess a source file
-test/point-to-point-test.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point-test.dir/build.make src/point-to-point/CMakeFiles/point-to-point-test.dir/test/point-to-point-test.cc.i
-.PHONY : test/point-to-point-test.cc.i
-
-test/point-to-point-test.s: test/point-to-point-test.cc.s
-.PHONY : test/point-to-point-test.s
-
-# target to generate assembly for a file
-test/point-to-point-test.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/point-to-point/CMakeFiles/point-to-point-test.dir/build.make src/point-to-point/CMakeFiles/point-to-point-test.dir/test/point-to-point-test.cc.s
-.PHONY : test/point-to-point-test.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -323,7 +285,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... point-to-point"
-	@echo "... point-to-point-test"
 	@echo "... helper/point-to-point-helper.o"
 	@echo "... helper/point-to-point-helper.i"
 	@echo "... helper/point-to-point-helper.s"
@@ -336,9 +297,6 @@ help:
 	@echo "... model/ppp-header.o"
 	@echo "... model/ppp-header.i"
 	@echo "... model/ppp-header.s"
-	@echo "... test/point-to-point-test.o"
-	@echo "... test/point-to-point-test.i"
-	@echo "... test/point-to-point-test.s"
 .PHONY : help
 
 

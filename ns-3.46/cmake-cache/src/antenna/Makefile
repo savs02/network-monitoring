@@ -176,20 +176,6 @@ antenna/fast:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna.dir/build.make src/antenna/CMakeFiles/antenna.dir/build
 .PHONY : antenna/fast
 
-# Convenience name for target.
-src/antenna/CMakeFiles/antenna-test.dir/rule:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/antenna/CMakeFiles/antenna-test.dir/rule
-.PHONY : src/antenna/CMakeFiles/antenna-test.dir/rule
-
-# Convenience name for target.
-antenna-test: src/antenna/CMakeFiles/antenna-test.dir/rule
-.PHONY : antenna-test
-
-# fast build rule for target.
-antenna-test/fast:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/build
-.PHONY : antenna-test/fast
-
 model/angles.o: model/angles.cc.o
 .PHONY : model/angles.o
 
@@ -382,174 +368,6 @@ model/uniform-planar-array.cc.s:
 	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna.dir/build.make src/antenna/CMakeFiles/antenna.dir/model/uniform-planar-array.cc.s
 .PHONY : model/uniform-planar-array.cc.s
 
-test/test-adjacency-matrix.o: test/test-adjacency-matrix.cc.o
-.PHONY : test/test-adjacency-matrix.o
-
-# target to build an object file
-test/test-adjacency-matrix.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-adjacency-matrix.cc.o
-.PHONY : test/test-adjacency-matrix.cc.o
-
-test/test-adjacency-matrix.i: test/test-adjacency-matrix.cc.i
-.PHONY : test/test-adjacency-matrix.i
-
-# target to preprocess a source file
-test/test-adjacency-matrix.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-adjacency-matrix.cc.i
-.PHONY : test/test-adjacency-matrix.cc.i
-
-test/test-adjacency-matrix.s: test/test-adjacency-matrix.cc.s
-.PHONY : test/test-adjacency-matrix.s
-
-# target to generate assembly for a file
-test/test-adjacency-matrix.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-adjacency-matrix.cc.s
-.PHONY : test/test-adjacency-matrix.cc.s
-
-test/test-angles.o: test/test-angles.cc.o
-.PHONY : test/test-angles.o
-
-# target to build an object file
-test/test-angles.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-angles.cc.o
-.PHONY : test/test-angles.cc.o
-
-test/test-angles.i: test/test-angles.cc.i
-.PHONY : test/test-angles.i
-
-# target to preprocess a source file
-test/test-angles.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-angles.cc.i
-.PHONY : test/test-angles.cc.i
-
-test/test-angles.s: test/test-angles.cc.s
-.PHONY : test/test-angles.s
-
-# target to generate assembly for a file
-test/test-angles.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-angles.cc.s
-.PHONY : test/test-angles.cc.s
-
-test/test-cosine-antenna.o: test/test-cosine-antenna.cc.o
-.PHONY : test/test-cosine-antenna.o
-
-# target to build an object file
-test/test-cosine-antenna.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-cosine-antenna.cc.o
-.PHONY : test/test-cosine-antenna.cc.o
-
-test/test-cosine-antenna.i: test/test-cosine-antenna.cc.i
-.PHONY : test/test-cosine-antenna.i
-
-# target to preprocess a source file
-test/test-cosine-antenna.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-cosine-antenna.cc.i
-.PHONY : test/test-cosine-antenna.cc.i
-
-test/test-cosine-antenna.s: test/test-cosine-antenna.cc.s
-.PHONY : test/test-cosine-antenna.s
-
-# target to generate assembly for a file
-test/test-cosine-antenna.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-cosine-antenna.cc.s
-.PHONY : test/test-cosine-antenna.cc.s
-
-test/test-degrees-radians.o: test/test-degrees-radians.cc.o
-.PHONY : test/test-degrees-radians.o
-
-# target to build an object file
-test/test-degrees-radians.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-degrees-radians.cc.o
-.PHONY : test/test-degrees-radians.cc.o
-
-test/test-degrees-radians.i: test/test-degrees-radians.cc.i
-.PHONY : test/test-degrees-radians.i
-
-# target to preprocess a source file
-test/test-degrees-radians.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-degrees-radians.cc.i
-.PHONY : test/test-degrees-radians.cc.i
-
-test/test-degrees-radians.s: test/test-degrees-radians.cc.s
-.PHONY : test/test-degrees-radians.s
-
-# target to generate assembly for a file
-test/test-degrees-radians.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-degrees-radians.cc.s
-.PHONY : test/test-degrees-radians.cc.s
-
-test/test-isotropic-antenna.o: test/test-isotropic-antenna.cc.o
-.PHONY : test/test-isotropic-antenna.o
-
-# target to build an object file
-test/test-isotropic-antenna.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-isotropic-antenna.cc.o
-.PHONY : test/test-isotropic-antenna.cc.o
-
-test/test-isotropic-antenna.i: test/test-isotropic-antenna.cc.i
-.PHONY : test/test-isotropic-antenna.i
-
-# target to preprocess a source file
-test/test-isotropic-antenna.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-isotropic-antenna.cc.i
-.PHONY : test/test-isotropic-antenna.cc.i
-
-test/test-isotropic-antenna.s: test/test-isotropic-antenna.cc.s
-.PHONY : test/test-isotropic-antenna.s
-
-# target to generate assembly for a file
-test/test-isotropic-antenna.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-isotropic-antenna.cc.s
-.PHONY : test/test-isotropic-antenna.cc.s
-
-test/test-parabolic-antenna.o: test/test-parabolic-antenna.cc.o
-.PHONY : test/test-parabolic-antenna.o
-
-# target to build an object file
-test/test-parabolic-antenna.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-parabolic-antenna.cc.o
-.PHONY : test/test-parabolic-antenna.cc.o
-
-test/test-parabolic-antenna.i: test/test-parabolic-antenna.cc.i
-.PHONY : test/test-parabolic-antenna.i
-
-# target to preprocess a source file
-test/test-parabolic-antenna.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-parabolic-antenna.cc.i
-.PHONY : test/test-parabolic-antenna.cc.i
-
-test/test-parabolic-antenna.s: test/test-parabolic-antenna.cc.s
-.PHONY : test/test-parabolic-antenna.s
-
-# target to generate assembly for a file
-test/test-parabolic-antenna.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-parabolic-antenna.cc.s
-.PHONY : test/test-parabolic-antenna.cc.s
-
-test/test-uniform-planar-array.o: test/test-uniform-planar-array.cc.o
-.PHONY : test/test-uniform-planar-array.o
-
-# target to build an object file
-test/test-uniform-planar-array.cc.o:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-uniform-planar-array.cc.o
-.PHONY : test/test-uniform-planar-array.cc.o
-
-test/test-uniform-planar-array.i: test/test-uniform-planar-array.cc.i
-.PHONY : test/test-uniform-planar-array.i
-
-# target to preprocess a source file
-test/test-uniform-planar-array.cc.i:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-uniform-planar-array.cc.i
-.PHONY : test/test-uniform-planar-array.cc.i
-
-test/test-uniform-planar-array.s: test/test-uniform-planar-array.cc.s
-.PHONY : test/test-uniform-planar-array.s
-
-# target to generate assembly for a file
-test/test-uniform-planar-array.cc.s:
-	cd /Users/savanisawaikar/network-monitoring/ns-3.46/cmake-cache && $(MAKE) $(MAKESILENT) -f src/antenna/CMakeFiles/antenna-test.dir/build.make src/antenna/CMakeFiles/antenna-test.dir/test/test-uniform-planar-array.cc.s
-.PHONY : test/test-uniform-planar-array.cc.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -563,7 +381,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... antenna"
-	@echo "... antenna-test"
 	@echo "... model/angles.o"
 	@echo "... model/angles.i"
 	@echo "... model/angles.s"
@@ -588,27 +405,6 @@ help:
 	@echo "... model/uniform-planar-array.o"
 	@echo "... model/uniform-planar-array.i"
 	@echo "... model/uniform-planar-array.s"
-	@echo "... test/test-adjacency-matrix.o"
-	@echo "... test/test-adjacency-matrix.i"
-	@echo "... test/test-adjacency-matrix.s"
-	@echo "... test/test-angles.o"
-	@echo "... test/test-angles.i"
-	@echo "... test/test-angles.s"
-	@echo "... test/test-cosine-antenna.o"
-	@echo "... test/test-cosine-antenna.i"
-	@echo "... test/test-cosine-antenna.s"
-	@echo "... test/test-degrees-radians.o"
-	@echo "... test/test-degrees-radians.i"
-	@echo "... test/test-degrees-radians.s"
-	@echo "... test/test-isotropic-antenna.o"
-	@echo "... test/test-isotropic-antenna.i"
-	@echo "... test/test-isotropic-antenna.s"
-	@echo "... test/test-parabolic-antenna.o"
-	@echo "... test/test-parabolic-antenna.i"
-	@echo "... test/test-parabolic-antenna.s"
-	@echo "... test/test-uniform-planar-array.o"
-	@echo "... test/test-uniform-planar-array.i"
-	@echo "... test/test-uniform-planar-array.s"
 .PHONY : help
 
 

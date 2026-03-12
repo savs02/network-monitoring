@@ -23,7 +23,7 @@ SQLite support                : [32mON[0m
 Eigen3 support                : [31mOFF (Eigen was not found)[0m
 Tap Bridge                    : OFF (not requested)
 Tap FdNetDevice               : OFF (not requested)
-Tests                         : [32mON[0m
+Tests                         : OFF (not requested)
 
 
 Modules configured to be built:
@@ -36,13 +36,12 @@ lr-wpan                   lte                       mesh
 mobility                  netanim                   network                   
 nix-vector-routing        olsr                      point-to-point            
 point-to-point-layout     propagation               sixlowpan                 
-spectrum                  stats                     test                      
-topology-read             traffic-control           uan                       
-virtual-net-device        wifi                      zigbee                    
-
+spectrum                  stats                     topology-read             
+traffic-control           uan                       virtual-net-device        
+wifi                      zigbee                    
 
 Modules that cannot be built:
 brite                     click                     fd-net-device             
 mpi                       openflow                  tap-bridge                
-visualizer                
+test                      visualizer                
 
