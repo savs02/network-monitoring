@@ -14,7 +14,10 @@
       "Bash(python3 -c \"\nimport math\nBIN_SIZES = [1, 2, 5, 10]\nGRID_MAX  = 150.0\nEPSILON   = 0.05\nDELTA     = 0.05\n\nheader = 'bin_size    k   n_theory      n/4      n/2        n       2n'\nprint\\(header\\)\nprint\\('-' * len\\(header\\)\\)\nfor b in BIN_SIZES:\n    k = int\\(GRID_MAX / b\\)\n    n = math.ceil\\(\\(k + math.log\\(1/EPSILON\\)\\) / DELTA**2\\)\n    print\\(f'{b:>8}ms {k:>5} {n:>10,} {n//4:>8,} {n//2:>8,} {n:>8,} {n*2:>8,}'\\)\n\")",
       "Bash(cd /Users/savanisawaikar/network-monitoring && chmod +x delay-monitoring/scripts/run_bin_size_experiment.sh && bash delay-monitoring/scripts/run_bin_size_experiment.sh)",
       "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 bin_size_experiment.py)",
-      "Bash(python3 bin_size_experiment.py 2>&1 | tail -10)"
+      "Bash(python3 bin_size_experiment.py 2>&1 | tail -10)",
+      "Bash(chmod +x /Users/savanisawaikar/network-monitoring/delay-monitoring/scripts/run_packet_loss_experiment.sh)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring && bash delay-monitoring/scripts/run_packet_loss_experiment.sh 2>&1)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 packet_loss_experiment.py 2>&1)"
     ]
   }
 }

@@ -35,7 +35,9 @@ VariableDelaySender::VariableDelaySender()
       m_interval(MilliSeconds(100)),
       m_delayRv(nullptr),
       m_intervalRv(nullptr),
-      m_delayMonitor(nullptr)
+      m_delayMonitor(nullptr),
+      m_lossRate(0.0),
+      m_lossRv(CreateObject<UniformRandomVariable>())
 {
 }
 
@@ -94,6 +96,12 @@ VariableDelaySender::SetDelayMonitor(DelayMonitor* monitor)
 }
 
 void
+VariableDelaySender::SetLossRate(double lossRate)
+{
+    m_lossRate = lossRate;
+}
+
+void
 VariableDelaySender::StartApplication()
 {
     if (!m_socket)
@@ -146,8 +154,12 @@ VariableDelaySender::SendPacket()
 
     NS_LOG_INFO("Packet " << m_packetsSent << ": sampled delay = " << sampledDelay << " ms");
 
-    // record the sample directly — this is the baseline non-binning monitor
-    if (m_delayMonitor)
+    // packet loss experiment: independent Bernoulli drop per packet
+    // packetReceived = false means the monitor never sees this packet
+    bool packetReceived = (m_lossRate == 0.0) || (m_lossRv->GetValue(0.0, 1.0) >= m_lossRate);
+
+    // record the sample only if the packet was not lost
+    if (m_delayMonitor && packetReceived)
     {
         m_delayMonitor->RecordDelay(m_packetsSent, sampledDelay);
     }

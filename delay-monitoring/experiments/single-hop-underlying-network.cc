@@ -52,6 +52,10 @@ main(int argc, char* argv[])
     
     uint32_t numPackets = 100;
 
+    // packet loss experiment: fraction of packets independently lost before reaching the monitor
+    // (used by packet_loss_experiment.py — run via run_packet_loss_experiment.sh)
+    double lossRate = 0.0;
+
     // interval distribution parameters
     double intervalMean = 1.0; // mean inter-packet time in ms (exponential)
 
@@ -73,6 +77,7 @@ main(int argc, char* argv[])
     cmd.AddValue("binomial_trials", "Binomial number of trials (N)", binomial_trials);
     cmd.AddValue("binomial_prob", "Binomial success probability (p)", binomial_prob);
     cmd.AddValue("numPackets", "Number of packets to send", numPackets);
+    cmd.AddValue("lossRate", "Fraction of packets independently lost before reaching the monitor, 0.0 = no loss (packet loss experiment)", lossRate);
     cmd.AddValue("intervalMean", "Mean inter-packet interval in ms (exponential)", intervalMean);
     cmd.AddValue("outputFile", "Output CSV path for delay samples (default: results/delay_samples_{dist}.csv)", outputFile);
     // cmd.AddValue("enableMonitoring", "Enable binning monitoring", enableMonitoring);
@@ -166,6 +171,7 @@ main(int argc, char* argv[])
     sender->SetPacketSize(1024);
     sender->SetMaxPackets(numPackets);
     sender->SetDelayMonitor(&delayMonitor);
+    sender->SetLossRate(lossRate); // packet loss experiment: 0.0 by default, no effect on other experiments
     nodes.Get(0)->AddApplication(sender);
     sender->SetStartTime(Seconds(0.01));
     sender->SetStopTime(Seconds(100.0));

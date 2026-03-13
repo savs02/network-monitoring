@@ -26,6 +26,10 @@ public:
     void SetInterval(Time interval);
     void SetDelayMonitor(DelayMonitor* monitor);
 
+    // packet loss experiment: fraction of packets not seen by the monitor
+    // (models packets lost in the network before reaching the passive observer)
+    void SetLossRate(double lossRate);
+
 protected:
     virtual void DoDispose() override;
 
@@ -45,7 +49,9 @@ private:
     EventId m_sendEvent;
     Ptr<RandomVariableStream> m_delayRv;
     Ptr<RandomVariableStream> m_intervalRv;
-    DelayMonitor* m_delayMonitor; // nullable: only records if set
+    DelayMonitor* m_delayMonitor;              // nullable: only records if set
+    double        m_lossRate;                  // fraction of packets lost (0 = no loss)
+    Ptr<UniformRandomVariable> m_lossRv;       // RNG for loss decisions
     
     // trace source for transmitted packets
     TracedCallback<Ptr<const Packet>, const Address&> m_txTrace;
