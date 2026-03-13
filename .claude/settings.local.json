@@ -3,7 +3,12 @@
     "allow": [
       "Bash(./ns3 build:*)",
       "Bash(./ns3 run:*)",
-      "Bash(python3 plot_delay_distributions.py)"
+      "Bash(python3 plot_delay_distributions.py)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring && chmod +x delay-monitoring/scripts/run_sample_complexity.sh && bash delay-monitoring/scripts/run_sample_complexity.sh)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 sample_complexity.py)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring && bash delay-monitoring/scripts/run_sample_complexity.sh)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 kl_experiment.py)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 kl_experiment_discrete.py)"
     ]
   }
 }

@@ -11,6 +11,7 @@
 #include "ns3/point-to-point-module.h"
 #include "variable-delay-application.h"
 #include "delay-monitor.h"
+// BinomialRandomVariable is built into NS-3 core (random-variable-stream.h)
 
 // binning monitor kept for reference but not used in this experiment
 // #include "binning-monitor.h"
@@ -41,14 +42,21 @@ main(int argc, char* argv[])
     
     double weibull_scale = 10.0;
     double weibull_shape = 2.0;
-    
+
     double normal_mean = 40.0;
     double normal_variance = 4.0;
+
+    // binomial distribution parameters
+    uint32_t binomial_trials = 20;
+    double   binomial_prob   = 0.5; // mean delay = trials * prob ms
     
     uint32_t numPackets = 100;
 
     // interval distribution parameters
     double intervalMean = 1.0; // mean inter-packet time in ms (exponential)
+
+    // output file for delay samples (default uses distribution name)
+    std::string outputFile = "";
 
     // binning monitor parameters (kept for reference, not used)
     // bool enableMonitoring = false;
@@ -62,8 +70,11 @@ main(int argc, char* argv[])
     cmd.AddValue("weibull_shape", "Weibull shape parameter", weibull_shape);
     cmd.AddValue("normal_mean", "Normal mean parameter", normal_mean);
     cmd.AddValue("normal_variance", "Normal variance parameter", normal_variance);
+    cmd.AddValue("binomial_trials", "Binomial number of trials (N)", binomial_trials);
+    cmd.AddValue("binomial_prob", "Binomial success probability (p)", binomial_prob);
     cmd.AddValue("numPackets", "Number of packets to send", numPackets);
     cmd.AddValue("intervalMean", "Mean inter-packet interval in ms (exponential)", intervalMean);
+    cmd.AddValue("outputFile", "Output CSV path for delay samples (default: results/delay_samples_{dist}.csv)", outputFile);
     // cmd.AddValue("enableMonitoring", "Enable binning monitoring", enableMonitoring);
     // cmd.AddValue("binWidth", "Bin width in ms", binWidth);
     cmd.Parse(argc, argv);
@@ -119,6 +130,14 @@ main(int argc, char* argv[])
         delayRv = nrv;
         NS_LOG_INFO("Normal: Mean=" << normal_mean << ", Variance=" << normal_variance);
     }
+    else if (delayDist == "binomial") {
+        Ptr<BinomialRandomVariable> brv = CreateObject<BinomialRandomVariable>();
+        brv->SetAttribute("Trials", IntegerValue(binomial_trials));
+        brv->SetAttribute("Probability", DoubleValue(binomial_prob));
+        delayRv = brv;
+        NS_LOG_INFO("Binomial: Trials=" << binomial_trials << ", Prob=" << binomial_prob
+                    << " (mean=" << binomial_trials * binomial_prob << "ms)");
+    }
     else {
         NS_FATAL_ERROR("Unknown distribution: " << delayDist);
     }
@@ -159,8 +178,11 @@ main(int argc, char* argv[])
     Simulator::Run();
     NS_LOG_INFO("Simulation complete. Packets received: " << receiver->GetReceived());
 
-    // export delay samples — filename includes distribution name for easy identification
-    std::string outputFile = "../delay-monitoring/results/delay_samples_" + delayDist + ".csv";
+    // if no output file was specified, fall back to the default per-distribution name
+    if (outputFile.empty())
+    {
+        outputFile = "../delay-monitoring/results/delay_samples_" + delayDist + ".csv";
+    }
     delayMonitor.ExportToCSV(outputFile);
 
     // binning monitor export (not used)
