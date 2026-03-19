@@ -17,7 +17,17 @@
       "Bash(python3 bin_size_experiment.py 2>&1 | tail -10)",
       "Bash(chmod +x /Users/savanisawaikar/network-monitoring/delay-monitoring/scripts/run_packet_loss_experiment.sh)",
       "Bash(cd /Users/savanisawaikar/network-monitoring && bash delay-monitoring/scripts/run_packet_loss_experiment.sh 2>&1)",
-      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 packet_loss_experiment.py 2>&1)"
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 packet_loss_experiment.py 2>&1)",
+      "Bash(chmod +x /Users/savanisawaikar/network-monitoring/delay-monitoring/scripts/run_load_experiment.sh && cd /Users/savanisawaikar/network-monitoring && bash delay-monitoring/scripts/run_load_experiment.sh 2>&1)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 load_experiment.py 2>&1)",
+      "Bash(chmod +x /Users/savanisawaikar/network-monitoring/delay-monitoring/scripts/run_load_change_experiment.sh && cd /Users/savanisawaikar/network-monitoring && bash delay-monitoring/scripts/run_load_change_experiment.sh 2>&1)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 load_change_experiment.py 2>&1)",
+      "Bash(chmod +x /Users/savanisawaikar/network-monitoring/delay-monitoring/scripts/run_cross_traffic_experiment.sh)",
+      "Read(//tmp/**)",
+      "Bash(wait && cat /private/tmp/claude-501/-Users-savanisawaikar-network-monitoring/tasks/bdo020n1i.output 2>/dev/null || true)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring && bash delay-monitoring/scripts/run_cross_traffic_experiment.sh 2>&1)",
+      "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 cross_traffic_experiment.py)",
+      "Bash(ls -lh /Users/savanisawaikar/network-monitoring/delay-monitoring/results/cross-traffic/*.png 2>/dev/null; ls /Users/savanisawaikar/network-monitoring/delay-monitoring/results/cross-traffic/)"
     ]
   }
 }

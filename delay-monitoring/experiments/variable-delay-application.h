@@ -7,9 +7,31 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/traced-callback.h"
 #include "ns3/ipv4-address.h"
+#include "ns3/tag.h"
 #include "delay-monitor.h"
 
 namespace ns3 {
+
+// ---------------------------------------------------------------------------
+// DelayProbeTag — carries the probe-packet send time through the simulator
+// so the receiver can compute the actual end-to-end delay.
+// Used by the cross-traffic experiment (cross_traffic_experiment.py).
+// ---------------------------------------------------------------------------
+class DelayProbeTag : public Tag
+{
+public:
+    static TypeId GetTypeId();
+    TypeId GetInstanceTypeId() const override;
+    uint32_t GetSerializedSize()           const override;
+    void Serialize(TagBuffer buf)          const override;
+    void Deserialize(TagBuffer buf)              override;
+    void Print(std::ostream& os)           const override;
+
+    void     SetSentNs(uint64_t ns);
+    uint64_t GetSentNs() const;
+private:
+    uint64_t m_sentNs = 0;   // Simulator::Now() in nanoseconds at send time
+};
 
 class VariableDelaySender : public Application
 {
@@ -63,9 +85,13 @@ public:
     static TypeId GetTypeId();
     VariableDelayReceiver();
     virtual ~VariableDelayReceiver();
-    
+
     void SetPort(uint16_t port);
     uint32_t GetReceived() const;
+
+    // cross-traffic experiment: attach monitor so the receiver measures real
+    // end-to-end delay via DelayProbeTag (arrival_time - send_time in ns)
+    void SetDelayMonitor(DelayMonitor* monitor);
 
 protected:
     virtual void DoDispose() override;
@@ -74,11 +100,12 @@ private:
     virtual void StartApplication() override;
     virtual void StopApplication() override;
     void HandleRead(Ptr<Socket> socket);
-    
+
     Ptr<Socket> m_socket;
     uint16_t m_port;
     uint32_t m_received;
-    
+    DelayMonitor* m_delayMonitor;   // nullable: set for cross-traffic experiment
+
     // trace source for received packets
     TracedCallback<Ptr<const Packet>, const Address&> m_rxTrace;
 };

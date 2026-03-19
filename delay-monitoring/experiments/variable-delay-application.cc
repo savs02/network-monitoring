@@ -9,6 +9,68 @@
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE("VariableDelayApplication");
+
+// ---------------------------------------------------------------------------
+// DelayProbeTag — carries probe-packet send time through the simulator so the
+// receiver can compute the actual end-to-end delay.
+// Used by the cross-traffic experiment (cross_traffic_experiment.py).
+// ---------------------------------------------------------------------------
+
+NS_OBJECT_ENSURE_REGISTERED(DelayProbeTag);
+
+TypeId
+DelayProbeTag::GetTypeId()
+{
+    static TypeId tid = TypeId("ns3::DelayProbeTag")
+        .SetParent<Tag>()
+        .AddConstructor<DelayProbeTag>();
+    return tid;
+}
+
+TypeId
+DelayProbeTag::GetInstanceTypeId() const
+{
+    return GetTypeId();
+}
+
+uint32_t
+DelayProbeTag::GetSerializedSize() const
+{
+    return sizeof(uint64_t);   // 8 bytes for nanoseconds
+}
+
+void
+DelayProbeTag::Serialize(TagBuffer buf) const
+{
+    buf.WriteU64(m_sentNs);
+}
+
+void
+DelayProbeTag::Deserialize(TagBuffer buf)
+{
+    m_sentNs = buf.ReadU64();
+}
+
+void
+DelayProbeTag::Print(std::ostream& os) const
+{
+    os << "sentNs=" << m_sentNs;
+}
+
+void
+DelayProbeTag::SetSentNs(uint64_t ns)
+{
+    m_sentNs = ns;
+}
+
+uint64_t
+DelayProbeTag::GetSentNs() const
+{
+    return m_sentNs;
+}
+
+// ---------------------------------------------------------------------------
+
 NS_OBJECT_ENSURE_REGISTERED(VariableDelaySender);
 
 TypeId
@@ -172,12 +234,22 @@ VariableDelaySender::SendPacket()
     m_txTrace(packet, peerAddr);
     
     NS_LOG_INFO("Packet " << m_packetsSent << " entered ingress at t=" << Simulator::Now().GetSeconds() << "s");
-    
+
+    // cross-traffic experiment: record send time NOW (before artificial delay),
+    // so receiver measures total E2E = base_delay + propagation + queuing
+    uint64_t sendNs = Simulator::Now().GetNanoSeconds();
+
     // schedule the actual network delivery after the sampled delay
-    Time delayTime = MilliSeconds(sampledDelay);
+    // (NanoSeconds(1) minimum: Simulator::Schedule requires strictly positive delay)
+    Time delayTime = (sampledDelay > 0.0) ? MilliSeconds(sampledDelay) : NanoSeconds(1);
     uint32_t currentPacket = m_packetsSent;
-    
-    Simulator::Schedule(delayTime, [this, packet, currentPacket]() {
+
+    Simulator::Schedule(delayTime, [this, packet, currentPacket, sendNs]() {
+        // stamp packet with the original send time (before artificial delay)
+        DelayProbeTag tsTag;
+        tsTag.SetSentNs(sendNs);
+        packet->AddPacketTag(tsTag);
+
         int sent = m_socket->Send(packet);
         if (sent > 0)
         {
@@ -228,7 +300,8 @@ VariableDelayReceiver::GetTypeId()
 VariableDelayReceiver::VariableDelayReceiver()
     : m_socket(nullptr),
       m_port(9),
-      m_received(0)
+      m_received(0),
+      m_delayMonitor(nullptr)
 {
 }
 
@@ -247,6 +320,12 @@ void
 VariableDelayReceiver::SetPort(uint16_t port)
 {
     m_port = port;
+}
+
+void
+VariableDelayReceiver::SetDelayMonitor(DelayMonitor* monitor)
+{
+    m_delayMonitor = monitor;
 }
 
 uint32_t
@@ -295,11 +374,22 @@ VariableDelayReceiver::HandleRead(Ptr<Socket> socket)
         {
             // fire Rx trace - this is the egress timestamp
             m_rxTrace(packet, from);
-            
-            NS_LOG_INFO("Received packet #" << m_received 
+
+            // cross-traffic experiment: extract send timestamp and compute
+            // real end-to-end delay (propagation + transmission + queuing)
+            DelayProbeTag tsTag;
+            if (m_delayMonitor && packet->RemovePacketTag(tsTag))
+            {
+                uint64_t sentNs  = tsTag.GetSentNs();
+                uint64_t nowNs   = Simulator::Now().GetNanoSeconds();
+                double   delayMs = static_cast<double>(nowNs - sentNs) / 1.0e6;
+                m_delayMonitor->RecordDelay(m_received, delayMs);
+            }
+
+            NS_LOG_INFO("Received packet #" << m_received
                        << " (" << packet->GetSize() << " bytes)"
                        << " at egress t=" << Simulator::Now().GetSeconds() << "s");
-            
+
             m_received++;
         }
     }

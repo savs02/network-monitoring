@@ -1637,5 +1637,56 @@ scratch/CMakeFiles/scratch_delay-monitoring_single-hop-underlying-network.dir/de
   /Users/savanisawaikar/network-monitoring/ns-3.46/src/point-to-point/model/point-to-point-net-device.h \
   /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/ppp-header.h \
   /Users/savanisawaikar/network-monitoring/ns-3.46/src/point-to-point/model/ppp-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/applications-module.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/bulk-send-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/helper/bulk-send-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/on-off-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/helper/on-off-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/packet-sink-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/helper/packet-sink-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/three-gpp-http-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/helper/three-gpp-http-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/udp-client-server-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/helper/udp-client-server-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/udp-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/udp-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/source-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/udp-server.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/udp-server.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/packet-loss-counter.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/sink-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/udp-trace-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/udp-trace-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/udp-echo-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/helper/udp-echo-helper.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/application-packet-probe.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/application-packet-probe.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/bulk-send-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/bulk-send-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/seq-ts-size-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/seq-ts-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/onoff-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/onoff-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/packet-loss-counter.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/packet-sink.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/packet-sink.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/seq-ts-echo-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/seq-ts-echo-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/seq-ts-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/seq-ts-size-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/sink-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/source-application.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/three-gpp-http-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/three-gpp-http-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/three-gpp-http-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/three-gpp-http-header.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/three-gpp-http-server.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/three-gpp-http-server.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/three-gpp-http-variables.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/three-gpp-http-variables.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/udp-echo-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/udp-echo-client.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/build/include/ns3/udp-echo-server.h \
+  /Users/savanisawaikar/network-monitoring/ns-3.46/src/applications/model/udp-echo-server.h \
   /Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/variable-delay-application.h \
   /Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/delay-monitor.h
