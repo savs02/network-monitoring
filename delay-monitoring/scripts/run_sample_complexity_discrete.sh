@@ -6,10 +6,10 @@
 #
 # Theoretical sample requirement:
 #   k = N + 1 = 21  (support of Binomial(20, 0.5) is {0, 1, ..., 20})
-#   n_theory = ceil((k + log(1/epsilon)) / delta^2)
-#            = ceil((21 + 2.9957) / 0.0025) = 9599
+#   n_theory = ceil((k * log(1/epsilon)) / delta^2)
+#            = ceil((21 * 2.9957) / 0.0025) = 25165
 #
-# Sample sizes: n/4=2399, n/2=4799, n=9599, 2n=19198
+# Sample sizes: n/4=6291, n/2=12582, n=25165, 2n=50330
 
 set -e
 
@@ -19,7 +19,7 @@ RESULTS_RELPATH="../delay-monitoring/results/sample-complexity-discrete"
 
 mkdir -p "$RESULTS_DIR"
 
-SAMPLE_SIZES=(2399 4799 9599 19198)
+SAMPLE_SIZES=(6291 12582 25165 50330)
 
 total=${#SAMPLE_SIZES[@]}
 count=0
