@@ -36,6 +36,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ---------------------------------------------------------------------------
 # parameters — must match run_packet_loss_experiment.sh
 # ---------------------------------------------------------------------------
@@ -52,8 +54,8 @@ LOSS_RATES         = [0.0, 0.1, 0.25, 0.5, 0.75]
 TRANSMITTED_COUNTS = [n_theory // 4, n_theory // 2, n_theory, n_theory * 2]
 TRANSMITTED_LABELS = ["n/4",          "n/2",         "n",      "2n"]
 
-SOURCE_DIR  = "../results/packet-loss"
-RESULTS_DIR = "../results/packet-loss"
+SOURCE_DIR  = os.path.join(SCRIPT_DIR, "../results/packet-loss")
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/packet-loss")
 
 DISTRIBUTIONS = {
     "normal": {

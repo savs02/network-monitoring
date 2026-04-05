@@ -17,7 +17,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-RESULTS_DIR = "../results/sample-complexity"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/sample-complexity")
 
 SAMPLE_SIZES = [50, 100, 200, 500, 1000, 2000, 5000, 10000]
 

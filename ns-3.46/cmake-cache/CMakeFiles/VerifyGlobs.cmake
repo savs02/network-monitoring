@@ -30,7 +30,6 @@ endif()
 # scratch_sources at scratch/CMakeLists.txt:98 (file)
 file(GLOB NEW_GLOB LIST_DIRECTORIES true "/Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/[^.]*.cc")
 set(OLD_GLOB
-  "/Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/binning-monitor.cc"
   "/Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/delay-monitor.cc"
   "/Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/single-hop-underlying-network.cc"
   "/Users/savanisawaikar/network-monitoring/ns-3.46/scratch/delay-monitoring/variable-delay-application.cc"

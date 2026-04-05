@@ -1,5 +1,5 @@
 """
-Bin size experiment.
+Bin size experiment — multi-seed.
 
 For each bin size, the theoretical sample requirement is computed as:
     n_theory = ceil((k + log(1 / epsilon)) / delta^2)
@@ -11,12 +11,12 @@ Two estimators are compared for each (bin size, distribution, sample count):
   - Probability Mass Function (PMF): the raw sample counts rounded to the
     nearest bin and normalised — no smoothing applied.
 
-Both Total Variation Distance (TVD) and Kullback-Leibler (KL) divergence
-between the estimate and the true distribution are computed.
+TVD between the estimate and the true distribution is computed for each
+random seed. Box plots across seeds show the variability of TVD at each
+sample count, using the same multi-seed methodology as the discrete experiment.
 
-The x-axis of all per-distribution plots is normalised: each bin size's
-sample counts are expressed as n/4, n/2, n, and 2n relative to its own
-n_theory. This puts all bin sizes on a common scale for fair comparison.
+The x-axis of all per-distribution-per-binsize plots is normalised:
+sample counts are expressed as n/4, n/2, n, and 2n relative to n_theory.
 
 Results saved to: results/bin-size-experiment/
 """
@@ -26,8 +26,9 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
 from scipy import stats
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ---------------------------------------------------------------------------
 # parameters
@@ -38,8 +39,10 @@ GRID_MAX  = 150.0
 EPSILON   = 0.05
 DELTA     = 0.05
 
-BASE_DIR    = "../results/bin-size-experiment"
-RESULTS_DIR = "../results/bin-size-experiment"
+SEEDS = list(range(1, 31))   # 30 random seeds (NS-3 RngRun values)
+
+BASE_DIR    = os.path.join(SCRIPT_DIR, "../results/bin-size-experiment")
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/bin-size-experiment")
 
 DISTRIBUTIONS = {
     "normal": {
@@ -56,24 +59,24 @@ DISTRIBUTIONS = {
     },
 }
 
-# distinct color and marker per bin size so lines are easily told apart
+# distinct colour per bin size
 BIN_STYLE = {
-    1:  {"color": "#2196F3", "marker": "o", "label": "1ms bins"},
-    2:  {"color": "#FF9800", "marker": "s", "label": "2ms bins"},
-    5:  {"color": "#4CAF50", "marker": "^", "label": "5ms bins"},
-    10: {"color": "#E91E63", "marker": "D", "label": "10ms bins"},
+    1:  {"color": "#2196F3", "label": "1ms bins"},
+    2:  {"color": "#FF9800", "label": "2ms bins"},
+    5:  {"color": "#4CAF50", "label": "5ms bins"},
+    10: {"color": "#E91E63", "label": "10ms bins"},
 }
 
 # normalised x positions and their axis labels
-X_POSITIONS  = [0.25, 0.5, 1.0, 2.0]   # multiples of n_theory
-X_TICK_LABELS = ["n/4", "n/2", "n", "2n"]
+X_TICK_LABELS = ["n/4", "n/2", "n", "2n", "4n"]
+BOX_POSITIONS = list(range(len(X_TICK_LABELS)))
 
 
 def bin_config(bin_size):
     """Return k, n_theory, and the four sample sizes for a given bin size."""
     k        = int(GRID_MAX / bin_size)
     n_theory = math.ceil((k + math.log(1.0 / EPSILON)) / DELTA ** 2)
-    return k, n_theory, [n_theory // 4, n_theory // 2, n_theory, n_theory * 2]
+    return k, n_theory, [n_theory // 4, n_theory // 2, n_theory, n_theory * 2, n_theory * 4]
 
 
 # ---------------------------------------------------------------------------
@@ -82,14 +85,15 @@ def bin_config(bin_size):
 
 def print_parameters():
     print("=" * 70)
-    print("Bin size experiment — parameters")
+    print("Bin size experiment — parameters (multi-seed)")
     print("=" * 70)
     print(f"  Grid max : {GRID_MAX} ms")
     print(f"  epsilon  : {EPSILON}")
     print(f"  delta    : {DELTA}")
+    print(f"  Seeds    : {len(SEEDS)} ({SEEDS[0]}..{SEEDS[-1]})")
     print(f"  Formula  : n_theory = ceil((k + log(1/epsilon)) / delta^2)")
     print()
-    print(f"  {'Bin size':>10}  {'k':>5}  {'n_theory':>10}  Sample sizes (n/4, n/2, n, 2n)")
+    print(f"  {'Bin size':>10}  {'k':>5}  {'n_theory':>10}  Sample sizes (n/4, n/2, n, 2n, 4n)")
     print(f"  {'-'*65}")
     for b in BIN_SIZES:
         k, n_theory, sizes = bin_config(b)
@@ -99,9 +103,9 @@ def print_parameters():
     print()
 
 
-def load_samples(bin_size, dist_name, n):
+def load_samples(bin_size, dist_name, n, seed):
     path = os.path.join(BASE_DIR, f"bin_{bin_size}ms",
-                        f"delay_samples_{dist_name}_{n}.csv")
+                        f"delay_samples_{dist_name}_{n}_seed{seed}.csv")
     return pd.read_csv(path)["delay_ms"].values
 
 
@@ -137,35 +141,20 @@ def kde_pmf(samples, bin_centres, bin_size):
     return masses / masses.sum()
 
 
-def empirical_pmf(samples, bin_size, n_bins, smoothing=0.5):
-    """
-    Probability Mass Function from raw counts.
-    Samples are rounded to the nearest bin. A small pseudocount (Laplace
-    smoothing) is added to each bin so that unobserved bins do not cause
-    Kullback-Leibler divergence to be undefined.
-    """
+def empirical_pmf(samples, bin_size, n_bins):
+    """Probability Mass Function from raw counts, rounded to the nearest bin."""
     bin_indices = np.floor(samples / bin_size).astype(int)
     counts = np.zeros(n_bins)
     for idx in bin_indices:
         if 0 <= idx < n_bins:
             counts[idx] += 1
-    smoothed = counts + smoothing
-    return smoothed / smoothed.sum()
+    total = counts.sum()
+    return counts / total if total > 0 else counts
 
 
 def tvd(p, q):
     """Total Variation Distance between two probability distributions."""
     return 0.5 * float(np.sum(np.abs(p - q)))
-
-
-def kl_divergence(true_masses, est_masses, eps=1e-10):
-    """
-    Kullback-Leibler divergence KL(true || estimate).
-    Measures how much the estimate diverges from the true distribution.
-    """
-    est_safe = np.clip(est_masses, eps, None)
-    mask = true_masses > 0
-    return float(np.sum(true_masses[mask] * np.log(true_masses[mask] / est_safe[mask])))
 
 
 def param_label(dist_name, params):
@@ -182,64 +171,144 @@ def param_label(dist_name, params):
 # plotting
 # ---------------------------------------------------------------------------
 
-def ntheory_subtitle(dist_name):
+def plot_tvd_vs_n(dist_name, dist_config, bin_size, kde_tvds_by_n, pmf_tvds_by_n):
     """
-    One-line string listing n_theory for each bin size.
-    Placed as a subtitle so the reader knows the absolute sample counts.
-    """
-    parts = []
-    for b in BIN_SIZES:
-        k, n_theory, _ = bin_config(b)
-        parts.append(f"{b}ms bins: n = {n_theory:,}")
-    return "  |  ".join(parts)
-
-
-def plot_tvd_vs_n(dist_name, dist_config, results_by_binsize):
-    """
-    Two-panel plot: Total Variation Distance vs sample count for each bin size.
+    Two-panel box plot of TVD vs sample count for one distribution and bin size.
     Left panel: Kernel Density Estimate.  Right panel: Probability Mass Function.
-    x-axis is normalised (n/4, n/2, n, 2n) so all bin sizes share the same scale.
+    Each box shows the spread of TVD across all seeds at that sample count.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5), sharey=False)
+    _, n_theory, sample_sizes = bin_config(bin_size)
+    color = BIN_STYLE[bin_size]["color"]
 
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5), sharey=False)
     fig.suptitle(
-        f"{dist_config['label']}  —  Total Variation Distance vs sample count\n"
+        f"{dist_config['label']}  —  TVD vs sample count  |  {bin_size}ms bins\n"
         f"{param_label(dist_name, dist_config['params'])}",
         fontsize=11
     )
+    fig.text(
+        0.5, 0.91,
+        f"n_theory = {n_theory:,}  |  k = {int(GRID_MAX / bin_size)}  |  "
+        f"ε = {EPSILON}, δ = {DELTA}  |  {len(SEEDS)} seeds",
+        ha="center", fontsize=8, color="#555555"
+    )
 
-    # subtitle showing n_theory for each bin size
-    fig.text(0.5, 0.91, ntheory_subtitle(dist_name),
-             ha="center", fontsize=8, color="#555555")
-
-    for ax, estimator_key, estimator_label in [
-        (axes[0], "kde", "Kernel Density Estimate (KDE)"),
-        (axes[1], "pmf", "Probability Mass Function (PMF)"),
+    for ax, tvds_by_n, estimator_label in [
+        (axes[0], kde_tvds_by_n, "Kernel Density Estimate (KDE)"),
+        (axes[1], pmf_tvds_by_n, "Probability Mass Function (PMF)"),
     ]:
-        for bin_size, (kde_tvds, pmf_tvds, _kl_kde, _kl_pmf) in results_by_binsize.items():
-            style = BIN_STYLE[bin_size]
-            tvds  = kde_tvds if estimator_key == "kde" else pmf_tvds
+        ax.boxplot(tvds_by_n, positions=BOX_POSITIONS, widths=0.5,
+                   patch_artist=True,
+                   boxprops=dict(facecolor=color, alpha=0.5),
+                   medianprops=dict(color="black", linewidth=2),
+                   flierprops=dict(marker="o", markersize=3, alpha=0.4))
 
-            ax.plot(X_POSITIONS, tvds,
-                    color=style["color"],
-                    marker=style["marker"],
-                    linestyle="-",
-                    linewidth=2.0,
-                    markersize=7,
-                    label=style["label"])
+        ax.axhline(y=DELTA, color="red", linestyle=":", linewidth=1.2,
+                   label=f"TVD = {DELTA} (accuracy target)")
 
-        ax.set_xscale("log")
-        ax.xaxis.set_major_locator(mticker.FixedLocator(X_POSITIONS))
-        ax.xaxis.set_major_formatter(mticker.FixedFormatter(X_TICK_LABELS))
-        ax.xaxis.set_minor_formatter(mticker.NullFormatter())
-        ax.set_xlabel("Sample count (relative to n_theory)")
+        tick_labels = [f"{l}\n({n:,})" for l, n in zip(X_TICK_LABELS, sample_sizes)]
+        ax.set_xticks(BOX_POSITIONS)
+        ax.set_xticklabels(tick_labels)
+        ax.set_xlabel("Sample count")
         ax.set_ylabel("Total Variation Distance")
+        ax.set_yscale("log")
         ax.set_title(estimator_label)
         ax.legend(fontsize=9)
-        ax.grid(True, alpha=0.3, which="both")
+        ax.grid(True, alpha=0.3, axis="y", which="both")
 
     plt.subplots_adjust(top=0.82)
-    out = os.path.join(RESULTS_DIR, f"tvd_vs_n_{dist_name}.png")
+    out = os.path.join(RESULTS_DIR,
+                       f"tvd_vs_n_{dist_name}_bin{bin_size}ms.png")
+    plt.savefig(out, dpi=150, bbox_inches="tight")
+    plt.close()
+    print(f"  Saved: {out}")
+
+
+def dist_xlim(dist_name, params):
+    """Return (xmin, xmax) covering the 0.1th–99.9th percentile of the distribution."""
+    if dist_name == "normal":
+        d = stats.norm(loc=params["mean"], scale=np.sqrt(params["variance"]))
+    elif dist_name == "lognormal":
+        d = stats.lognorm(s=params["sigma"], scale=np.exp(params["mu"]))
+    elif dist_name == "weibull":
+        d = stats.weibull_min(c=params["shape"], scale=params["scale"])
+    return max(0.0, d.ppf(0.001)), d.ppf(0.999)
+
+
+def true_pdf_fine(dist_name, params, x):
+    """Evaluate the true PDF at points x."""
+    if dist_name == "normal":
+        return stats.norm.pdf(x, loc=params["mean"],
+                              scale=np.sqrt(params["variance"]))
+    elif dist_name == "lognormal":
+        return stats.lognorm.pdf(x, s=params["sigma"],
+                                 scale=np.exp(params["mu"]))
+    elif dist_name == "weibull":
+        return stats.weibull_min.pdf(x, c=params["shape"],
+                                     scale=params["scale"])
+
+
+def plot_distribution_comparison(dist_name, dist_config):
+    """
+    For 1ms and 2ms bins, overlay the true underlying PDF, empirical PMF
+    (as a bar histogram), and KDE on the same axes.  Uses seed 1 at n_theory
+    samples as a representative single run.
+
+    This motivates the choice to focus on finer bins: coarser bins visibly
+    lose the shape of the underlying distribution, while the KDE adds a
+    smoothing approximation on top of the PMF.
+    """
+    bin_sizes_to_show = [1, 2, 5, 10]
+    params = dist_config["params"]
+
+    xmin, xmax = dist_xlim(dist_name, params)
+    x_fine = np.linspace(xmin, xmax, 1000)
+    true_pdf_vals = true_pdf_fine(dist_name, params, x_fine)
+
+    fig, axes_grid = plt.subplots(2, 2, figsize=(14, 10), sharey=False)
+    axes = axes_grid.flatten()
+    fig.suptitle(
+        f"{dist_config['label']}  —  Underlying distribution, PMF, and KDE\n"
+        f"{param_label(dist_name, params)}  |  seed 1, n = n_theory",
+        fontsize=11
+    )
+
+    for ax, bin_size in zip(axes, bin_sizes_to_show):
+        _, n_theory, sample_sizes = bin_config(bin_size)
+        n = sample_sizes[2]   # n_theory
+        bin_edges, bin_centres = make_grid(bin_size)
+        n_bins = len(bin_centres)
+
+        samples = load_samples(bin_size, dist_name, n, seed=1)
+
+        # PMF masses converted to density for a common y-axis scale
+        pmf_masses = empirical_pmf(samples, bin_size, n_bins)
+        pmf_density = pmf_masses / bin_size
+
+        # KDE as continuous density
+        kde_obj  = stats.gaussian_kde(samples, bw_method="scott")
+        kde_vals = kde_obj(x_fine)
+
+        # restrict bar centres to the visible x range
+        visible = (bin_centres >= xmin) & (bin_centres <= xmax)
+
+        ax.bar(bin_centres[visible], pmf_density[visible],
+               width=bin_size * 0.9, color="#FF9800", alpha=0.55,
+               label=f"PMF ({bin_size}ms bins)")
+        ax.plot(x_fine, kde_vals, color="#9b59b6", linewidth=2.0,
+                label="KDE (Scott's rule)")
+        ax.plot(x_fine, true_pdf_vals, color="black", linewidth=2.0,
+                linestyle="--", label="True distribution")
+
+        ax.set_xlim(xmin, xmax)
+        ax.set_xlabel("Delay (ms)")
+        ax.set_ylabel("Probability density")
+        ax.set_title(f"{bin_size}ms bins  |  n = {n:,}")
+        ax.legend(fontsize=9)
+        ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    out = os.path.join(RESULTS_DIR, f"dist_comparison_{dist_name}.png")
     plt.savefig(out, dpi=150, bbox_inches="tight")
     plt.close()
     print(f"  Saved: {out}")
@@ -247,17 +316,17 @@ def plot_tvd_vs_n(dist_name, dist_config, results_by_binsize):
 
 def plot_tvd_vs_binsize_summary(all_results):
     """
-    Summary: Total Variation Distance at n (the theoretical sample count)
-    vs bin size, for each distribution.
-    Left: Kernel Density Estimate.  Right: Probability Mass Function.
+    Summary: median TVD at n_theory vs bin size, for each distribution.
+    Left panel: KDE.  Right panel: PMF.
     """
-    dist_colors = {"normal": "#3498db", "lognormal": "#e74c3c", "weibull": "#2ecc71"}
+    dist_colors  = {"normal": "#3498db", "lognormal": "#e74c3c", "weibull": "#2ecc71"}
     dist_markers = {"normal": "o", "lognormal": "s", "weibull": "^"}
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle(
-        "Total Variation Distance at n_theory vs bin size — all distributions\n"
-        "n_theory = ceil((k + log(1/epsilon)) / delta^2),  epsilon = 0.05,  delta = 0.05",
+        "Median TVD at n_theory vs bin size — all distributions\n"
+        f"n_theory = ceil((k + log(1/ε)) / δ²),  ε = {EPSILON},  δ = {DELTA},  "
+        f"{len(SEEDS)} seeds",
         fontsize=11
     )
 
@@ -266,20 +335,21 @@ def plot_tvd_vs_binsize_summary(all_results):
         (axes[1], "pmf", "Probability Mass Function (PMF)"),
     ]:
         for dist_name, dist_config in DISTRIBUTIONS.items():
-            tvd_at_n = []
+            medians = []
             for bin_size in BIN_SIZES:
-                kde_tvds, pmf_tvds, _, _ = all_results[dist_name][bin_size]
-                tvds = kde_tvds if estimator_key == "kde" else pmf_tvds
-                tvd_at_n.append(tvds[2])   # index 2 = n (not n/4, n/2, or 2n)
+                tvds_at_n = all_results[dist_name][bin_size][estimator_key][2]  # index 2 = n
+                medians.append(float(np.median(tvds_at_n)))
 
-            ax.plot(BIN_SIZES, tvd_at_n,
+            ax.plot(BIN_SIZES, medians,
                     color=dist_colors[dist_name],
                     marker=dist_markers[dist_name],
                     linestyle="-", linewidth=2.0, markersize=8,
                     label=dist_config["label"])
 
+        ax.axhline(y=DELTA, color="red", linestyle=":", linewidth=1.2,
+                   label=f"TVD = {DELTA} (accuracy target)")
         ax.set_xlabel("Bin size (ms)")
-        ax.set_ylabel("Total Variation Distance at n_theory")
+        ax.set_ylabel("Median TVD at n_theory")
         ax.set_title(estimator_label)
         ax.legend(fontsize=9)
         ax.grid(True, alpha=0.3)
@@ -299,55 +369,52 @@ def run():
     os.makedirs(RESULTS_DIR, exist_ok=True)
     print_parameters()
 
-    # all_results[dist_name][bin_size] = (kde_tvds, pmf_tvds, kl_kdes, kl_pmfs)
+    # all_results[dist_name][bin_size] = {
+    #   'kde': [tvds_for_n1, tvds_for_n2, tvds_for_n3, tvds_for_n4],
+    #   'pmf': [tvds_for_n1, tvds_for_n2, tvds_for_n3, tvds_for_n4],
+    # }
+    # each tvds_for_ni is a list of len(SEEDS) TVD values
     all_results = {d: {} for d in DISTRIBUTIONS}
-
-    col = (f"{'Distribution':<12} {'Bin size':>9} {'Sample count':>15} "
-           f"{'TVD (KDE)':>11} {'TVD (PMF)':>11} "
-           f"{'KL (KDE)':>10} {'KL (PMF)':>10}")
-    print(col)
-    print("-" * len(col))
 
     for bin_size in BIN_SIZES:
         k, n_theory, sample_sizes = bin_config(bin_size)
         bin_edges, bin_centres = make_grid(bin_size)
         n_bins = len(bin_centres)
 
+        print(f"\n=== bin_size={bin_size}ms  k={k}  n_theory={n_theory:,} ===")
+
         for dist_name, dist_config in DISTRIBUTIONS.items():
             true_masses = true_pmf(dist_name, dist_config["params"], bin_edges)
 
-            kde_tvds, pmf_tvds, kl_kdes, kl_pmfs = [], [], [], []
-            first = True
+            kde_tvds_by_n = [[] for _ in sample_sizes]
+            pmf_tvds_by_n = [[] for _ in sample_sizes]
 
-            for label, n in zip(X_TICK_LABELS, sample_sizes):
-                samples = load_samples(bin_size, dist_name, n)
+            for i, (label, n) in enumerate(zip(X_TICK_LABELS, sample_sizes)):
+                for seed in SEEDS:
+                    samples = load_samples(bin_size, dist_name, n, seed)
 
-                kde_masses = kde_pmf(samples, bin_centres, bin_size)
-                pmf_masses = empirical_pmf(samples, bin_size, n_bins)
+                    kde_masses = kde_pmf(samples, bin_centres, bin_size)
+                    pmf_masses = empirical_pmf(samples, bin_size, n_bins)
 
-                tvd_kde = tvd(true_masses, kde_masses)
-                tvd_pmf = tvd(true_masses, pmf_masses)
-                kl_kde  = kl_divergence(true_masses, kde_masses)
-                kl_pmf  = kl_divergence(true_masses, pmf_masses)
+                    kde_tvds_by_n[i].append(tvd(true_masses, kde_masses))
+                    pmf_tvds_by_n[i].append(tvd(true_masses, pmf_masses))
 
-                d_col = dist_name if first else ""
-                b_col = f"{bin_size}ms" if first else ""
-                print(f"{d_col:<12} {b_col:>9} {label:>6} ({n:>7,}) "
-                      f"{tvd_kde:>11.5f} {tvd_pmf:>11.5f} "
-                      f"{kl_kde:>10.6f} {kl_pmf:>10.6f}")
-                first = False
+                print(f"  {dist_name:<12} {label:>4} (n={n:>8,})  "
+                      f"KDE median={np.median(kde_tvds_by_n[i]):.5f}  "
+                      f"PMF median={np.median(pmf_tvds_by_n[i]):.5f}")
 
-                kde_tvds.append(tvd_kde)
-                pmf_tvds.append(tvd_pmf)
-                kl_kdes.append(kl_kde)
-                kl_pmfs.append(kl_pmf)
+            all_results[dist_name][bin_size] = {
+                "kde": kde_tvds_by_n,
+                "pmf": pmf_tvds_by_n,
+            }
 
-            all_results[dist_name][bin_size] = (kde_tvds, pmf_tvds, kl_kdes, kl_pmfs)
-            print()
-
-    print("Generating plots...")
+    print("\nGenerating plots...")
     for dist_name, dist_config in DISTRIBUTIONS.items():
-        plot_tvd_vs_n(dist_name, dist_config, all_results[dist_name])
+        for bin_size in BIN_SIZES:
+            r = all_results[dist_name][bin_size]
+            plot_tvd_vs_n(dist_name, dist_config, bin_size,
+                          r["kde"], r["pmf"])
+        plot_distribution_comparison(dist_name, dist_config)
 
     plot_tvd_vs_binsize_summary(all_results)
     print("Done.")

@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import os
 
-RESULTS_DIR = "../results"
-OUTPUT_FILE = "../results/delay_distributions.png"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results"
+OUTPUT_FILE = os.path.join(SCRIPT_DIR, "../results/delay_distributions.png")
 
 # distribution configurations matching the NS-3 simulation defaults
 DISTRIBUTIONS = [

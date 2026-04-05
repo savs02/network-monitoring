@@ -1,0 +1,117 @@
+#ifndef VARIABLE_DELAY_APPLICATION_H
+#define VARIABLE_DELAY_APPLICATION_H
+
+#include "ns3/application.h"
+#include "ns3/socket.h"
+#include "ns3/address.h"
+#include "ns3/random-variable-stream.h"
+#include "ns3/traced-callback.h"
+#include "ns3/ipv4-address.h"
+#include "ns3/tag.h"
+#include "delay-monitor.h"
+
+namespace ns3 {
+
+// ---------------------------------------------------------------------------
+// DelayProbeTag — carries the probe-packet send time through the simulator
+// so the receiver can compute the actual end-to-end delay.
+// Used by the cross-traffic experiment (cross_traffic_experiment.py).
+// ---------------------------------------------------------------------------
+class DelayProbeTag : public Tag
+{
+public:
+    static TypeId GetTypeId();
+    TypeId GetInstanceTypeId() const override;
+    uint32_t GetSerializedSize()           const override;
+    void Serialize(TagBuffer buf)          const override;
+    void Deserialize(TagBuffer buf)              override;
+    void Print(std::ostream& os)           const override;
+
+    void     SetSentNs(uint64_t ns);
+    uint64_t GetSentNs() const;
+private:
+    uint64_t m_sentNs = 0;   // Simulator::Now() in nanoseconds at send time
+};
+
+class VariableDelaySender : public Application
+{
+public:
+    static TypeId GetTypeId();
+    VariableDelaySender();
+    virtual ~VariableDelaySender();
+    
+    void SetRemote(Ipv4Address ip, uint16_t port);
+    void SetDelayRandomVariable(Ptr<RandomVariableStream> delay);
+    void SetIntervalRandomVariable(Ptr<RandomVariableStream> interval);
+    void SetPacketSize(uint32_t packetSize);
+    void SetMaxPackets(uint32_t maxPackets);
+    void SetInterval(Time interval);
+    void SetDelayMonitor(DelayMonitor* monitor);
+    void SetTheoreticalMode(bool theoretical);
+
+    // packet loss experiment: fraction of packets not seen by the monitor
+    // (models packets lost in the network before reaching the passive observer)
+    void SetLossRate(double lossRate);
+
+protected:
+    virtual void DoDispose() override;
+
+private:
+    virtual void StartApplication() override;
+    virtual void StopApplication() override;
+    void ScheduleTransmit(Time dt);
+    void SendPacket();
+    
+    Ptr<Socket> m_socket;
+    Ipv4Address m_peerAddress;
+    uint16_t m_peerPort;
+    uint32_t m_packetSize;
+    uint32_t m_maxPackets;
+    uint32_t m_packetsSent;
+    Time m_interval;
+    EventId m_sendEvent;
+    Ptr<RandomVariableStream> m_delayRv;
+    Ptr<RandomVariableStream> m_intervalRv;
+    DelayMonitor* m_delayMonitor;              // nullable: only records if set
+    bool          m_theoreticalMode;           // if true, sample and record only — no packet sent
+    double        m_lossRate;                  // fraction of packets lost (0 = no loss)
+    Ptr<UniformRandomVariable> m_lossRv;       // RNG for loss decisions
+    
+    // trace source for transmitted packets
+    TracedCallback<Ptr<const Packet>, const Address&> m_txTrace;
+};
+
+class VariableDelayReceiver : public Application
+{
+public:
+    static TypeId GetTypeId();
+    VariableDelayReceiver();
+    virtual ~VariableDelayReceiver();
+
+    void SetPort(uint16_t port);
+    uint32_t GetReceived() const;
+
+    // cross-traffic experiment: attach monitor so the receiver measures real
+    // end-to-end delay via DelayProbeTag (arrival_time - send_time in ns)
+    void SetDelayMonitor(DelayMonitor* monitor);
+
+protected:
+    virtual void DoDispose() override;
+
+private:
+    virtual void StartApplication() override;
+    virtual void StopApplication() override;
+    void HandleRead(Ptr<Socket> socket);
+
+    Ptr<Socket> m_socket;
+    uint16_t m_port;
+    uint32_t m_received;
+    DelayMonitor* m_delayMonitor;   // nullable: set for cross-traffic experiment
+
+    // trace source for received packets
+    TracedCallback<Ptr<const Packet>, const Address&> m_rxTrace;
+};
+
+} 
+
+#endif

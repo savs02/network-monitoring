@@ -48,6 +48,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ---------------------------------------------------------------------------
 # parameters — must match run_cross_traffic_experiment.sh
 # ---------------------------------------------------------------------------
@@ -73,8 +75,8 @@ K = int(GRID_MAX / BIN_SIZE)
 BIN_EDGES   = np.arange(0.0, GRID_MAX + BIN_SIZE, BIN_SIZE)
 BIN_CENTRES = BIN_EDGES[:-1] + BIN_SIZE / 2.0
 
-SOURCE_DIR  = "../results/cross-traffic"
-RESULTS_DIR = "../results/cross-traffic"
+SOURCE_DIR  = os.path.join(SCRIPT_DIR, "../results/cross-traffic")
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/cross-traffic")
 
 
 # ---------------------------------------------------------------------------

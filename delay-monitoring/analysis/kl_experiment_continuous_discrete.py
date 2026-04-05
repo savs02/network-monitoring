@@ -19,6 +19,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ---------------------------------------------------------------------------
 # parameters — must match run_sample_complexity.sh
 # ---------------------------------------------------------------------------
@@ -45,8 +47,8 @@ SAMPLE_SIZES = [
 ]
 
 # reuse CSVs from the continuous experiment
-SOURCE_DIR  = "../results/sample-complexity"
-RESULTS_DIR = "../results/sample-complexity-continuous-discrete"
+SOURCE_DIR  = os.path.join(SCRIPT_DIR, "../results/sample-complexity")
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/sample-complexity-continuous-discrete")
 
 DISTRIBUTIONS = {
     "normal": {

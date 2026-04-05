@@ -25,6 +25,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ---------------------------------------------------------------------------
 # experiment parameters
 # ---------------------------------------------------------------------------
@@ -49,7 +51,7 @@ SAMPLE_SIZES = [
     n_theory * 2,
 ]
 
-RESULTS_DIR = "../results/sample-complexity"
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/sample-complexity")
 
 # distribution configs — must match NS-3 simulation defaults
 DISTRIBUTIONS = {

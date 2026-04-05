@@ -598,7 +598,7 @@ PDFLATEX:FILEPATH=PDFLATEX-NOTFOUND
 PKG_CONFIG_ARGN:STRING=
 
 //pkg-config executable
-PKG_CONFIG_EXECUTABLE:FILEPATH=PKG_CONFIG_EXECUTABLE-NOTFOUND
+PKG_CONFIG_EXECUTABLE:FILEPATH=/opt/homebrew/bin/pkg-config
 
 //Path to a program.
 PYTHON3:FILEPATH=/opt/homebrew/bin/python3
@@ -648,11 +648,22 @@ openflow_header_internal_openflow.h:FILEPATH=openflow_header_internal_openflow.h
 //Path to a library.
 openflow_library_internal_openflow:FILEPATH=openflow_library_internal_openflow-NOTFOUND
 
+//Path to a library.
+pkgcfg_lib_PC_HARFBUZZ_harfbuzz:FILEPATH=/opt/homebrew/Cellar/harfbuzz/11.1.0/lib/libharfbuzz.dylib
+
+//Path to a library.
+pkgcfg_lib_PC_LIBXML_xml2:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libxml2.tbd
+
+//Path to a library.
+pkgcfg_lib_PC_SQLite3_sqlite3:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libsqlite3.tbd
+
 
 ########################
 # INTERNAL cache entries
 ########################
 
+//ADVANCED property for variable: CCACHE
+CCACHE-ADVANCED:INTERNAL=1
 //Result of TRY_COMPILE
 CLANG_LIBCPP_WORKS:INTERNAL=TRUE
 //Result of TRY_COMPILE
@@ -713,6 +724,8 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
+//ADVANCED property for variable: CMAKE_FORMAT_PROGRAM
+CMAKE_FORMAT_PROGRAM-ADVANCED:INTERNAL=1
 //Name of generator.
 CMAKE_GENERATOR:INTERNAL=Unix Makefiles
 //Generator instance identifier.
@@ -836,15 +849,35 @@ COMPILER_HAS_DEPRECATED_ATTR:INTERNAL=1
 COMPILER_HAS_HIDDEN_INLINE_VISIBILITY:INTERNAL=1
 //Test COMPILER_HAS_HIDDEN_VISIBILITY
 COMPILER_HAS_HIDDEN_VISIBILITY:INTERNAL=1
+//ADVANCED property for variable: CONVERT
+CONVERT-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: DIA
 DIA-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOT
+DOT-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOXYGEN
+DOXYGEN-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DVIPNG
+DVIPNG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: EIGEN3_INCLUDE_DIR
 EIGEN3_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ENABLE_DPDKDEVNET
+ENABLE_DPDKDEVNET-ADVANCED:INTERNAL=1
 ENABLE_DPDKDEVNET:INTERNAL=False
+//ADVANCED property for variable: ENABLE_EMUNETDEV
+ENABLE_EMUNETDEV-ADVANCED:INTERNAL=1
 ENABLE_EMUNETDEV:INTERNAL=False
+//ADVANCED property for variable: ENABLE_FDNETDEV
+ENABLE_FDNETDEV-ADVANCED:INTERNAL=1
 ENABLE_FDNETDEV:INTERNAL=False
+//ADVANCED property for variable: ENABLE_NETMAP_EMU
+ENABLE_NETMAP_EMU-ADVANCED:INTERNAL=1
 ENABLE_NETMAP_EMU:INTERNAL=False
+//ADVANCED property for variable: ENABLE_TAPNETDEV
+ENABLE_TAPNETDEV-ADVANCED:INTERNAL=1
 ENABLE_TAPNETDEV:INTERNAL=False
+//ADVANCED property for variable: EPSTOPDF
+EPSTOPDF-ADVANCED:INTERNAL=1
 //Details about finding Git
 FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[/opt/homebrew/bin/git][v2.47.1()]
 //Details about finding Python3
@@ -863,12 +896,39 @@ GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 GSL_CBLAS_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: GSL_CBLAS_LIBRARY_DEBUG
 GSL_CBLAS_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+GSL_CFLAGS:INTERNAL=
+GSL_CFLAGS_I:INTERNAL=
+GSL_CFLAGS_OTHER:INTERNAL=
+GSL_FOUND:INTERNAL=
+GSL_INCLUDEDIR:INTERNAL=
 //ADVANCED property for variable: GSL_INCLUDE_DIR
 GSL_INCLUDE_DIR-ADVANCED:INTERNAL=1
+GSL_LIBDIR:INTERNAL=
 //ADVANCED property for variable: GSL_LIBRARY
 GSL_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: GSL_LIBRARY_DEBUG
 GSL_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+GSL_LIBS:INTERNAL=
+GSL_LIBS_L:INTERNAL=
+GSL_LIBS_OTHER:INTERNAL=
+GSL_LIBS_PATHS:INTERNAL=
+GSL_MODULE_NAME:INTERNAL=
+GSL_PREFIX:INTERNAL=
+GSL_STATIC_CFLAGS:INTERNAL=
+GSL_STATIC_CFLAGS_I:INTERNAL=
+GSL_STATIC_CFLAGS_OTHER:INTERNAL=
+GSL_STATIC_LIBDIR:INTERNAL=
+GSL_STATIC_LIBS:INTERNAL=
+GSL_STATIC_LIBS_L:INTERNAL=
+GSL_STATIC_LIBS_OTHER:INTERNAL=
+GSL_STATIC_LIBS_PATHS:INTERNAL=
+//ADVANCED property for variable: GSL_VERSION
+GSL_VERSION-ADVANCED:INTERNAL=1
+GSL_VERSION:INTERNAL=
+GSL_gsl_INCLUDEDIR:INTERNAL=
+GSL_gsl_LIBDIR:INTERNAL=
+GSL_gsl_PREFIX:INTERNAL=
+GSL_gsl_VERSION:INTERNAL=
 //ADVANCED property for variable: GTK3_ATK_LIBRARY
 GTK3_ATK_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: GTK3_CAIRO_INCLUDE_DIR
@@ -931,56 +991,166 @@ HAVE___UINT128_T:INTERNAL=1
 HarfBuzz_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: HarfBuzz_LIBRARY
 HarfBuzz_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: LATEXMK
+LATEXMK-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LIBXML2_INCLUDE_DIR
 LIBXML2_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LIBXML2_LIBRARY
 LIBXML2_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LIBXML2_XMLLINT_EXECUTABLE
 LIBXML2_XMLLINT_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: LLD
+LLD-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: MOLD
+MOLD-ADVANCED:INTERNAL=1
 //ON if Brite is found in NS3_WITH_BRITE
 NS3_BRITE:INTERNAL=OFF
+//ADVANCED property for variable: NS3_BRITE_REASON
+NS3_BRITE_REASON-ADVANCED:INTERNAL=1
 NS3_BRITE_REASON:INTERNAL=Missing headers: "Brite.h" and missing libraries: "brite"
 //ON if Click is found in NS3_WITH_CLICK
 NS3_CLICK:INTERNAL=OFF
+//ADVANCED property for variable: NS3_CLICK_REASON
+NS3_CLICK_REASON-ADVANCED:INTERNAL=1
 NS3_CLICK_REASON:INTERNAL=Missing headers: "simclick.h" and missing libraries: "nsclick;click"
 //STRINGS property for variable: NS3_INT64X64
 NS3_INT64X64-STRINGS:INTERNAL=INT128;CAIRO;DOUBLE
 //ON if Openflow is found in NS3_WITH_OPENFLOW
 NS3_OPENFLOW:INTERNAL=OFF
+//ADVANCED property for variable: NS3_OPENFLOW_REASON
+NS3_OPENFLOW_REASON-ADVANCED:INTERNAL=1
 NS3_OPENFLOW_REASON:INTERNAL=Missing headers: "openflow.h" and missing libraries: "openflow"
-PC_HARFBUZZ_CFLAGS:INTERNAL=
+PC_HARFBUZZ_CFLAGS:INTERNAL=-I/opt/homebrew/Cellar/harfbuzz/11.1.0/include/harfbuzz;-I/opt/homebrew/opt/freetype/include/freetype2;-I/opt/homebrew/opt/libpng/include/libpng16;-I/opt/homebrew/Cellar/glib/2.84.1/include/glib-2.0;-I/opt/homebrew/Cellar/glib/2.84.1/lib/glib-2.0/include;-I/opt/homebrew/opt/gettext/include;-I/opt/homebrew/Cellar/pcre2/10.45/include;-I/opt/homebrew/Cellar/graphite2/1.3.14/include
 PC_HARFBUZZ_CFLAGS_I:INTERNAL=
 PC_HARFBUZZ_CFLAGS_OTHER:INTERNAL=
-PC_HARFBUZZ_FOUND:INTERNAL=
-PC_HARFBUZZ_INCLUDEDIR:INTERNAL=
-PC_HARFBUZZ_LIBDIR:INTERNAL=
+PC_HARFBUZZ_FOUND:INTERNAL=1
+PC_HARFBUZZ_INCLUDEDIR:INTERNAL=/opt/homebrew/Cellar/harfbuzz/11.1.0/include
+PC_HARFBUZZ_INCLUDE_DIRS:INTERNAL=/opt/homebrew/Cellar/harfbuzz/11.1.0/include/harfbuzz;/opt/homebrew/opt/freetype/include/freetype2;/opt/homebrew/opt/libpng/include/libpng16;/opt/homebrew/Cellar/glib/2.84.1/include/glib-2.0;/opt/homebrew/Cellar/glib/2.84.1/lib/glib-2.0/include;/opt/homebrew/opt/gettext/include;/opt/homebrew/Cellar/pcre2/10.45/include;/opt/homebrew/Cellar/graphite2/1.3.14/include
+PC_HARFBUZZ_LDFLAGS:INTERNAL=-L/opt/homebrew/Cellar/harfbuzz/11.1.0/lib;-lharfbuzz
+PC_HARFBUZZ_LDFLAGS_OTHER:INTERNAL=
+PC_HARFBUZZ_LIBDIR:INTERNAL=/opt/homebrew/Cellar/harfbuzz/11.1.0/lib
+PC_HARFBUZZ_LIBRARIES:INTERNAL=harfbuzz
+PC_HARFBUZZ_LIBRARY_DIRS:INTERNAL=/opt/homebrew/Cellar/harfbuzz/11.1.0/lib
 PC_HARFBUZZ_LIBS:INTERNAL=
 PC_HARFBUZZ_LIBS_L:INTERNAL=
 PC_HARFBUZZ_LIBS_OTHER:INTERNAL=
 PC_HARFBUZZ_LIBS_PATHS:INTERNAL=
-PC_HARFBUZZ_MODULE_NAME:INTERNAL=
-PC_HARFBUZZ_PREFIX:INTERNAL=
-PC_HARFBUZZ_STATIC_CFLAGS:INTERNAL=
+PC_HARFBUZZ_MODULE_NAME:INTERNAL=harfbuzz
+PC_HARFBUZZ_PREFIX:INTERNAL=/opt/homebrew/Cellar/harfbuzz/11.1.0
+PC_HARFBUZZ_STATIC_CFLAGS:INTERNAL=-I/opt/homebrew/Cellar/harfbuzz/11.1.0/include/harfbuzz;-I/opt/homebrew/opt/freetype/include/freetype2;-I/opt/homebrew/opt/libpng/include/libpng16;-I/opt/homebrew/Cellar/glib/2.84.1/include/glib-2.0;-I/opt/homebrew/Cellar/glib/2.84.1/lib/glib-2.0/include;-I/opt/homebrew/opt/gettext/include;-I/opt/homebrew/Cellar/pcre2/10.45/include;-I/opt/homebrew/Cellar/graphite2/1.3.14/include
 PC_HARFBUZZ_STATIC_CFLAGS_I:INTERNAL=
 PC_HARFBUZZ_STATIC_CFLAGS_OTHER:INTERNAL=
+PC_HARFBUZZ_STATIC_INCLUDE_DIRS:INTERNAL=/opt/homebrew/Cellar/harfbuzz/11.1.0/include/harfbuzz;/opt/homebrew/opt/freetype/include/freetype2;/opt/homebrew/opt/libpng/include/libpng16;/opt/homebrew/Cellar/glib/2.84.1/include/glib-2.0;/opt/homebrew/Cellar/glib/2.84.1/lib/glib-2.0/include;/opt/homebrew/opt/gettext/include;/opt/homebrew/Cellar/pcre2/10.45/include;/opt/homebrew/Cellar/graphite2/1.3.14/include
+PC_HARFBUZZ_STATIC_LDFLAGS:INTERNAL=-L/opt/homebrew/Cellar/harfbuzz/11.1.0/lib;-lharfbuzz;-lm;-framework;ApplicationServices;-L/opt/homebrew/opt/freetype/lib;-lfreetype;-lbz2;-L/opt/homebrew/opt/libpng/lib;-lpng16;-L/usr/lib;-lz;-L/opt/homebrew/Cellar/glib/2.84.1/lib;-lglib-2.0;-L/opt/homebrew/opt/gettext/lib;-lintl;-liconv;-lm;-framework;Foundation;-framework;CoreFoundation;-framework;AppKit;-framework;Carbon;-L/opt/homebrew/Cellar/pcre2/10.45/lib;-lpcre2-8;-D_THREAD_SAFE;-pthread;-L/opt/homebrew/Cellar/graphite2/1.3.14/lib;-lgraphite2
+PC_HARFBUZZ_STATIC_LDFLAGS_OTHER:INTERNAL=-framework;ApplicationServices;-framework;Foundation;-framework;CoreFoundation;-framework;AppKit;-framework;Carbon;-D_THREAD_SAFE;-pthread
 PC_HARFBUZZ_STATIC_LIBDIR:INTERNAL=
+PC_HARFBUZZ_STATIC_LIBRARIES:INTERNAL=harfbuzz;m;freetype;bz2;png16;z;glib-2.0;intl;iconv;m;pcre2-8;graphite2
+PC_HARFBUZZ_STATIC_LIBRARY_DIRS:INTERNAL=/opt/homebrew/Cellar/harfbuzz/11.1.0/lib;/opt/homebrew/opt/freetype/lib;/opt/homebrew/opt/libpng/lib;/usr/lib;/opt/homebrew/Cellar/glib/2.84.1/lib;/opt/homebrew/opt/gettext/lib;/opt/homebrew/Cellar/pcre2/10.45/lib;/opt/homebrew/Cellar/graphite2/1.3.14/lib
 PC_HARFBUZZ_STATIC_LIBS:INTERNAL=
 PC_HARFBUZZ_STATIC_LIBS_L:INTERNAL=
 PC_HARFBUZZ_STATIC_LIBS_OTHER:INTERNAL=
 PC_HARFBUZZ_STATIC_LIBS_PATHS:INTERNAL=
-PC_HARFBUZZ_VERSION:INTERNAL=
+PC_HARFBUZZ_VERSION:INTERNAL=11.1.0
+PC_HARFBUZZ_harfbuzz_INCLUDEDIR:INTERNAL=
+PC_HARFBUZZ_harfbuzz_LIBDIR:INTERNAL=
+PC_HARFBUZZ_harfbuzz_PREFIX:INTERNAL=
+PC_HARFBUZZ_harfbuzz_VERSION:INTERNAL=
+PC_LIBXML_CFLAGS:INTERNAL=
+PC_LIBXML_CFLAGS_I:INTERNAL=
+PC_LIBXML_CFLAGS_OTHER:INTERNAL=
+PC_LIBXML_FOUND:INTERNAL=1
+PC_LIBXML_INCLUDEDIR:INTERNAL=/Library/Developer/CommandLineTools/SDKs/MacOSX26.sdk/usr/include
+PC_LIBXML_INCLUDE_DIRS:INTERNAL=
+PC_LIBXML_LDFLAGS:INTERNAL=-L/usr/lib;-lxml2
+PC_LIBXML_LDFLAGS_OTHER:INTERNAL=
+PC_LIBXML_LIBDIR:INTERNAL=/usr/lib
+PC_LIBXML_LIBRARIES:INTERNAL=xml2
+PC_LIBXML_LIBRARY_DIRS:INTERNAL=/usr/lib
+PC_LIBXML_LIBS:INTERNAL=
+PC_LIBXML_LIBS_L:INTERNAL=
+PC_LIBXML_LIBS_OTHER:INTERNAL=
+PC_LIBXML_LIBS_PATHS:INTERNAL=
+PC_LIBXML_MODULE_NAME:INTERNAL=libxml-2.0
+PC_LIBXML_PREFIX:INTERNAL=/Library/Developer/CommandLineTools/SDKs/MacOSX26.sdk/usr
+PC_LIBXML_STATIC_CFLAGS:INTERNAL=
+PC_LIBXML_STATIC_CFLAGS_I:INTERNAL=
+PC_LIBXML_STATIC_CFLAGS_OTHER:INTERNAL=
+PC_LIBXML_STATIC_INCLUDE_DIRS:INTERNAL=
+PC_LIBXML_STATIC_LDFLAGS:INTERNAL=-L/usr/lib;-lxml2;-lz;-lpthread;-licucore;-lm
+PC_LIBXML_STATIC_LDFLAGS_OTHER:INTERNAL=
+PC_LIBXML_STATIC_LIBDIR:INTERNAL=
+PC_LIBXML_STATIC_LIBRARIES:INTERNAL=xml2;z;pthread;icucore;m
+PC_LIBXML_STATIC_LIBRARY_DIRS:INTERNAL=/usr/lib
+PC_LIBXML_STATIC_LIBS:INTERNAL=
+PC_LIBXML_STATIC_LIBS_L:INTERNAL=
+PC_LIBXML_STATIC_LIBS_OTHER:INTERNAL=
+PC_LIBXML_STATIC_LIBS_PATHS:INTERNAL=
+PC_LIBXML_VERSION:INTERNAL=2.9.13
+PC_LIBXML_libxml-2.0_INCLUDEDIR:INTERNAL=
+PC_LIBXML_libxml-2.0_LIBDIR:INTERNAL=
+PC_LIBXML_libxml-2.0_PREFIX:INTERNAL=
+PC_LIBXML_libxml-2.0_VERSION:INTERNAL=
+PC_SQLite3_CFLAGS:INTERNAL=
+PC_SQLite3_CFLAGS_I:INTERNAL=
+PC_SQLite3_CFLAGS_OTHER:INTERNAL=
+PC_SQLite3_FOUND:INTERNAL=1
+PC_SQLite3_INCLUDEDIR:INTERNAL=/Library/Developer/CommandLineTools/SDKs/MacOSX26.sdk/usr/include
+PC_SQLite3_INCLUDE_DIRS:INTERNAL=
+PC_SQLite3_LDFLAGS:INTERNAL=-L/usr/lib;-lsqlite3
+PC_SQLite3_LDFLAGS_OTHER:INTERNAL=
+PC_SQLite3_LIBDIR:INTERNAL=/usr/lib
+PC_SQLite3_LIBRARIES:INTERNAL=sqlite3
+PC_SQLite3_LIBRARY_DIRS:INTERNAL=/usr/lib
+PC_SQLite3_LIBS:INTERNAL=
+PC_SQLite3_LIBS_L:INTERNAL=
+PC_SQLite3_LIBS_OTHER:INTERNAL=
+PC_SQLite3_LIBS_PATHS:INTERNAL=
+PC_SQLite3_MODULE_NAME:INTERNAL=sqlite3
+PC_SQLite3_PREFIX:INTERNAL=/Library/Developer/CommandLineTools/SDKs/MacOSX26.sdk/usr
+PC_SQLite3_STATIC_CFLAGS:INTERNAL=
+PC_SQLite3_STATIC_CFLAGS_I:INTERNAL=
+PC_SQLite3_STATIC_CFLAGS_OTHER:INTERNAL=
+PC_SQLite3_STATIC_INCLUDE_DIRS:INTERNAL=
+PC_SQLite3_STATIC_LDFLAGS:INTERNAL=-L/usr/lib;-lsqlite3
+PC_SQLite3_STATIC_LDFLAGS_OTHER:INTERNAL=
+PC_SQLite3_STATIC_LIBDIR:INTERNAL=
+PC_SQLite3_STATIC_LIBRARIES:INTERNAL=sqlite3
+PC_SQLite3_STATIC_LIBRARY_DIRS:INTERNAL=/usr/lib
+PC_SQLite3_STATIC_LIBS:INTERNAL=
+PC_SQLite3_STATIC_LIBS_L:INTERNAL=
+PC_SQLite3_STATIC_LIBS_OTHER:INTERNAL=
+PC_SQLite3_STATIC_LIBS_PATHS:INTERNAL=
+PC_SQLite3_VERSION:INTERNAL=3.51.0
+PC_SQLite3_sqlite3_INCLUDEDIR:INTERNAL=
+PC_SQLite3_sqlite3_LIBDIR:INTERNAL=
+PC_SQLite3_sqlite3_PREFIX:INTERNAL=
+PC_SQLite3_sqlite3_VERSION:INTERNAL=
+//ADVANCED property for variable: PDFLATEX
+PDFLATEX-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PKG_CONFIG_ARGN
 PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
 PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PYTHON3
+PYTHON3-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ProcessorCount_cmd_sysctl
 ProcessorCount_cmd_sysctl-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SPHINX_EXECUTABLE
+SPHINX_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SPHINX_OUTPUT_HTML
+SPHINX_OUTPUT_HTML-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SPHINX_OUTPUT_MAN
+SPHINX_OUTPUT_MAN-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SPHINX_WARNINGS_AS_ERRORS
+SPHINX_WARNINGS_AS_ERRORS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: SQLite3_INCLUDE_DIR
 SQLite3_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: SQLite3_LIBRARY
 SQLite3_LIBRARY-ADVANCED:INTERNAL=1
 //Test STACKTRACE_LIBRARY_ENABLED
 STACKTRACE_LIBRARY_ENABLED:INTERNAL=
+//ADVANCED property for variable: VALGRIND
+VALGRIND-ADVANCED:INTERNAL=1
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
 //Compiler reason failure
@@ -994,95 +1164,285 @@ _Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;13;3;64;32;<none>;cpython-313-
 _Python3_INTERPRETER_SIGNATURE:INTERNAL=e1ba756c0efa4ce95761537909c76734
 //NumPy reason failure
 _Python3_NumPy_REASON_FAILURE:INTERNAL=
+__pkg_config_arguments_PC_HARFBUZZ:INTERNAL=QUIET;harfbuzz
+__pkg_config_arguments_PC_LIBXML:INTERNAL=QUIET;libxml-2.0
+__pkg_config_arguments_PC_SQLite3:INTERNAL=QUIET;sqlite3
+__pkg_config_checked_GSL:INTERNAL=1
 __pkg_config_checked_PC_HARFBUZZ:INTERNAL=1
+__pkg_config_checked_PC_LIBXML:INTERNAL=1
+__pkg_config_checked_PC_SQLite3:INTERNAL=1
+//ADVANCED property for variable: brite_header_internal_Brite.h
+brite_header_internal_Brite.h-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: brite_library_internal_brite
+brite_library_internal_brite-ADVANCED:INTERNAL=1
 build_profile:INTERNAL=default
 build_profile_suffix:INTERNAL=-default
+//ADVANCED property for variable: click_header_internal_simclick.h
+click_header_internal_simclick.h-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: click_library_internal_click
+click_library_internal_click-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: click_library_internal_nsclick
+click_library_internal_nsclick-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: libantenna
+libantenna-ADVANCED:INTERNAL=1
 libantenna:INTERNAL=antenna
+//ADVANCED property for variable: libantenna-obj
+libantenna-obj-ADVANCED:INTERNAL=1
 libantenna-obj:INTERNAL=antenna-obj
+//ADVANCED property for variable: libaodv
+libaodv-ADVANCED:INTERNAL=1
 libaodv:INTERNAL=aodv
+//ADVANCED property for variable: libaodv-obj
+libaodv-obj-ADVANCED:INTERNAL=1
 libaodv-obj:INTERNAL=aodv-obj
+//ADVANCED property for variable: libapplications
+libapplications-ADVANCED:INTERNAL=1
 libapplications:INTERNAL=applications
+//ADVANCED property for variable: libapplications-obj
+libapplications-obj-ADVANCED:INTERNAL=1
 libapplications-obj:INTERNAL=applications-obj
+//ADVANCED property for variable: libbridge
+libbridge-ADVANCED:INTERNAL=1
 libbridge:INTERNAL=bridge
+//ADVANCED property for variable: libbridge-obj
+libbridge-obj-ADVANCED:INTERNAL=1
 libbridge-obj:INTERNAL=bridge-obj
+//ADVANCED property for variable: libbrite
+libbrite-ADVANCED:INTERNAL=1
 libbrite:INTERNAL=brite
+//ADVANCED property for variable: libbrite-obj
+libbrite-obj-ADVANCED:INTERNAL=1
 libbrite-obj:INTERNAL=brite-obj
+//ADVANCED property for variable: libbuildings
+libbuildings-ADVANCED:INTERNAL=1
 libbuildings:INTERNAL=buildings
+//ADVANCED property for variable: libbuildings-obj
+libbuildings-obj-ADVANCED:INTERNAL=1
 libbuildings-obj:INTERNAL=buildings-obj
+//ADVANCED property for variable: libclick
+libclick-ADVANCED:INTERNAL=1
 libclick:INTERNAL=click
+//ADVANCED property for variable: libclick-obj
+libclick-obj-ADVANCED:INTERNAL=1
 libclick-obj:INTERNAL=click-obj
+//ADVANCED property for variable: libconfig-store
+libconfig-store-ADVANCED:INTERNAL=1
 libconfig-store:INTERNAL=config-store
+//ADVANCED property for variable: libconfig-store-obj
+libconfig-store-obj-ADVANCED:INTERNAL=1
 libconfig-store-obj:INTERNAL=config-store-obj
+//ADVANCED property for variable: libcore
+libcore-ADVANCED:INTERNAL=1
 libcore:INTERNAL=core
+//ADVANCED property for variable: libcore-obj
+libcore-obj-ADVANCED:INTERNAL=1
 libcore-obj:INTERNAL=core-obj
+//ADVANCED property for variable: libcsma
+libcsma-ADVANCED:INTERNAL=1
 libcsma:INTERNAL=csma
+//ADVANCED property for variable: libcsma-layout
+libcsma-layout-ADVANCED:INTERNAL=1
 libcsma-layout:INTERNAL=csma-layout
+//ADVANCED property for variable: libcsma-layout-obj
+libcsma-layout-obj-ADVANCED:INTERNAL=1
 libcsma-layout-obj:INTERNAL=csma-layout-obj
+//ADVANCED property for variable: libcsma-obj
+libcsma-obj-ADVANCED:INTERNAL=1
 libcsma-obj:INTERNAL=csma-obj
+//ADVANCED property for variable: libdsdv
+libdsdv-ADVANCED:INTERNAL=1
 libdsdv:INTERNAL=dsdv
+//ADVANCED property for variable: libdsdv-obj
+libdsdv-obj-ADVANCED:INTERNAL=1
 libdsdv-obj:INTERNAL=dsdv-obj
+//ADVANCED property for variable: libdsr
+libdsr-ADVANCED:INTERNAL=1
 libdsr:INTERNAL=dsr
+//ADVANCED property for variable: libdsr-obj
+libdsr-obj-ADVANCED:INTERNAL=1
 libdsr-obj:INTERNAL=dsr-obj
+//ADVANCED property for variable: libenergy
+libenergy-ADVANCED:INTERNAL=1
 libenergy:INTERNAL=energy
+//ADVANCED property for variable: libenergy-obj
+libenergy-obj-ADVANCED:INTERNAL=1
 libenergy-obj:INTERNAL=energy-obj
+//ADVANCED property for variable: libfd-net-device
+libfd-net-device-ADVANCED:INTERNAL=1
 libfd-net-device:INTERNAL=fd-net-device
+//ADVANCED property for variable: libfd-net-device-obj
+libfd-net-device-obj-ADVANCED:INTERNAL=1
 libfd-net-device-obj:INTERNAL=fd-net-device-obj
+//ADVANCED property for variable: libflow-monitor
+libflow-monitor-ADVANCED:INTERNAL=1
 libflow-monitor:INTERNAL=flow-monitor
+//ADVANCED property for variable: libflow-monitor-obj
+libflow-monitor-obj-ADVANCED:INTERNAL=1
 libflow-monitor-obj:INTERNAL=flow-monitor-obj
+//ADVANCED property for variable: libinternet
+libinternet-ADVANCED:INTERNAL=1
 libinternet:INTERNAL=internet
+//ADVANCED property for variable: libinternet-apps
+libinternet-apps-ADVANCED:INTERNAL=1
 libinternet-apps:INTERNAL=internet-apps
+//ADVANCED property for variable: libinternet-apps-obj
+libinternet-apps-obj-ADVANCED:INTERNAL=1
 libinternet-apps-obj:INTERNAL=internet-apps-obj
+//ADVANCED property for variable: libinternet-obj
+libinternet-obj-ADVANCED:INTERNAL=1
 libinternet-obj:INTERNAL=internet-obj
+//ADVANCED property for variable: liblr-wpan
+liblr-wpan-ADVANCED:INTERNAL=1
 liblr-wpan:INTERNAL=lr-wpan
+//ADVANCED property for variable: liblr-wpan-obj
+liblr-wpan-obj-ADVANCED:INTERNAL=1
 liblr-wpan-obj:INTERNAL=lr-wpan-obj
+//ADVANCED property for variable: liblte
+liblte-ADVANCED:INTERNAL=1
 liblte:INTERNAL=lte
+//ADVANCED property for variable: liblte-obj
+liblte-obj-ADVANCED:INTERNAL=1
 liblte-obj:INTERNAL=lte-obj
+//ADVANCED property for variable: libmesh
+libmesh-ADVANCED:INTERNAL=1
 libmesh:INTERNAL=mesh
+//ADVANCED property for variable: libmesh-obj
+libmesh-obj-ADVANCED:INTERNAL=1
 libmesh-obj:INTERNAL=mesh-obj
+//ADVANCED property for variable: libmobility
+libmobility-ADVANCED:INTERNAL=1
 libmobility:INTERNAL=mobility
+//ADVANCED property for variable: libmobility-obj
+libmobility-obj-ADVANCED:INTERNAL=1
 libmobility-obj:INTERNAL=mobility-obj
+//ADVANCED property for variable: libmpi
+libmpi-ADVANCED:INTERNAL=1
 libmpi:INTERNAL=mpi
+//ADVANCED property for variable: libmpi-obj
+libmpi-obj-ADVANCED:INTERNAL=1
 libmpi-obj:INTERNAL=mpi-obj
+//ADVANCED property for variable: libnetanim
+libnetanim-ADVANCED:INTERNAL=1
 libnetanim:INTERNAL=netanim
+//ADVANCED property for variable: libnetanim-obj
+libnetanim-obj-ADVANCED:INTERNAL=1
 libnetanim-obj:INTERNAL=netanim-obj
+//ADVANCED property for variable: libnetwork
+libnetwork-ADVANCED:INTERNAL=1
 libnetwork:INTERNAL=network
+//ADVANCED property for variable: libnetwork-obj
+libnetwork-obj-ADVANCED:INTERNAL=1
 libnetwork-obj:INTERNAL=network-obj
+//ADVANCED property for variable: libnix-vector-routing
+libnix-vector-routing-ADVANCED:INTERNAL=1
 libnix-vector-routing:INTERNAL=nix-vector-routing
+//ADVANCED property for variable: libnix-vector-routing-obj
+libnix-vector-routing-obj-ADVANCED:INTERNAL=1
 libnix-vector-routing-obj:INTERNAL=nix-vector-routing-obj
+//ADVANCED property for variable: libolsr
+libolsr-ADVANCED:INTERNAL=1
 libolsr:INTERNAL=olsr
+//ADVANCED property for variable: libolsr-obj
+libolsr-obj-ADVANCED:INTERNAL=1
 libolsr-obj:INTERNAL=olsr-obj
+//ADVANCED property for variable: libopenflow
+libopenflow-ADVANCED:INTERNAL=1
 libopenflow:INTERNAL=openflow
+//ADVANCED property for variable: libopenflow-obj
+libopenflow-obj-ADVANCED:INTERNAL=1
 libopenflow-obj:INTERNAL=openflow-obj
+//ADVANCED property for variable: libpoint-to-point
+libpoint-to-point-ADVANCED:INTERNAL=1
 libpoint-to-point:INTERNAL=point-to-point
+//ADVANCED property for variable: libpoint-to-point-layout
+libpoint-to-point-layout-ADVANCED:INTERNAL=1
 libpoint-to-point-layout:INTERNAL=point-to-point-layout
+//ADVANCED property for variable: libpoint-to-point-layout-obj
+libpoint-to-point-layout-obj-ADVANCED:INTERNAL=1
 libpoint-to-point-layout-obj:INTERNAL=point-to-point-layout-obj
+//ADVANCED property for variable: libpoint-to-point-obj
+libpoint-to-point-obj-ADVANCED:INTERNAL=1
 libpoint-to-point-obj:INTERNAL=point-to-point-obj
+//ADVANCED property for variable: libpropagation
+libpropagation-ADVANCED:INTERNAL=1
 libpropagation:INTERNAL=propagation
+//ADVANCED property for variable: libpropagation-obj
+libpropagation-obj-ADVANCED:INTERNAL=1
 libpropagation-obj:INTERNAL=propagation-obj
+//ADVANCED property for variable: libsixlowpan
+libsixlowpan-ADVANCED:INTERNAL=1
 libsixlowpan:INTERNAL=sixlowpan
+//ADVANCED property for variable: libsixlowpan-obj
+libsixlowpan-obj-ADVANCED:INTERNAL=1
 libsixlowpan-obj:INTERNAL=sixlowpan-obj
+//ADVANCED property for variable: libspectrum
+libspectrum-ADVANCED:INTERNAL=1
 libspectrum:INTERNAL=spectrum
+//ADVANCED property for variable: libspectrum-obj
+libspectrum-obj-ADVANCED:INTERNAL=1
 libspectrum-obj:INTERNAL=spectrum-obj
+//ADVANCED property for variable: libstats
+libstats-ADVANCED:INTERNAL=1
 libstats:INTERNAL=stats
+//ADVANCED property for variable: libstats-obj
+libstats-obj-ADVANCED:INTERNAL=1
 libstats-obj:INTERNAL=stats-obj
+//ADVANCED property for variable: libtap-bridge
+libtap-bridge-ADVANCED:INTERNAL=1
 libtap-bridge:INTERNAL=tap-bridge
+//ADVANCED property for variable: libtap-bridge-obj
+libtap-bridge-obj-ADVANCED:INTERNAL=1
 libtap-bridge-obj:INTERNAL=tap-bridge-obj
+//ADVANCED property for variable: libtest
+libtest-ADVANCED:INTERNAL=1
 libtest:INTERNAL=test
+//ADVANCED property for variable: libtest-obj
+libtest-obj-ADVANCED:INTERNAL=1
 libtest-obj:INTERNAL=test-obj
+//ADVANCED property for variable: libtopology-read
+libtopology-read-ADVANCED:INTERNAL=1
 libtopology-read:INTERNAL=topology-read
+//ADVANCED property for variable: libtopology-read-obj
+libtopology-read-obj-ADVANCED:INTERNAL=1
 libtopology-read-obj:INTERNAL=topology-read-obj
+//ADVANCED property for variable: libtraffic-control
+libtraffic-control-ADVANCED:INTERNAL=1
 libtraffic-control:INTERNAL=traffic-control
+//ADVANCED property for variable: libtraffic-control-obj
+libtraffic-control-obj-ADVANCED:INTERNAL=1
 libtraffic-control-obj:INTERNAL=traffic-control-obj
+//ADVANCED property for variable: libuan
+libuan-ADVANCED:INTERNAL=1
 libuan:INTERNAL=uan
+//ADVANCED property for variable: libuan-obj
+libuan-obj-ADVANCED:INTERNAL=1
 libuan-obj:INTERNAL=uan-obj
+//ADVANCED property for variable: libvirtual-net-device
+libvirtual-net-device-ADVANCED:INTERNAL=1
 libvirtual-net-device:INTERNAL=virtual-net-device
+//ADVANCED property for variable: libvirtual-net-device-obj
+libvirtual-net-device-obj-ADVANCED:INTERNAL=1
 libvirtual-net-device-obj:INTERNAL=virtual-net-device-obj
+//ADVANCED property for variable: libvisualizer
+libvisualizer-ADVANCED:INTERNAL=1
 libvisualizer:INTERNAL=visualizer
+//ADVANCED property for variable: libvisualizer-obj
+libvisualizer-obj-ADVANCED:INTERNAL=1
 libvisualizer-obj:INTERNAL=visualizer-obj
+//ADVANCED property for variable: libwifi
+libwifi-ADVANCED:INTERNAL=1
 libwifi:INTERNAL=wifi
+//ADVANCED property for variable: libwifi-obj
+libwifi-obj-ADVANCED:INTERNAL=1
 libwifi-obj:INTERNAL=wifi-obj
+//ADVANCED property for variable: libzigbee
+libzigbee-ADVANCED:INTERNAL=1
 libzigbee:INTERNAL=zigbee
+//ADVANCED property for variable: libzigbee-obj
+libzigbee-obj-ADVANCED:INTERNAL=1
 libzigbee-obj:INTERNAL=zigbee-obj
+//ADVANCED property for variable: ns3-all-enabled-modules
+ns3-all-enabled-modules-ADVANCED:INTERNAL=1
 //list with all enabled modules
 ns3-all-enabled-modules:INTERNAL=antenna;aodv;applications;bridge;brite;buildings;click;config-store;core;csma;csma-layout;dsdv;dsr;energy;fd-net-device;flow-monitor;internet;internet-apps;lr-wpan;lte;mesh;mobility;mpi;netanim;network;nix-vector-routing;olsr;openflow;point-to-point;point-to-point-layout;propagation;sixlowpan;spectrum;stats;tap-bridge;test;topology-read;traffic-control;uan;virtual-net-device;visualizer;wifi;zigbee;
 //ADVANCED property for variable: ns3-contrib-libs
@@ -1121,5 +1481,18 @@ ns3-libs-tests:INTERNAL=
 ns3-optional-visualizer-lib-ADVANCED:INTERNAL=1
 //visualizer library name
 ns3-optional-visualizer-lib:INTERNAL=
+//ADVANCED property for variable: openflow_header_internal_openflow.h
+openflow_header_internal_openflow.h-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: openflow_library_internal_openflow
+openflow_library_internal_openflow-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_PC_HARFBUZZ_harfbuzz
+pkgcfg_lib_PC_HARFBUZZ_harfbuzz-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_PC_LIBXML_xml2
+pkgcfg_lib_PC_LIBXML_xml2-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_PC_SQLite3_sqlite3
+pkgcfg_lib_PC_SQLite3_sqlite3-ADVANCED:INTERNAL=1
+prefix_result:INTERNAL=/usr/lib
+//ADVANCED property for variable: stacktrace_flags
+stacktrace_flags-ADVANCED:INTERNAL=1
 stacktrace_flags:INTERNAL=
 

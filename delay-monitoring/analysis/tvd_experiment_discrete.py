@@ -1,21 +1,22 @@
 """
 TVD experiment — discrete distributions (multi-seed).
 
-Uses a Binomial(N, p) delay distribution. Since the distribution is discrete,
-the monitor's estimate is the empirical PMF (observed counts / total), not a KDE.
-TVD is the natural metric here: it is well-defined on discrete distributions
-without any approximation or smoothing, and it has a clean sample complexity bound.
+Compares two discrete delay distributions:
+  - Binomial(N=20, p=0.5): symmetric, moderate spread
+  - Zipf(N=20, alpha=1.5): heavy-tailed, highly skewed — harder to reconstruct
+
+Since both distributions are discrete, the monitor's estimate is the empirical PMF
+(observed counts / total). TVD is the natural metric here: it is well-defined on
+discrete distributions without any approximation or smoothing, and it has a clean
+sample complexity bound.
 
 Theoretical sample requirement:
-    n_theory = ceil((k * log(1/epsilon)) / delta^2)
-where k = N + 1 (the support size of Binomial(N, p)).
-This follows from the Theta(k * log(1/epsilon) / delta^2) sample complexity
-for learning a discrete distribution over k outcomes to TVD <= delta with
-probability >= 1 - epsilon.
+    n_theory = ceil((k + log(1/epsilon)) / delta^2)
+where k is the support size.
 
-For each sample count n in [n/4, n/2, n, 2n] and each random seed:
+For each distribution, sample counts n in [n/4, n/2, n, 2n] and each random seed:
   - Load delay samples from the NS-3 simulation CSV
-  - Build the empirical PMF over {0, 1, ..., N}
+  - Build the empirical PMF over the support
   - Compute TVD(true, empirical)
 
 Summary plot: box plot of TVD vs n across all seeds, with theoretical bound.
@@ -31,34 +32,53 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # ---------------------------------------------------------------------------
 # experiment parameters
 # ---------------------------------------------------------------------------
 
-BINOMIAL_N = 20
-BINOMIAL_P = 0.5
-
-# support: {0, 1, ..., N} — this is exactly k, the number of outcomes
-SUPPORT = np.arange(0, BINOMIAL_N + 1)
-K       = len(SUPPORT)  # = N + 1 = 21
-
 EPSILON = 0.05
 DELTA   = 0.05
+SEEDS   = list(range(1, 101))
 
-SEEDS = list(range(1, 101))  # 100 random seeds (NS-3 RngRun values)
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/sample-complexity-discrete-seeded")
 
-n_theory = math.ceil((K * math.log(1.0 / EPSILON)) / (DELTA ** 2))
-
-SAMPLE_SIZES = [
-    n_theory // 4,
-    n_theory // 2,
-    n_theory,
-    n_theory * 2,
-]
-
-RESULTS_DIR = "../results/sample-complexity-discrete-seeded"
-
-DIST_COLOR = "#9b59b6"  # purple to distinguish from the continuous experiments
+DISTRIBUTIONS = {
+    "binomial": {
+        "label":        "Binomial(N=20, p=0.5)",
+        "color":        "#9b59b6",
+        "support":      np.arange(0, 21),       # {0, 1, ..., 20}
+        "k":            21,
+        "true_pmf":     lambda support: stats.binom.pmf(support, n=20, p=0.5),
+        # n_theory = ceil((21 + ln(1/0.05)) / 0.05^2) = 9599
+        "n_theory":     9599,
+        "sample_sizes": [2400, 4800, 9599, 19197, 38393],
+    },
+    "zipf": {
+        "label":        "Zipf(N=20, alpha=1.5)",
+        "color":        "#e67e22",
+        "support":      np.arange(1, 21),       # {1, 2, ..., 20}
+        "k":            20,
+        "true_pmf":     lambda support: stats.zipfian.pmf(support, a=1.5, n=20),
+        # n_theory = ceil((20 + ln(1/0.05)) / 0.05^2) = 9199
+        "n_theory":     9199,
+        "sample_sizes": [2300, 4599, 9199, 18397, 36793],
+    },
+    "piecewise": {
+        "label":        "Piecewise (irregular multi-modal)",
+        "color":        "#27ae60",
+        "support":      np.arange(1, 21),       # {1, 2, ..., 20}
+        "k":            20,
+        "true_pmf":     lambda support: np.array([
+                            0.12, 0.02, 0.08, 0.01, 0.10, 0.03, 0.07, 0.12, 0.02, 0.09,
+                            0.01, 0.08, 0.04, 0.06, 0.02, 0.05, 0.02, 0.04, 0.01, 0.01
+                        ]),
+        # n_theory = ceil((20 + ln(1/0.05)) / 0.05^2) = 9199  (same k as Zipf)
+        "n_theory":     9199,
+        "sample_sizes": [2300, 4599, 9199, 18397, 36793],
+    },
+}
 
 
 # ---------------------------------------------------------------------------
@@ -66,108 +86,94 @@ DIST_COLOR = "#9b59b6"  # purple to distinguish from the continuous experiments
 # ---------------------------------------------------------------------------
 
 def print_parameters():
-    print("=" * 55)
-    print("Discrete experiment parameters (multi-seed)")
-    print("=" * 55)
-    print(f"  Distribution : Binomial(N={BINOMIAL_N}, p={BINOMIAL_P})")
-    print(f"  Support      : {{0, 1, ..., {BINOMIAL_N}}}")
-    print(f"  k (outcomes) : {K}")
-    print(f"  epsilon      : {EPSILON}")
-    print(f"  delta        : {DELTA}")
-    print(f"  log(1/eps)   : {math.log(1/EPSILON):.6f}")
-    print(f"  n_theory     : ceil(({K} * {math.log(1/EPSILON):.4f}) / {DELTA**2})")
-    print(f"               = {n_theory}")
-    print(f"  Sample sizes : {SAMPLE_SIZES}  (n/4, n/2, n, 2n)")
-    print(f"  Seeds        : {SEEDS}")
-    print("=" * 55)
+    print("=" * 60)
+    print("Discrete TVD experiment parameters (multi-seed)")
+    print("=" * 60)
+    for name, d in DISTRIBUTIONS.items():
+        print(f"  {d['label']}")
+        print(f"    k (outcomes) : {d['k']}")
+        print(f"    n_theory     : {d['n_theory']:,}")
+        print(f"    sample sizes : {d['sample_sizes']}")
+    print(f"  epsilon : {EPSILON}    delta : {DELTA}")
+    print(f"  seeds   : 1 - {max(SEEDS)}")
+    print("=" * 60)
     print()
 
 
-def load_samples(n, seed):
-    filepath = os.path.join(RESULTS_DIR, f"delay_samples_binomial_{n}_seed{seed}.csv")
+def load_samples(dist_name, n, seed):
+    filepath = os.path.join(RESULTS_DIR, f"delay_samples_{dist_name}_{n}_seed{seed}.csv")
     raw = pd.read_csv(filepath)["delay_ms"].values
-    # NS-3 returns float; convert to integers (binomial values are whole numbers)
     return np.round(raw).astype(int)
 
 
-def true_pmf():
-    """True probability mass function of Binomial(N, p) over its support."""
-    return stats.binom.pmf(SUPPORT, n=BINOMIAL_N, p=BINOMIAL_P)
-
-
-def empirical_pmf(samples):
-    """Empirical PMF over {0, ..., N} from observed samples."""
-    counts = np.zeros(K)
+def empirical_pmf(samples, support):
+    """Empirical PMF over the given support from observed samples."""
+    counts = np.zeros(len(support))
+    lo, hi = support[0], support[-1]
     for val in samples:
-        if 0 <= val <= BINOMIAL_N:
-            counts[val] += 1
-    return counts / counts.sum()
+        if lo <= val <= hi:
+            counts[val - lo] += 1
+    total = counts.sum()
+    return counts / total if total > 0 else counts
 
 
-def tvd(true_pmf_vals, est_pmf_vals):
-    """Total Variation Distance between the true and estimated PMF."""
-    return 0.5 * float(np.sum(np.abs(true_pmf_vals - est_pmf_vals)))
+def tvd(p, q):
+    return 0.5 * float(np.sum(np.abs(p - q)))
 
 
-def theoretical_bound(n):
-    """Upper bound on TVD: sqrt(k * log(1/epsilon) / n), clipped at 1."""
-    return min(1.0, math.sqrt(K * math.log(1.0 / EPSILON) / n))
+def theoretical_bound(n, n_theory):
+    """Bound derived from n_theory: sqrt(n_theory / n), scaled to delta at n=n_theory."""
+    return min(1.0, DELTA * math.sqrt(n_theory / n))
 
 
 # ---------------------------------------------------------------------------
 # plotting
 # ---------------------------------------------------------------------------
 
-def plot_distribution(emp_pmf, true_pmf_vals, n, tvd_val, seed):
-    """
-    Bar chart of empirical PMF alongside the true PMF for one sample count.
-    Produced for seed 1 only as a visual reference.
-    """
-    fig, ax = plt.subplots(figsize=(8, 4))
+def plot_distribution(emp_pmf, true_pmf_vals, support, dist_config, n, tvd_val, seed):
+    """Bar chart of empirical PMF vs true PMF for one sample count (seed 1 only)."""
+    fig, ax = plt.subplots(figsize=(9, 4))
 
     bar_width = 0.35
-
-    ax.bar(SUPPORT - bar_width / 2, emp_pmf, width=bar_width,
-           color=DIST_COLOR, alpha=0.7, label=f"Empirical PMF (n={n:,}, seed={seed})")
-    ax.bar(SUPPORT + bar_width / 2, true_pmf_vals, width=bar_width,
+    ax.bar(support - bar_width / 2, emp_pmf, width=bar_width,
+           color=dist_config["color"], alpha=0.7,
+           label=f"Empirical PMF (n={n:,}, seed={seed})")
+    ax.bar(support + bar_width / 2, true_pmf_vals, width=bar_width,
            color="black", alpha=0.5, label="True PMF")
 
-    ax.set_title(
-        f"Binomial(N={BINOMIAL_N}, p={BINOMIAL_P}) — n = {n:,}, seed = {seed}\n"
-        f"TVD = {tvd_val:.6f}"
-    )
+    ax.set_title(f"{dist_config['label']} — n = {n:,}, seed = {seed}\nTVD = {tvd_val:.6f}")
     ax.set_xlabel("Delay (ms, integer-valued)")
     ax.set_ylabel("Probability")
-    ax.set_xticks(SUPPORT)
+    ax.set_xticks(support)
     ax.legend(fontsize=8)
     ax.grid(True, alpha=0.3, axis="y")
 
-    output_path = os.path.join(RESULTS_DIR, f"dist_binomial_n{n}_seed{seed}.png")
+    dist_name = [k for k, v in DISTRIBUTIONS.items() if v is dist_config][0]
+    output_path = os.path.join(RESULTS_DIR, f"dist_{dist_name}_n{n}_seed{seed}.png")
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  Saved: {output_path}")
+    print(f"    Saved: {output_path}")
 
 
-def plot_tvd_vs_n(ns, tvd_by_n):
-    """
-    Box plot of TVD vs n across all seeds, with theoretical bound overlaid.
-    """
+def plot_tvd_vs_n(dist_name, dist_config, ns, tvd_by_n):
+    """Box plot of TVD vs n across all seeds, with theoretical bound overlaid."""
+    n_theory = dist_config["n_theory"]
+
     fig, ax = plt.subplots(figsize=(12, 7))
 
     positions = list(range(len(ns)))
     data      = [tvd_by_n[n] for n in ns]
-    bounds    = [theoretical_bound(n) for n in ns]
+    bounds    = [theoretical_bound(n, n_theory) for n in ns]
 
     ax.boxplot(data, positions=positions, widths=0.4,
                patch_artist=True,
-               boxprops=dict(facecolor=DIST_COLOR, alpha=0.5),
+               boxprops=dict(facecolor=dist_config["color"], alpha=0.5),
                medianprops=dict(color="black", linewidth=2),
                flierprops=dict(marker="o", markersize=4, alpha=0.5))
 
     ax.plot(positions, bounds, "--", color="black", linewidth=1.5,
-            label=rf"Bound $\sqrt{{k \log(1/\varepsilon) / n}}$, k={K}, $\varepsilon$={EPSILON}")
-
+            label=rf"Theoretical bound ($n_{{theory}}={n_theory:,}$)")
     ax.axhline(y=DELTA, color="red", linestyle=":", linewidth=1.2,
                label=f"TVD = {DELTA} (accuracy target)")
 
@@ -175,18 +181,15 @@ def plot_tvd_vs_n(ns, tvd_by_n):
     ax.set_xticklabels([f"{n:,}" for n in ns], rotation=15)
     ax.set_xlabel("Number of samples (n)")
     ax.set_ylabel("Total Variation Distance")
-    ax.set_title(
-        f"TVD vs n — Binomial(N={BINOMIAL_N}, p={BINOMIAL_P})\n"
-        f"Empirical PMF, {len(SEEDS)} seeds"
-    )
+    ax.set_title(f"TVD vs n — {dist_config['label']}\nEmpirical PMF, {len(SEEDS)} seeds")
     ax.legend(fontsize=9)
     ax.grid(True, alpha=0.3, axis="y")
 
-    output_path = os.path.join(RESULTS_DIR, "tvd_binomial.png")
+    output_path = os.path.join(RESULTS_DIR, f"tvd_{dist_name}.png")
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  Saved: {output_path}")
+    print(f"    Saved: {output_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -196,30 +199,34 @@ def plot_tvd_vs_n(ns, tvd_by_n):
 def run():
     print_parameters()
 
-    true_pmf_vals = true_pmf()
+    for dist_name, dist_config in DISTRIBUTIONS.items():
+        print(f"--- {dist_config['label']} ---")
 
-    print(f"{'n':>10} {'median TVD':>12} {'min TVD':>10} {'max TVD':>10}")
-    print("-" * 48)
+        support       = dist_config["support"]
+        true_pmf_vals = dist_config["true_pmf"](support)
+        sample_sizes  = dist_config["sample_sizes"]
 
-    tvd_by_n = {}
+        print(f"  {'n':>10} {'median TVD':>12} {'min TVD':>10} {'max TVD':>10}")
+        print("  " + "-" * 48)
 
-    for n in SAMPLE_SIZES:
-        tvd_vals = []
+        tvd_by_n = {}
 
-        for seed in SEEDS:
-            samples = load_samples(n, seed)
-            emp     = empirical_pmf(samples)
-            tvd_vals.append(tvd(true_pmf_vals, emp))
+        for n in sample_sizes:
+            tvd_vals = []
 
-            # distribution plot for seed 1 only
-            if seed == 1:
-                plot_distribution(emp, true_pmf_vals, n, tvd_vals[-1], seed)
+            for seed in SEEDS:
+                samples  = load_samples(dist_name, n, seed)
+                emp      = empirical_pmf(samples, support)
+                tvd_vals.append(tvd(true_pmf_vals, emp))
 
-        tvd_by_n[n] = tvd_vals
-        print(f"{n:>10,} {np.median(tvd_vals):>12.6f} {np.min(tvd_vals):>10.6f} {np.max(tvd_vals):>10.6f}")
+                if seed == 1:
+                    plot_distribution(emp, true_pmf_vals, support, dist_config, n, tvd_vals[-1], seed)
 
-    plot_tvd_vs_n(SAMPLE_SIZES, tvd_by_n)
-    print()
+            tvd_by_n[n] = tvd_vals
+            print(f"  {n:>10,} {np.median(tvd_vals):>12.6f} {np.min(tvd_vals):>10.6f} {np.max(tvd_vals):>10.6f}")
+
+        plot_tvd_vs_n(dist_name, dist_config, sample_sizes, tvd_by_n)
+        print()
 
 
 if __name__ == "__main__":
