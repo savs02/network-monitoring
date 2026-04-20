@@ -99,6 +99,7 @@ VariableDelaySender::VariableDelaySender()
       m_intervalRv(nullptr),
       m_delayMonitor(nullptr),
       m_theoreticalMode(false),
+      m_realisticMode(false),
       m_lossRate(0.0),
       m_lossRv(CreateObject<UniformRandomVariable>())
 {
@@ -165,6 +166,12 @@ VariableDelaySender::SetTheoreticalMode(bool theoretical)
 }
 
 void
+VariableDelaySender::SetRealisticMode(bool realistic)
+{
+    m_realisticMode = realistic;
+}
+
+void
 VariableDelaySender::SetLossRate(double lossRate)
 {
     m_lossRate = lossRate;
@@ -227,8 +234,10 @@ VariableDelaySender::SendPacket()
     // packetReceived = false means the monitor never sees this packet
     bool packetReceived = (m_lossRate == 0.0) || (m_lossRv->GetValue(0.0, 1.0) >= m_lossRate);
 
-    // record the sample only if the packet was not lost
-    if (m_delayMonitor && packetReceived)
+    // in theoretical mode, record the sampled delay directly at the sender.
+    // in realistic mode, the sampled delay is only a floor — the receiver
+    // records the true end-to-end delay via DelayProbeTag instead.
+    if (m_delayMonitor && packetReceived && !m_realisticMode)
         m_delayMonitor->RecordDelay(m_packetsSent, sampledDelay);
 
     // in theoretical mode the sample is all we need — no packet is sent
@@ -241,7 +250,7 @@ VariableDelaySender::SendPacket()
         NS_LOG_INFO("Packet " << m_packetsSent << " entered ingress at t=" << Simulator::Now().GetSeconds() << "s");
 
         uint64_t sendNs = Simulator::Now().GetNanoSeconds();
-        Time delayTime = (sampledDelay > 0.0) ? MilliSeconds(sampledDelay) : NanoSeconds(1);
+        Time delayTime = (sampledDelay > 0.0) ? Seconds(sampledDelay * 1e-3) : NanoSeconds(1);
         uint32_t currentPacket = m_packetsSent;
 
         Simulator::Schedule(delayTime, [this, packet, currentPacket, sendNs]() {

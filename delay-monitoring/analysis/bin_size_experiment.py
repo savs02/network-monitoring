@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
+from scipy.interpolate import make_interp_spline
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -131,13 +132,32 @@ def true_pmf(dist_name, params, bin_edges):
     return masses / masses.sum()
 
 
-def kde_pmf(samples, bin_centres, bin_size):
+def kde_pmf(samples, bin_edges):
     """
     Kernel Density Estimate discretised onto the bin grid.
     Bandwidth chosen by Scott's rule with no knowledge of the underlying family.
+
+    Each bin mass is computed by integrating the KDE over the bin exactly,
+    using the Gaussian CDF.  The KDE is a mixture of Gaussians, so the
+    mass in bin [a, b] is:
+
+        mean_j ( Phi((b - x_j) / h) - Phi((a - x_j) / h) )
+
+    where h is the kernel bandwidth and x_j are the samples.  This is
+    correct regardless of the ratio of bin width to bandwidth, unlike the
+    midpoint approximation (kde(centre) * bin_size) which breaks down
+    when the kernel is narrow relative to the bin.
     """
-    kde    = stats.gaussian_kde(samples, bw_method="scott")
-    masses = kde(bin_centres) * bin_size
+    kde = stats.gaussian_kde(samples, bw_method="scott")
+    h   = kde.factor * np.std(samples, ddof=1)
+    left  = bin_edges[:-1]
+    right = bin_edges[1:]
+    # shape: (n_samples, n_bins) -> mean over samples -> (n_bins,)
+    masses = np.mean(
+        stats.norm.cdf(right, loc=samples[:, None], scale=h) -
+        stats.norm.cdf(left,  loc=samples[:, None], scale=h),
+        axis=0,
+    )
     return masses / masses.sum()
 
 
@@ -250,13 +270,14 @@ def true_pdf_fine(dist_name, params, x):
 
 def plot_distribution_comparison(dist_name, dist_config):
     """
-    For 1ms and 2ms bins, overlay the true underlying PDF, empirical PMF
-    (as a bar histogram), and KDE on the same axes.  Uses seed 1 at n_theory
-    samples as a representative single run.
+    2x2 grid (one panel per bin size) overlaying:
+      - Empirical PMF bars (orange)
+      - KDE smooth PDF curve (purple) — evaluated on a fine grid via Scott's rule
+      - True underlying PDF (black dashed)
 
-    This motivates the choice to focus on finer bins: coarser bins visibly
-    lose the shape of the underlying distribution, while the KDE adds a
-    smoothing approximation on top of the PMF.
+    Bar heights are probability density (mass / bin_size).  The KDE curve is
+    the continuous density, so all three share a common y-axis scale.
+    Uses seed 1 at n_theory samples.
     """
     bin_sizes_to_show = [1, 2, 5, 10]
     params = dist_config["params"]
@@ -268,7 +289,7 @@ def plot_distribution_comparison(dist_name, dist_config):
     fig, axes_grid = plt.subplots(2, 2, figsize=(14, 10), sharey=False)
     axes = axes_grid.flatten()
     fig.suptitle(
-        f"{dist_config['label']}  —  Underlying distribution, PMF, and KDE\n"
+        f"{dist_config['label']}  —  Empirical PMF, smoothed PMF, and true PDF\n"
         f"{param_label(dist_name, params)}  |  seed 1, n = n_theory",
         fontsize=11
     )
@@ -281,30 +302,38 @@ def plot_distribution_comparison(dist_name, dist_config):
 
         samples = load_samples(bin_size, dist_name, n, seed=1)
 
-        # PMF masses converted to density for a common y-axis scale
+        # Empirical PMF masses -> density
         pmf_masses = empirical_pmf(samples, bin_size, n_bins)
         pmf_density = pmf_masses / bin_size
 
-        # KDE as continuous density
-        kde_obj  = stats.gaussian_kde(samples, bw_method="scott")
-        kde_vals = kde_obj(x_fine)
-
-        # restrict bar centres to the visible x range
         visible = (bin_centres >= xmin) & (bin_centres <= xmax)
 
+        # Smooth curve through the empirical bin densities via cubic spline.
+        # This passes exactly through the bar tops and interpolates between them,
+        # unlike KDE which underestimates the peak by 1/sqrt(2π) due to the
+        # Gaussian kernel shape.
+        centres_visible = bin_centres[visible]
+        pmf_density_visible = pmf_density[visible]
+        if len(centres_visible) >= 4:
+            spline = make_interp_spline(centres_visible, pmf_density_visible, k=3)
+        else:
+            spline = make_interp_spline(centres_visible, pmf_density_visible,
+                                        k=len(centres_visible) - 1)
+        spline_vals = np.clip(spline(x_fine), 0, None)
+
         ax.bar(bin_centres[visible], pmf_density[visible],
-               width=bin_size * 0.9, color="#FF9800", alpha=0.55,
-               label=f"PMF ({bin_size}ms bins)")
-        ax.plot(x_fine, kde_vals, color="#9b59b6", linewidth=2.0,
-                label="KDE (Scott's rule)")
+               width=bin_size * 0.85, color="#FF9800", alpha=0.55,
+               label="Empirical PMF")
+        ax.plot(x_fine, spline_vals, color="#9b59b6", linewidth=2.0,
+                label="Smoothed PMF")
         ax.plot(x_fine, true_pdf_vals, color="black", linewidth=2.0,
-                linestyle="--", label="True distribution")
+                linestyle="--", label="True PDF")
 
         ax.set_xlim(xmin, xmax)
         ax.set_xlabel("Delay (ms)")
         ax.set_ylabel("Probability density")
         ax.set_title(f"{bin_size}ms bins  |  n = {n:,}")
-        ax.legend(fontsize=9)
+        ax.legend(fontsize=8)
         ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
@@ -393,7 +422,7 @@ def run():
                 for seed in SEEDS:
                     samples = load_samples(bin_size, dist_name, n, seed)
 
-                    kde_masses = kde_pmf(samples, bin_centres, bin_size)
+                    kde_masses = kde_pmf(samples, bin_edges)
                     pmf_masses = empirical_pmf(samples, bin_size, n_bins)
 
                     kde_tvds_by_n[i].append(tvd(true_masses, kde_masses))

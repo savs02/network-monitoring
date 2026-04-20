@@ -18,8 +18,8 @@
 set -e
 
 NS3_DIR="ns-3.46"
-RESULTS_DIR="delay-monitoring/results/sample-complexity-discrete-seeded"
-RESULTS_RELPATH="../delay-monitoring/results/sample-complexity-discrete-seeded"
+RESULTS_DIR="delay-monitoring/results/sample-complexity/discrete/theoretical/seeded"
+RESULTS_RELPATH="../delay-monitoring/results/sample-complexity/discrete/theoretical/seeded"
 
 mkdir -p "$RESULTS_DIR"
 
@@ -27,7 +27,7 @@ SEEDS=($(seq 1 100))
 
 # --- Binomial(20, 0.5) ---
 
-BINOMIAL_SIZES=(2400 4800 9599 19197 38393)
+BINOMIAL_SIZES=(480 960 2400 4800 9599 19197 38393)
 total_b=$(( ${#BINOMIAL_SIZES[@]} * ${#SEEDS[@]} ))
 count=0
 
@@ -57,7 +57,7 @@ done
 
 # --- Zipf(N=20, alpha=1.5) ---
 
-ZIPF_SIZES=(2300 4599 9199 18397 36793)
+ZIPF_SIZES=(460 920 2300 4599 9199 18397 36793)
 total_z=$(( ${#ZIPF_SIZES[@]} * ${#SEEDS[@]} ))
 count=0
 
@@ -90,7 +90,7 @@ done
 #   k = 20  =>  n_theory = ceil((20 + ln(1/0.05)) / 0.05^2) = 9199
 #   Sample sizes: 2300  4599  9199  18397  36793
 
-PIECEWISE_SIZES=(2300 4599 9199 18397 36793)
+PIECEWISE_SIZES=(460 920 2300 4599 9199 18397 36793)
 total_p=$(( ${#PIECEWISE_SIZES[@]} * ${#SEEDS[@]} ))
 count=0
 

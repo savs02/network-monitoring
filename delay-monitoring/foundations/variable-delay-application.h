@@ -49,6 +49,12 @@ public:
     void SetDelayMonitor(DelayMonitor* monitor);
     void SetTheoreticalMode(bool theoretical);
 
+    // realistic mode: sampled delay acts as a floor — the packet is sent over
+    // the network after at least that delay, but real network effects may add
+    // more. the sender does not record the sampled value; the receiver records
+    // the actual end-to-end delay via DelayProbeTag.
+    void SetRealisticMode(bool realistic);
+
     // packet loss experiment: fraction of packets not seen by the monitor
     // (models packets lost in the network before reaching the passive observer)
     void SetLossRate(double lossRate);
@@ -74,6 +80,7 @@ private:
     Ptr<RandomVariableStream> m_intervalRv;
     DelayMonitor* m_delayMonitor;              // nullable: only records if set
     bool          m_theoreticalMode;           // if true, sample and record only — no packet sent
+    bool          m_realisticMode;             // if true, send packet with sampled delay as floor; receiver records actual E2E
     double        m_lossRate;                  // fraction of packets lost (0 = no loss)
     Ptr<UniformRandomVariable> m_lossRv;       // RNG for loss decisions
     

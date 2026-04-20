@@ -56,6 +56,10 @@ main(int argc, char* argv[])
     double   lossRate     = 0.0; // fraction of packets dropped before reaching the monitor
     double   intervalMean = 1.0; // mean inter-packet time in ms (exponential)
 
+    // --- Realistic mode parameters ---
+
+    bool realisticMode = false; // sample sets floor delay; packet sent over wire; receiver records actual E2E
+
     // --- Cross-traffic parameters ---
 
     bool   crossTrafficMode      = false;
@@ -64,6 +68,7 @@ main(int argc, char* argv[])
 
     std::string linkDataRate = "10Mbps";
     std::string linkDelay    = "2ms";
+    uint32_t    queueSize    = 50;  // DropTail queue depth in packets
 
     // --- Output ---
 
@@ -86,11 +91,13 @@ main(int argc, char* argv[])
     cmd.AddValue("numPackets",            "Number of packets to send", numPackets);
     cmd.AddValue("lossRate",              "Fraction of packets dropped before reaching the monitor (0 = no loss)", lossRate);
     cmd.AddValue("intervalMean",          "Mean inter-packet interval in ms (exponential)", intervalMean);
+    cmd.AddValue("realisticMode",         "Sampled delay is a floor; packet sent over wire; receiver records actual E2E delay", realisticMode);
     cmd.AddValue("crossTrafficMode",      "Use receiver-side TimestampTag monitoring — cross-traffic experiment", crossTrafficMode);
     cmd.AddValue("crossTrafficRate",      "Fraction of link capacity used by cross-traffic (0 = theoretical)", crossTrafficRate);
     cmd.AddValue("crossTrafficStartTime", "Simulation time (s) at which the cross-traffic sender starts", crossTrafficStartTime);
-    cmd.AddValue("linkDataRate",          "Point-to-point link data rate (cross-traffic experiment)", linkDataRate);
-    cmd.AddValue("linkDelay",             "Point-to-point link propagation delay (cross-traffic experiment)", linkDelay);
+    cmd.AddValue("linkDataRate",          "Point-to-point link data rate", linkDataRate);
+    cmd.AddValue("linkDelay",             "Point-to-point link propagation delay", linkDelay);
+    cmd.AddValue("queueSize",             "DropTail queue depth in packets", queueSize);
     cmd.AddValue("outputFile",            "Output CSV path for delay samples (default: results/delay_samples_{dist}.csv)", outputFile);
     cmd.Parse(argc, argv);
 
@@ -111,6 +118,8 @@ main(int argc, char* argv[])
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue(linkDataRate));
     p2p.SetChannelAttribute("Delay",   StringValue(linkDelay));
+    p2p.SetQueue("ns3::DropTailQueue<Packet>",
+                 "MaxSize", QueueSizeValue(QueueSize(std::to_string(queueSize) + "p")));
 
     NetDeviceContainer devices = p2p.Install(nodes);
 
@@ -225,7 +234,19 @@ main(int argc, char* argv[])
     sender->SetStartTime(Seconds(0.01));
     sender->SetStopTime(Seconds(1000.0));
 
-    if (crossTrafficMode)
+    if (realisticMode)
+    {
+        // Sampled delay acts as a floor: the sender schedules each packet to leave
+        // after at least the sampled delay, then the packet travels the real link.
+        // The receiver measures total E2E (floor delay + propagation + transmission)
+        // via DelayProbeTag. Use a negligible link delay and high data rate so the
+        // network overhead is sub-millisecond and rounds away in the analysis.
+        sender->SetDelayRandomVariable(delayRv);
+        sender->SetRealisticMode(true);
+        receiver->SetDelayMonitor(&delayMonitor);
+        NS_LOG_INFO("Realistic mode: sampled delay is floor; receiver records actual E2E");
+    }
+    else if (crossTrafficMode)
     {
         // Probe sender still applies an artificial delay from the chosen distribution.
         // The TimestampTag is stamped before the artificial delay, so the receiver

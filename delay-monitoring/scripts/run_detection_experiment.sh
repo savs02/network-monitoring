@@ -38,6 +38,8 @@ N_TOTAL=$(( N_BEFORE + N_AFTER ))
 # inter-packet interval (ms) — exponential mean
 INTERVAL_MEAN=1.0
 
+QUEUE_SIZE=50  # DropTail queue depth in packets
+
 # cross-traffic starts after expected arrival of N_BEFORE packets,
 # with a 10% buffer to absorb randomness in the exponential intervals
 CHANGE_TIME=$(python3 -c "
@@ -87,6 +89,7 @@ for dist in "${DISTRIBUTIONS[@]}"; do
             --crossTrafficMode=true \
             --crossTrafficRate=${ct_rate} \
             --crossTrafficStartTime=${CHANGE_TIME} \
+            --queueSize=${QUEUE_SIZE} \
             --outputFile=${output}" 2>/dev/null)
     done
 done

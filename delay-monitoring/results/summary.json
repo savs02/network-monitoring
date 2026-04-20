@@ -1,0 +1,1124 @@
+{
+  "theoretical__discrete__binomial": {
+    "mode": "theoretical",
+    "domain": "discrete",
+    "dist": "binomial",
+    "dist_info": {
+      "label": "Binomial(N=20, p=0.5)",
+      "params": {
+        "N": 20,
+        "p": 0.5
+      },
+      "n_theory": 9599,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        480,
+        960,
+        2400,
+        4800,
+        9599,
+        19197,
+        38393
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "support": "{0, 1, ..., 20}",
+      "k": 21,
+      "true_pmf_values": {
+        "0": 1e-06,
+        "1": 1.9e-05,
+        "2": 0.000181,
+        "3": 0.001087,
+        "4": 0.004621,
+        "5": 0.014786,
+        "6": 0.036964,
+        "7": 0.073929,
+        "8": 0.120134,
+        "9": 0.160179,
+        "10": 0.176197,
+        "11": 0.160179,
+        "12": 0.120134,
+        "13": 0.073929,
+        "14": 0.036964,
+        "15": 0.014786,
+        "16": 0.004621,
+        "17": 0.001087,
+        "18": 0.000181,
+        "19": 1.9e-05,
+        "20": 1e-06
+      }
+    },
+    "by_n": {}
+  },
+  "theoretical__discrete__zipf": {
+    "mode": "theoretical",
+    "domain": "discrete",
+    "dist": "zipf",
+    "dist_info": {
+      "label": "Zipf(N=20, alpha=1.5)",
+      "params": {
+        "N": 20,
+        "alpha": 1.5
+      },
+      "n_theory": 9199,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        460,
+        920,
+        2300,
+        4599,
+        9199,
+        18397,
+        36793
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "support": "{1, 2, ..., 20}",
+      "k": 20,
+      "true_pmf_values": {
+        "1": 0.460685,
+        "2": 0.162877,
+        "3": 0.088659,
+        "4": 0.057586,
+        "5": 0.041205,
+        "6": 0.031346,
+        "7": 0.024875,
+        "8": 0.02036,
+        "9": 0.017062,
+        "10": 0.014568,
+        "11": 0.012627,
+        "12": 0.011082,
+        "13": 0.009829,
+        "14": 0.008795,
+        "15": 0.00793,
+        "16": 0.007198,
+        "17": 0.006572,
+        "18": 0.006032,
+        "19": 0.005563,
+        "20": 0.005151
+      }
+    },
+    "by_n": {}
+  },
+  "theoretical__discrete__piecewise": {
+    "mode": "theoretical",
+    "domain": "discrete",
+    "dist": "piecewise",
+    "dist_info": {
+      "label": "Piecewise (irregular multi-modal)",
+      "params": {},
+      "n_theory": 9199,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        460,
+        920,
+        2300,
+        4599,
+        9199,
+        18397,
+        36793
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "support": "{1, 2, ..., 20}",
+      "k": 20,
+      "true_pmf_values": {
+        "1": 0.12,
+        "2": 0.02,
+        "3": 0.08,
+        "4": 0.01,
+        "5": 0.1,
+        "6": 0.03,
+        "7": 0.07,
+        "8": 0.12,
+        "9": 0.02,
+        "10": 0.09,
+        "11": 0.01,
+        "12": 0.08,
+        "13": 0.04,
+        "14": 0.06,
+        "15": 0.02,
+        "16": 0.05,
+        "17": 0.02,
+        "18": 0.04,
+        "19": 0.01,
+        "20": 0.01
+      }
+    },
+    "by_n": {}
+  },
+  "realistic__discrete__binomial": {
+    "mode": "realistic",
+    "domain": "discrete",
+    "dist": "binomial",
+    "dist_info": {
+      "label": "Binomial(N=20, p=0.5)",
+      "params": {
+        "N": 20,
+        "p": 0.5
+      },
+      "n_theory": 9599,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        480,
+        960,
+        2400,
+        4800,
+        9599,
+        19197,
+        38393
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "support": "{0, 1, ..., 20}",
+      "k": 21,
+      "true_pmf_values": {
+        "0": 1e-06,
+        "1": 1.9e-05,
+        "2": 0.000181,
+        "3": 0.001087,
+        "4": 0.004621,
+        "5": 0.014786,
+        "6": 0.036964,
+        "7": 0.073929,
+        "8": 0.120134,
+        "9": 0.160179,
+        "10": 0.176197,
+        "11": 0.160179,
+        "12": 0.120134,
+        "13": 0.073929,
+        "14": 0.036964,
+        "15": 0.014786,
+        "16": 0.004621,
+        "17": 0.001087,
+        "18": 0.000181,
+        "19": 1.9e-05,
+        "20": 1e-06
+      }
+    },
+    "by_n": {
+      "480": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.032699
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.057979,
+          "tvd_mean": 0.058674,
+          "tvd_min": 0.026051,
+          "tvd_max": 0.097662
+        }
+      },
+      "960": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.03071
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.040304,
+          "tvd_mean": 0.04148,
+          "tvd_min": 0.018823,
+          "tvd_max": 0.066946
+        }
+      },
+      "2400": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.026535
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.025835,
+          "tvd_mean": 0.02671,
+          "tvd_min": 0.015763,
+          "tvd_max": 0.044968
+        }
+      },
+      "4800": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.017694
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.017991,
+          "tvd_mean": 0.01845,
+          "tvd_min": 0.009865,
+          "tvd_max": 0.029003
+        }
+      },
+      "9599": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.011817
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.012567,
+          "tvd_mean": 0.012484,
+          "tvd_min": 0.006521,
+          "tvd_max": 0.022311
+        }
+      },
+      "19197": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.008088
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.008632,
+          "tvd_mean": 0.008877,
+          "tvd_min": 0.004749,
+          "tvd_max": 0.01504
+        }
+      },
+      "38393": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.005289
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.006372,
+          "tvd_mean": 0.006428,
+          "tvd_min": 0.003152,
+          "tvd_max": 0.012105
+        }
+      }
+    }
+  },
+  "realistic__discrete__zipf": {
+    "mode": "realistic",
+    "domain": "discrete",
+    "dist": "zipf",
+    "dist_info": {
+      "label": "Zipf(N=20, alpha=1.5)",
+      "params": {
+        "N": 20,
+        "alpha": 1.5
+      },
+      "n_theory": 9199,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        460,
+        920,
+        2300,
+        4599,
+        9199,
+        18397,
+        36793
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "support": "{1, 2, ..., 20}",
+      "k": 20,
+      "true_pmf_values": {
+        "1": 0.460685,
+        "2": 0.162877,
+        "3": 0.088659,
+        "4": 0.057586,
+        "5": 0.041205,
+        "6": 0.031346,
+        "7": 0.024875,
+        "8": 0.02036,
+        "9": 0.017062,
+        "10": 0.014568,
+        "11": 0.012627,
+        "12": 0.011082,
+        "13": 0.009829,
+        "14": 0.008795,
+        "15": 0.00793,
+        "16": 0.007198,
+        "17": 0.006572,
+        "18": 0.006032,
+        "19": 0.005563,
+        "20": 0.005151
+      }
+    },
+    "by_n": {
+      "460": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.042516
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.060051,
+          "tvd_mean": 0.060759,
+          "tvd_min": 0.030474,
+          "tvd_max": 0.096857
+        }
+      },
+      "920": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.026537
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.04047,
+          "tvd_mean": 0.04037,
+          "tvd_min": 0.023617,
+          "tvd_max": 0.065376
+        }
+      },
+      "2300": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.02531
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.025205,
+          "tvd_mean": 0.026282,
+          "tvd_min": 0.014032,
+          "tvd_max": 0.045631
+        }
+      },
+      "4599": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.01706
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.018267,
+          "tvd_mean": 0.018583,
+          "tvd_min": 0.011136,
+          "tvd_max": 0.03059
+        }
+      },
+      "9199": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.014608
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.012798,
+          "tvd_mean": 0.013012,
+          "tvd_min": 0.007225,
+          "tvd_max": 0.023094
+        }
+      },
+      "18397": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.006569
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.00907,
+          "tvd_mean": 0.009188,
+          "tvd_min": 0.005167,
+          "tvd_max": 0.018394
+        }
+      },
+      "36793": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.006035
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.00624,
+          "tvd_mean": 0.006307,
+          "tvd_min": 0.003532,
+          "tvd_max": 0.010983
+        }
+      }
+    }
+  },
+  "realistic__discrete__piecewise": {
+    "mode": "realistic",
+    "domain": "discrete",
+    "dist": "piecewise",
+    "dist_info": {
+      "label": "Piecewise (irregular multi-modal)",
+      "params": {},
+      "n_theory": 9199,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        460,
+        920,
+        2300,
+        4599,
+        9199,
+        18397,
+        36793
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "support": "{1, 2, ..., 20}",
+      "k": 20,
+      "true_pmf_values": {
+        "1": 0.12,
+        "2": 0.02,
+        "3": 0.08,
+        "4": 0.01,
+        "5": 0.1,
+        "6": 0.03,
+        "7": 0.07,
+        "8": 0.12,
+        "9": 0.02,
+        "10": 0.09,
+        "11": 0.01,
+        "12": 0.08,
+        "13": 0.04,
+        "14": 0.06,
+        "15": 0.02,
+        "16": 0.05,
+        "17": 0.02,
+        "18": 0.04,
+        "19": 0.01,
+        "20": 0.01
+      }
+    },
+    "by_n": {
+      "460": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.094348
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.076087,
+          "tvd_mean": 0.074822,
+          "tvd_min": 0.042609,
+          "tvd_max": 0.122174
+        }
+      },
+      "920": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.059348
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.052826,
+          "tvd_mean": 0.05338,
+          "tvd_min": 0.032391,
+          "tvd_max": 0.078913
+        }
+      },
+      "2300": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.029565
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.032826,
+          "tvd_mean": 0.03327,
+          "tvd_min": 0.017826,
+          "tvd_max": 0.05087
+        }
+      },
+      "4599": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.022061
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.02326,
+          "tvd_mean": 0.023921,
+          "tvd_min": 0.01384,
+          "tvd_max": 0.035134
+        }
+      },
+      "9199": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.016919
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.016899,
+          "tvd_mean": 0.016631,
+          "tvd_min": 0.007669,
+          "tvd_max": 0.024521
+        }
+      },
+      "18397": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.013483
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.011746,
+          "tvd_mean": 0.011624,
+          "tvd_min": 0.00751,
+          "tvd_max": 0.016339
+        }
+      },
+      "36793": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.007069
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.007957,
+          "tvd_mean": 0.008142,
+          "tvd_min": 0.004755,
+          "tvd_max": 0.012246
+        }
+      }
+    }
+  },
+  "realistic__continuous__lognormal": {
+    "mode": "realistic",
+    "domain": "continuous",
+    "dist": "lognormal",
+    "dist_info": {
+      "label": "Lognormal(mu=2.3, sigma=0.2)",
+      "params": {
+        "mu": 2.3,
+        "sigma": 0.2
+      },
+      "n_theory": 61199,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        3060,
+        6120,
+        15299,
+        30599,
+        61199,
+        122398,
+        244796
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "binning": {
+        "bin_size_ms": 1.0,
+        "bin_max_ms": 150.0,
+        "n_bins": 150
+      },
+      "mean_ms": 10.1757
+    },
+    "by_n": {
+      "3060": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.02608,
+          "ks": 0.174372
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.020426,
+          "tvd_mean": 0.021091,
+          "tvd_min": 0.009293,
+          "tvd_max": 0.035235,
+          "ks_median": 0.191038,
+          "ks_mean": 0.191401,
+          "ks_min": 0.16228,
+          "ks_max": 0.209666
+        }
+      },
+      "6120": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.019865,
+          "ks": 0.180254
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.015175,
+          "tvd_mean": 0.015087,
+          "tvd_min": 0.008105,
+          "tvd_max": 0.026727,
+          "ks_median": 0.190303,
+          "ks_mean": 0.19063,
+          "ks_min": 0.176496,
+          "ks_max": 0.206888
+        }
+      },
+      "15299": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.007511,
+          "ks": 0.185189
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.009374,
+          "tvd_mean": 0.009478,
+          "tvd_min": 0.0035,
+          "tvd_max": 0.016111,
+          "ks_median": 0.190058,
+          "ks_mean": 0.190487,
+          "ks_min": 0.178979,
+          "ks_max": 0.201072
+        }
+      },
+      "30599": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.0047,
+          "ks": 0.186512
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.006443,
+          "tvd_mean": 0.006689,
+          "tvd_min": 0.003893,
+          "tvd_max": 0.01183,
+          "ks_median": 0.189862,
+          "ks_mean": 0.190274,
+          "ks_min": 0.185172,
+          "ks_max": 0.197918
+        }
+      },
+      "61199": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.004547,
+          "ks": 0.18956
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.004608,
+          "tvd_mean": 0.004751,
+          "tvd_min": 0.002214,
+          "tvd_max": 0.007765,
+          "ks_median": 0.190524,
+          "ks_mean": 0.190568,
+          "ks_min": 0.185442,
+          "ks_max": 0.195115
+        }
+      },
+      "122398": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.004064,
+          "ks": 0.190859
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.003406,
+          "tvd_mean": 0.00337,
+          "tvd_min": 0.001347,
+          "tvd_max": 0.005429,
+          "ks_median": 0.190487,
+          "ks_mean": 0.190461,
+          "ks_min": 0.186038,
+          "ks_max": 0.194347
+        }
+      },
+      "244796": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.001605,
+          "ks": 0.190638
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.002344,
+          "tvd_mean": 0.002356,
+          "tvd_min": 0.00104,
+          "tvd_max": 0.004797,
+          "ks_median": 0.190428,
+          "ks_mean": 0.190386,
+          "ks_min": 0.186034,
+          "ks_max": 0.193093
+        }
+      }
+    }
+  },
+  "realistic__continuous__normal": {
+    "mode": "realistic",
+    "domain": "continuous",
+    "dist": "normal",
+    "dist_info": {
+      "label": "Normal(mean=40, var=4)",
+      "params": {
+        "mean": 40.0,
+        "variance": 4.0,
+        "std": 2.0
+      },
+      "n_theory": 61199,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        3060,
+        6120,
+        15299,
+        30599,
+        61199,
+        122398,
+        244796
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "binning": {
+        "bin_size_ms": 1.0,
+        "bin_max_ms": 150.0,
+        "n_bins": 150
+      },
+      "mean_ms": 40.0
+    },
+    "by_n": {
+      "3060": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.017351,
+          "ks": 0.173609
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.021339,
+          "tvd_mean": 0.021399,
+          "tvd_min": 0.008849,
+          "tvd_max": 0.034672,
+          "ks_median": 0.1841,
+          "ks_mean": 0.1846,
+          "ks_min": 0.157228,
+          "ks_max": 0.201781
+        }
+      },
+      "6120": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.014898,
+          "ks": 0.178184
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.014585,
+          "tvd_mean": 0.014951,
+          "tvd_min": 0.0075,
+          "tvd_max": 0.026538,
+          "ks_median": 0.183331,
+          "ks_mean": 0.183278,
+          "ks_min": 0.168583,
+          "ks_max": 0.197532
+        }
+      },
+      "15299": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.008556,
+          "ks": 0.177837
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.009425,
+          "tvd_mean": 0.00958,
+          "tvd_min": 0.004088,
+          "tvd_max": 0.016799,
+          "ks_median": 0.182314,
+          "ks_mean": 0.182705,
+          "ks_min": 0.171235,
+          "ks_max": 0.191814
+        }
+      },
+      "30599": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.006229,
+          "ks": 0.178305
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.006367,
+          "tvd_mean": 0.006532,
+          "tvd_min": 0.002821,
+          "tvd_max": 0.012906,
+          "ks_median": 0.182096,
+          "ks_mean": 0.182175,
+          "ks_min": 0.177614,
+          "ks_max": 0.188464
+        }
+      },
+      "61199": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.004323,
+          "ks": 0.180892
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.004643,
+          "tvd_mean": 0.004673,
+          "tvd_min": 0.002272,
+          "tvd_max": 0.007846,
+          "ks_median": 0.182289,
+          "ks_mean": 0.182254,
+          "ks_min": 0.178686,
+          "ks_max": 0.186299
+        }
+      },
+      "122398": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.003986,
+          "ks": 0.183482
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.003305,
+          "tvd_mean": 0.003321,
+          "tvd_min": 0.00175,
+          "tvd_max": 0.005175,
+          "ks_median": 0.182023,
+          "ks_mean": 0.182046,
+          "ks_min": 0.179568,
+          "ks_max": 0.185736
+        }
+      },
+      "244796": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.00206,
+          "ks": 0.18282
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.002361,
+          "tvd_mean": 0.002351,
+          "tvd_min": 0.001172,
+          "tvd_max": 0.004552,
+          "ks_median": 0.181918,
+          "ks_mean": 0.181942,
+          "ks_min": 0.179616,
+          "ks_max": 0.183901
+        }
+      }
+    }
+  },
+  "realistic__continuous__weibull": {
+    "mode": "realistic",
+    "domain": "continuous",
+    "dist": "weibull",
+    "dist_info": {
+      "label": "Weibull(scale=10, shape=2)",
+      "params": {
+        "scale": 10.0,
+        "shape": 2.0
+      },
+      "n_theory": 61199,
+      "epsilon": 0.05,
+      "delta": 0.05,
+      "sample_sizes": [
+        3060,
+        6120,
+        15299,
+        30599,
+        61199,
+        122398,
+        244796
+      ],
+      "size_labels": [
+        "n/20",
+        "n/10",
+        "n/4",
+        "n/2",
+        "n",
+        "2n",
+        "4n"
+      ],
+      "binning": {
+        "bin_size_ms": 1.0,
+        "bin_max_ms": 150.0,
+        "n_bins": 150
+      },
+      "mean_ms": 8.8623
+    },
+    "by_n": {
+      "3060": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.035377,
+          "ks": 0.098553
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.032894,
+          "tvd_mean": 0.032852,
+          "tvd_min": 0.019427,
+          "tvd_max": 0.043705,
+          "ks_median": 0.082949,
+          "ks_mean": 0.083272,
+          "ks_min": 0.062684,
+          "ks_max": 0.106326
+        }
+      },
+      "6120": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.023061,
+          "ks": 0.091853
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.022239,
+          "tvd_mean": 0.022462,
+          "tvd_min": 0.013809,
+          "tvd_max": 0.033292,
+          "ks_median": 0.08221,
+          "ks_mean": 0.081996,
+          "ks_min": 0.067507,
+          "ks_max": 0.10166
+        }
+      },
+      "15299": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.0137,
+          "ks": 0.08329
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.014045,
+          "tvd_mean": 0.014207,
+          "tvd_min": 0.009148,
+          "tvd_max": 0.020899,
+          "ks_median": 0.081507,
+          "ks_mean": 0.08157,
+          "ks_min": 0.072047,
+          "ks_max": 0.089332
+        }
+      },
+      "30599": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.011076,
+          "ks": 0.08396
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.009792,
+          "tvd_mean": 0.010072,
+          "tvd_min": 0.006077,
+          "tvd_max": 0.015767,
+          "ks_median": 0.081547,
+          "ks_mean": 0.081536,
+          "ks_min": 0.074908,
+          "ks_max": 0.088242
+        }
+      },
+      "61199": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.007364,
+          "ks": 0.079835
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.007056,
+          "tvd_mean": 0.007173,
+          "tvd_min": 0.005052,
+          "tvd_max": 0.010099,
+          "ks_median": 0.080767,
+          "ks_mean": 0.081037,
+          "ks_min": 0.077646,
+          "ks_max": 0.08562
+        }
+      },
+      "122398": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.00629,
+          "ks": 0.078855
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.005016,
+          "tvd_mean": 0.005099,
+          "tvd_min": 0.003288,
+          "tvd_max": 0.006899,
+          "ks_median": 0.080969,
+          "ks_mean": 0.081049,
+          "ks_min": 0.078348,
+          "ks_max": 0.085652
+        }
+      },
+      "244796": {
+        "single_seed": {
+          "seeds": 1,
+          "tvd": 0.004092,
+          "ks": 0.079855
+        },
+        "seeded": {
+          "seeds": 100,
+          "tvd_median": 0.003594,
+          "tvd_mean": 0.003596,
+          "tvd_min": 0.002522,
+          "tvd_max": 0.006925,
+          "ks_median": 0.081118,
+          "ks_mean": 0.081166,
+          "ks_min": 0.079157,
+          "ks_max": 0.086563
+        }
+      }
+    }
+  }
+}

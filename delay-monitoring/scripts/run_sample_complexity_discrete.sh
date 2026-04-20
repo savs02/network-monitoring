@@ -20,14 +20,14 @@
 set -e
 
 NS3_DIR="ns-3.46"
-RESULTS_DIR="delay-monitoring/results/sample-complexity-discrete"
-RESULTS_RELPATH="../delay-monitoring/results/sample-complexity-discrete"
+RESULTS_DIR="delay-monitoring/results/sample-complexity/discrete/theoretical/single_seed"
+RESULTS_RELPATH="../delay-monitoring/results/sample-complexity/discrete/theoretical/single_seed"
 
 mkdir -p "$RESULTS_DIR"
 
 # --- Binomial(20, 0.5) ---
 
-BINOMIAL_SIZES=(2400 4800 9599 19197 38393)
+BINOMIAL_SIZES=(480 960 2400 4800 9599 19197 38393)
 total_b=${#BINOMIAL_SIZES[@]}
 count=0
 
@@ -48,7 +48,7 @@ done
 
 # --- Zipf(N=20, alpha=1.5) ---
 
-ZIPF_SIZES=(2300 4599 9199 18397 36793)
+ZIPF_SIZES=(460 920 2300 4599 9199 18397 36793)
 total_z=${#ZIPF_SIZES[@]}
 count=0
 
@@ -70,7 +70,7 @@ done
 
 # --- Piecewise (irregular multi-modal PMF over {1,...,20}) ---
 
-PIECEWISE_SIZES=(2300 4599 9199 18397 36793)
+PIECEWISE_SIZES=(460 920 2300 4599 9199 18397 36793)
 total_p=${#PIECEWISE_SIZES[@]}
 count=0
 

@@ -11,13 +11,13 @@
 set -e
 
 NS3_DIR="ns-3.46"
-RESULTS_DIR="delay-monitoring/results/sample-complexity"
-RESULTS_RELPATH="../delay-monitoring/results/sample-complexity"
+RESULTS_DIR="delay-monitoring/results/sample-complexity/continuous/theoretical/single_seed"
+RESULTS_RELPATH="../delay-monitoring/results/sample-complexity/continuous/theoretical/single_seed"
 
 mkdir -p "$RESULTS_DIR"
 
 DISTRIBUTIONS=("lognormal" "normal" "weibull")
-SAMPLE_SIZES=(15299 30599 61199 122398)
+SAMPLE_SIZES=(3060 6120 15299 30599 61199 122398 244796)
 
 total=$(( ${#DISTRIBUTIONS[@]} * ${#SAMPLE_SIZES[@]} ))
 count=0
