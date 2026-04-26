@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt]{report}
+\documentclass[a4paper,11pt]{report}
 \usepackage[a4paper, margin=3cm, bottom=2.5cm]{geometry}
 \usepackage{setspace}
 \usepackage{amssymb, amsfonts, amsmath, latexsym}
@@ -83,77 +83,189 @@ Knowing how much additional traffic a path can absorb before performance degrade
 
 \chapter{Evaluation}
 
-The evaluation has five parts: statistical sample complexity, adaptive stopping, the motivating use case, multi-hop topologies, and multi-path topologies. The first two parts are developed here because they establish the statistical basis of the monitor before the network scenarios become more complex. The later use-case, multi-hop, and multi-path studies are intentionally left for later sections.
+The evaluation has five parts: statistical sample complexity, adaptive stopping, the motivating use case, multi-hop topologies, and multi-path topologies.
 
 \section{Statistical sample complexity}
 \label{sec:eval-statistical}
 
-The first evaluation asks how many passive delay samples are needed before the reconstructed delay distribution is accurate. The monitor observes independent packet delay samples from an unknown distribution and constructs an empirical reconstruction without being told which parametric family generated the samples. The main accuracy metric is total variation distance (TVD). For an unknown distribution \(P\) and an estimate \(\widehat{P}\) over a finite domain \(\mathcal{X}\), this is
+The first evaluation asks how many samples are needed before an unknown delay distribution can be reconstructed accurately. This part deliberately removes the network simulator from the loop. Samples are drawn directly from the configured distributions so that the statistical claim can be tested before any network effects are added. The monitor sees only samples. It is not told whether they came from a binomial, Zipfian, piecewise, normal, lognormal, or Weibull distribution.
+
+The main accuracy metric is total variation distance (TVD). For a true distribution \(P\) and an estimate \(\widehat{P}\) over a finite domain \(\mathcal{X}\), this is
 \[
 d_{\mathrm{TV}}(P,\widehat{P}) =
 \frac{1}{2}\sum_{x \in \mathcal{X}} |P(x)-\widehat{P}(x)|.
 \]
-A reconstruction is treated as successful when this distance is at most a target error \(\delta\), with failure probability at most \(\varepsilon\).
+A reconstruction is treated as successful when this distance is at most a target error \(\delta\), with failure probability at most \(\varepsilon\). Throughout this section, \(\delta=0.05\) and \(\varepsilon=0.05\), so the target is reconstruction within 5 percent TVD with probability at least 0.95.
 
-The theoretical baseline comes from finite-domain distribution learning. If the distribution has support size \(k\), standard results show that the sample complexity for learning the distribution in TVD is
+\subsection{The learning bound}
+
+The theoretical reference point comes from finite-domain distribution learning. The statistical learning notes identify this as the relevant distribution reconstruction problem and point to Canonne's treatment of learning and testing discrete distributions. Given independent samples from an unknown distribution over \(k\) possible outcomes, the plug-in histogram estimator can learn the distribution in TVD with sample complexity
 \[
 n = \Theta\left(\frac{k+\log(1/\varepsilon)}{\delta^2}\right).
 \]
-This result gives the statistical backing for the \(n\)-theory experiments. It predicts that the required number of samples should grow linearly with the number of resolution cells and quadratically as the target error becomes stricter \cite{canonneShort,devroyeLugosi}. Canonne's survey also distinguishes this reconstruction task from identity testing, where the goal is only to decide whether samples match a known distribution \cite{canonneSurvey}. This project needs reconstruction rather than rejection of a candidate distribution, so the finite-domain learning result is the relevant point of comparison.
+This is an information-theoretic finite-sample bound, tight up to universal constants for arbitrary distributions on \(k\) categories \cite{canonneShort,canonneTopics,devroyeLugosi}. The \(k\) term is the number of probabilities that must be estimated. The \(1/\delta^2\) term comes from concentration: halving the desired error requires roughly four times as many samples. The \(\log(1/\varepsilon)\) term pays for high probability rather than only average-case accuracy.
 
-The experiment applies the finite-domain result to packet delays by choosing a delay resolution. For continuous delay distributions, the monitor uses kernel density estimation (KDE) evaluated on a 1 millisecond (ms) grid from 0 ms to 150 ms. This creates \(K=150\) evaluation cells for the theoretical comparison. For the discrete probability mass function (PMF) estimator, the same delay range is quantised into bins of width 1 ms, 2 ms, 5 ms, or 10 ms, giving \(k=150\), \(k=75\), \(k=30\), and \(k=15\). The confidence parameter is fixed at \(\varepsilon=0.05\), and the target error \(\delta\) is swept from 0.01 to 0.1.
+This is the correct baseline because the monitor is reconstructing the full distribution. It is not doing identity testing. Identity testing asks whether samples match a known candidate distribution and has a different sample complexity with a \(\sqrt{k}\) dependence \cite{canonneSurvey}. That easier problem is not enough here, because the deployed monitor does not know a candidate ground truth distribution in advance.
 
-The sample-complexity runs use the simple single-link delay setup. The continuous cases are normal, lognormal, and Weibull delay distributions. Each empirical point is the smallest tested sample size for which the median TVD across 20 random seeds is at most the target \(\delta\). This design deliberately separates two questions. The theoretical curve asks what is guaranteed for an arbitrary distribution over the chosen number of cells. The empirical curve asks how many samples are needed for the structured delay distributions used by the monitor. The difference between these curves is therefore expected to be informative rather than problematic.
+The word finite is important. A discrete distribution already has a finite support. A continuous delay distribution has to be evaluated on a finite grid before TVD can be computed as a sum. A bin is one such grid cell. In the continuous experiments below, one bin corresponds to a one millisecond interval, and all bins from 0 milliseconds to 150 milliseconds are used. This gives \(k=150\) categories. Once the continuous distribution has been converted into bin probabilities, the same finite-domain comparison applies.
 
-The evaluation tests whether the monitor behaves in the way predicted by the learning theory. The purpose is not to show that the worst-case theorem is tight for the tested delay distributions. Instead, the experiment asks whether the qualitative dependencies in the theory are visible in practice. If the empirical sample requirement rises as \(\delta\) becomes smaller and falls as the number of delay cells decreases, then the \(n\)-theory analysis is a useful guide for the design of the monitor even when the absolute bound is conservative.
-
-The experiment is motivated by two design choices. The first is the choice of estimator. KDE can share information across neighbouring delay values, while PMF estimation treats each bin as a separate category. The second is the choice of resolution. A fine grid preserves more distributional detail, but it increases the number of probabilities that must be estimated. The plots in this section therefore compare KDE and PMF estimation across both target error and bin width.
-
-The evaluation also includes two supporting diagnostics. First, the bin-resolution experiment varies the number of delay cells to test the predicted dependence on \(k\). Second, one-sample Kolmogorov-Smirnov tests are used as secondary diagnostics for convergence. These tests are not used as the primary success criterion because the monitor's objective is distribution reconstruction in TVD, but they provide a useful independent check that the empirical samples converge towards the configured ground truth as \(n\) grows.
+The experiments use the explicit reference value
+\[
+n_{\mathrm{theory}} =
+\left\lceil \frac{k+\log(1/\varepsilon)}{\delta^2} \right\rceil .
+\]
+With \(\varepsilon=0.05\), \(\log(1/\varepsilon)=\log(20)=2.996\). The corresponding theory curve in the plots is the same relationship inverted as
+\[
+\delta_{\mathrm{theory}}(n)=
+\sqrt{\frac{k+\log(1/\varepsilon)}{n}}.
+\]
+The curve should be read as a distribution-free reference, not as a prediction that every structured distribution will need exactly that many samples. The main empirical pattern to look for is therefore not equality between the curves, but whether TVD falls with \(n\), whether harder shapes converge more slowly, and whether the target is reached no later than the calculated reference point.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{n_vs_delta_main.png}
-\caption{Theoretical and empirical sample requirements as the TVD target varies. The left panel shows the KDE estimator on the 1 ms grid. The right panels show the PMF estimator at 1 ms, 2 ms, 5 ms, and 10 ms bin widths.}
-\label{fig:n-vs-delta-main}
+\includegraphics[width=\textwidth]{statistical_distribution_shapes.png}
+\caption{Ground-truth distributions used in the direct-sampling sample-complexity evaluation. The top row shows the three discrete probability mass functions. The bottom row shows the three continuous densities.}
+\label{fig:statistical-distribution-shapes}
 \end{figure}
 
-Figure \ref{fig:n-vs-delta-main} confirms the expected shape of the theory. Tightening \(\delta\) increases the number of required samples approximately according to the \(1/\delta^2\) rate, and reducing the number of bins lowers the discrete theoretical bound. The important practical result is that the theoretical curves remain conservative for the distributions used in this evaluation. At \(\delta=0.05\), the continuous bound with \(K=150\) is 179,744 samples, while the empirical KDE requirement is 500 samples for all three tested continuous distributions. For the 1 ms PMF estimator, the theoretical bound is 61,199 samples, while the empirical requirement is 1,000 samples for the normal and lognormal cases and 2,000 samples for the Weibull case. At 10 ms resolution, the theoretical bound falls to 7,199 samples and the empirical requirement is already 100 samples for all three distributions.
+\subsection{Discrete sampling}
+
+The discrete experiment uses three finite distributions, shown in the top row of Figure \ref{fig:statistical-distribution-shapes}. They were chosen because the theorem is stated directly for finite domains, and because they stress different forms of discrete structure. The binomial distribution is smooth and concentrated. The Zipfian distribution is highly skewed and has a long finite tail of rare outcomes. The piecewise distribution is deliberately irregular and multi-modal, so it tests a case where there is no smooth ordering for the estimator to exploit.
+
+The binomial case uses
+\[
+X \sim \mathrm{Binomial}(20,0.5),
+\qquad
+p(x)=\binom{20}{x}0.5^x0.5^{20-x},
+\qquad x \in \{0,\ldots,20\}.
+\]
+This gives \(k=21\) possible outcomes. The Zipfian case uses a truncated power law,
+\[
+p(x)=\frac{x^{-1.5}}{\sum_{j=1}^{20}j^{-1.5}},
+\qquad x \in \{1,\ldots,20\},
+\]
+so \(k=20\). The piecewise case also uses support \(\{1,\ldots,20\}\), with probabilities indexed in support order as
+\[
+\begin{aligned}
+p = (&0.12,0.02,0.08,0.01,0.10,0.03,0.07,0.12,0.02,0.09,\\
+     &0.01,0.08,0.04,0.06,0.02,0.05,0.02,0.04,0.01,0.01).
+\end{aligned}
+\]
+The values sum to one and create separated high-probability regions.
+
+For each distribution, samples are drawn directly from the probability mass function (PMF). The estimator is the empirical PMF. Each point in Figure \ref{fig:statistical-discrete-tvd} is the median TVD over 100 random seeds, and the shaded band is the interquartile range. The tested sample sizes are centred around the calculated \(n_{\mathrm{theory}}\) value for each support size.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{statistical_discrete_tvd_vs_n.png}
+\caption{Discrete reconstruction error as the sample count increases. The dotted horizontal line is the target \(\delta=0.05\), the red vertical line is the calculated \(n_{\mathrm{theory}}\), and the dashed black curve is \(\delta_{\mathrm{theory}}(n)\).}
+\label{fig:statistical-discrete-tvd}
+\end{figure}
 
 \begin{table}[htbp]
 \centering
 \small
-\begin{tabular}{llrrrr}
+\begin{tabular}{lrrrr}
 \toprule
-Estimator & Resolution & Theory & Normal & Lognormal & Weibull \\
+Distribution & \(k\) & \(n_{\mathrm{theory}}\) & Target \(n\) & TVD at \(n_{\mathrm{theory}}\) \\
 \midrule
-KDE & 1 ms grid, \(K=150\) & 179,744 & 500 & 500 & 500 \\
-PMF & 1 ms bins, \(k=150\) & 61,199 & 1,000 & 1,000 & 2,000 \\
-PMF & 2 ms bins, \(k=75\) & 31,199 & 500 & 500 & 1,000 \\
-PMF & 5 ms bins, \(k=30\) & 13,199 & 100 & 100 & 500 \\
-PMF & 10 ms bins, \(k=15\) & 7,199 & 100 & 100 & 100 \\
+Binomial & 21 & 9,599 & 960 & 0.0123 \\
+Zipfian & 20 & 9,199 & 920 & 0.0132 \\
+Piecewise & 20 & 9,199 & 2,300 & 0.0158 \\
 \bottomrule
 \end{tabular}
-\caption{Theoretical and empirical sample requirements at \(\delta=0.05\) and \(\varepsilon=0.05\). Empirical values are the smallest tested \(n\) for which median TVD is at most 0.05 across 20 seeds.}
-\label{tab:n-theory-delta-005}
+\caption{Discrete sample-complexity results. The first \(n\) column reports the smallest tested sample count for which the median TVD is below 0.05.}
+\label{tab:statistical-discrete-results}
 \end{table}
 
-The gap between the bound and the empirical curves is not a failure of the theory. The theorem protects against worst-case distributions over \(k\) cells. The tested delay distributions are much more structured than an arbitrary distribution over 150 unrelated categories. The normal and lognormal distributions concentrate their mass smoothly, while the Weibull distribution has a sharper asymmetric peak and a longer region of lower-density tail. This explains why Weibull is consistently the hardest case for the 1 ms PMF estimator. Its mass is spread in a way that makes fine histogram counts noisier, so more samples are needed before every relevant bin has stabilised. Appendix \ref{app:statistical-diagnostics} gives the supporting TVD, bin-resolution, and hypothesis-test plots.
+The calculation for the binomial case is
+\[
+n_{\mathrm{theory}} =
+\left\lceil \frac{21+\log(20)}{0.05^2} \right\rceil
+=
+\left\lceil \frac{23.996}{0.0025} \right\rceil
+= 9{,}599.
+\]
+For the Zipfian and piecewise cases, \(k=20\), so
+\[
+n_{\mathrm{theory}} =
+\left\lceil \frac{20+\log(20)}{0.05^2} \right\rceil
+=
+\left\lceil \frac{22.996}{0.0025} \right\rceil
+= 9{,}199.
+\]
+
+Figure \ref{fig:statistical-discrete-tvd} shows the expected monotone decrease in TVD as \(n\) grows. The empirical curves all fall below the target well before the calculated reference point, but the ranking across distributions is meaningful. The binomial distribution is the easiest of the three. Although it has one more support point than the others, most of its mass is concentrated near the centre, so the low-probability tails contribute little to TVD. It first reaches the target at \(n=960\), and by \(n_{\mathrm{theory}}=9{,}599\) the median TVD is 0.0123.
+
+The Zipfian distribution reaches the target at \(n=920\) and has median TVD 0.0132 at its theory point. Its head is easy to estimate because the first few outcomes carry most of the mass. The rare tail outcomes are harder individually, but their combined probability is limited, so errors in the tail do not dominate TVD. This is why the Zipfian curve is close to the binomial curve despite having a more uneven shape.
+
+The piecewise distribution is the hardest discrete case. It is still below the theoretical reference by a wide margin, but it needs \(n=2{,}300\) samples before the median TVD falls below 0.05. This behaviour matches the design of the distribution. Probability mass is spread across separated peaks and troughs, so the empirical PMF has to learn several non-neighbouring support points accurately. The result is useful because it shows that the theoretical bound is not only conservative for smooth distributions. Even an irregular finite distribution reaches the target before the calculated distribution-free sample count, but it does so later than the smoother and more skewed alternatives.
+
+\subsection{Continuous sampling}
+
+The continuous experiment uses the normal, lognormal, and Weibull distributions shown in the bottom row of Figure \ref{fig:statistical-distribution-shapes}. These are the same families used elsewhere in the project because they cover three different delay shapes. The normal distribution is symmetric and concentrated, representing a low-variability delay regime. The lognormal distribution is positive and right-skewed, which is a common shape for multiplicative delay effects. The Weibull distribution is also positive but has a different asymmetric shape, with a sharp rise and a longer decaying tail.
+
+The parameter choices are
+\[
+X_{\mathrm{normal}} \sim \mathcal{N}(40,2^2),
+\qquad
+\log X_{\mathrm{lognormal}} \sim \mathcal{N}(2.3,0.2^2),
+\qquad
+X_{\mathrm{weibull}} \sim \mathrm{Weibull}(\lambda=10,\alpha=2).
+\]
+All samples are evaluated on the same one millisecond grid from 0 milliseconds to 150 milliseconds. The true binned distribution is computed by integrating the known cumulative distribution function over each bin. The empirical PMF counts how many samples fall in each bin. The kernel density estimate (KDE) is computed from the same samples, evaluated at the bin centres, and normalised so that it can also be compared as a probability mass function on the grid. This matters because TVD compares probability mass, not raw continuous density values.
+
+The finite-grid comparison has \(k=150\), so the calculated bound is
+\[
+n_{\mathrm{theory}} =
+\left\lceil \frac{150+\log(20)}{0.05^2} \right\rceil
+=
+\left\lceil \frac{152.996}{0.0025} \right\rceil
+= 61{,}199.
+\]
+Each point in Figure \ref{fig:statistical-continuous-tvd} is the median across 30 random seeds, with interquartile shading.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{n_vs_delta_overlay.png}
-\caption{Comparison between KDE and PMF using 1 ms bins. The empirical KDE lines sit below the empirical PMF lines in the small-sample regime, especially for the Weibull distribution.}
-\label{fig:kde-pmf-overlay}
+\includegraphics[width=\textwidth]{statistical_continuous_tvd_vs_n.png}
+\caption{Continuous reconstruction error on the one millisecond grid. The PMF line compares the binned empirical distribution with the true bin probabilities. The KDE line compares the smoothed estimate with the same true bin probabilities.}
+\label{fig:statistical-continuous-tvd}
 \end{figure}
 
-Figure \ref{fig:kde-pmf-overlay} compares the continuous KDE estimator with the 1 ms PMF estimator. KDE is more sample efficient in these experiments because it uses smoothness across neighbouring delay values, while the PMF estimator treats adjacent bins as separate categories. This is most visible for Weibull, where the KDE empirical requirement is 500 samples at \(\delta=0.05\) but the 1 ms PMF requirement is 2,000 samples. The result is useful for the monitoring design because it shows that an estimator can use structure in delay data without assuming the parametric family that generated it.
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Distribution & PMF target \(n\) & KDE target \(n\) & PMF at theory & KDE at theory & Gap \\
+\midrule
+Normal & 500 & 500 & 0.0047 & 0.0060 & 0.0031 \\
+Lognormal & 1,000 & 500 & 0.0052 & 0.0057 & 0.0030 \\
+Weibull & 2,000 & 500 & 0.0073 & 0.0058 & 0.0039 \\
+\bottomrule
+\end{tabular}
+\caption{Continuous sample-complexity results on the one millisecond grid. The first \(n\) columns report the smallest tested sample count for which the median TVD is below 0.05. The last three columns report median values at \(n_{\mathrm{theory}}=61{,}199\).}
+\label{tab:statistical-continuous-results}
+\end{table}
 
-The PMF results also show the cost of resolution. Finer bins preserve more detail, but each bin introduces another probability to estimate. Coarser bins reduce the statistical burden, but they also discard within-bin structure. In this experiment, 1 ms bins are already fine enough that the PMF and KDE reconstructions become similar at larger \(n\), while 5 ms and 10 ms bins make the monitor cheaper but less faithful to the continuous shape. The KDE versus PMF comparison therefore suggests a practical rule: use a fine grid when the goal is to reconstruct the delay shape, and use coarser bins only when the application is explicitly tolerant of lower resolution. The supporting estimator-disagreement and KDE-advantage plots are included in Appendix \ref{app:statistical-diagnostics}; they show the same trend without changing the main conclusion.
+The continuous results show the same broad pattern as the discrete results. TVD falls as the number of samples grows, and all three distributions are well below the target by the calculated \(n_{\mathrm{theory}}\). The empirical PMF reaches the target at 500 samples for the normal distribution, 1,000 samples for the lognormal distribution, and 2,000 samples for the Weibull distribution. The ordering is intuitive. The normal distribution places most mass in a narrow symmetric region, so the important bins are quickly populated. The lognormal distribution is skewed, which makes its right tail noisier. The Weibull distribution is the hardest for the binned PMF because its mass rises sharply near the lower end and then decays over a longer range, so the histogram has to estimate both a peak and a tail.
 
-The total variation results are also supported by hypothesis-test diagnostics. The one-sample Kolmogorov-Smirnov statistic decreases approximately as \(1/\sqrt{n}\), and the pass-rate view aligns with the sample sizes where median TVD first reaches 0.05. Those plots are useful checks, but they are secondary to the reconstruction metric, so they are included in the appendix rather than in the main evaluation flow.
+KDE changes this picture in the low-sample regime. It reaches the 0.05 target at the first tested point, 500 samples, for all three continuous distributions. This does not mean KDE has been given the parametric family. It only uses the local smoothness of nearby delay values. The empirical PMF treats adjacent one millisecond bins as unrelated categories, while KDE shares information across neighbouring values. That smoothing is especially helpful for Weibull, where the PMF median TVD is 0.0875 at 500 samples but the KDE median TVD is 0.0421.
 
-Overall, the statistical evaluation validates the use of total variation distance as the primary reconstruction metric. The results match the theory in their dependence on \(k\), \(\delta\), and \(n\), but the absolute worst-case bounds are too conservative to be used directly as deployment stopping thresholds. That conservatism motivates the second part of the evaluation. If the monitor can detect when its own estimate has stabilised, it may stop far earlier than the distribution-free bound while still meeting the target TVD in practice.
+At the theory point, both estimators are much more accurate than required. The binned PMF medians are 0.0047 for normal, 0.0052 for lognormal, and 0.0073 for Weibull. The KDE medians are 0.0060, 0.0057, and 0.0058. The small reversal for normal and lognormal, where the PMF is slightly closer than KDE at very large \(n\), is also expected. Once many samples have populated the bins, the empirical PMF has little variance left, while KDE still introduces a small amount of smoothing bias. The practical conclusion is therefore not that KDE always dominates PMF. It is that KDE is more sample efficient at the target accuracy used here, while PMF becomes competitive once the sample count is already large.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.86\textwidth]{statistical_continuous_kde_pmf_gap.png}
+\caption{TVD between the binned empirical PMF and the KDE reconstruction on the one millisecond grid. The disagreement shrinks as \(n\) grows, with the largest small-sample gap in the Weibull case.}
+\label{fig:statistical-kde-pmf-gap}
+\end{figure}
+
+Figure \ref{fig:statistical-kde-pmf-gap} directly compares the two continuous reconstructions. The gap between the binned PMF and KDE falls with \(n\), from 0.0704 to 0.0039 in the Weibull case and from roughly 0.03 to 0.003 in the normal and lognormal cases. This shows that KDE is not reconstructing a fundamentally different object. It is a smoothed version of the same empirical information, and the two estimates agree once enough samples are available.
+
+The main implication for the monitor is that the theoretical bound is useful as a statistical backstop but too conservative as a stopping rule. It correctly identifies the dependence on support size, confidence, and error tolerance, and the empirical curves behave in the direction predicted by the theory. However, the direct-sampling distributions are far more structured than an arbitrary distribution over \(k\) unrelated cells. Their smoothness, concentration, and skew all affect how quickly TVD falls. This gap between worst-case theory and observed convergence motivates the adaptive stopping evaluation in the next section: instead of always waiting for \(n_{\mathrm{theory}}\), the monitor should stop when the estimate itself has stabilised.
+
+The older delta-sweep, bin-resolution, KDE-disagreement, and Kolmogorov-Smirnov diagnostics are kept in Appendix \ref{app:statistical-diagnostics}. They support the same conclusion from a wider set of views: stricter TVD targets and finer grids increase the theoretical sample requirement, while the empirical structured distributions usually converge much earlier than the worst-case finite-domain reference.
 
 \clearpage
 
