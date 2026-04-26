@@ -6,7 +6,7 @@ results/adaptive-stopping-v2 and adds report-specific diagnostics:
 
 * heatmaps with batch size increasing upwards;
 * continuous stopping summaries for normal, lognormal, and Weibull;
-* zoomed B=100 stopped KDE reconstructions with true distributions overlaid;
+* zoomed B=200 stopped KDE reconstructions with true distributions overlaid;
 * continued traces after an early B=100 stop.
 
 The additional stopped-distribution and trace plots are illustrative follow-up
@@ -256,8 +256,8 @@ def plot_n_stop_summary_all(rows):
     return out
 
 
-def plot_n_stop_b100(rows):
-    batch_size = 100
+def plot_n_stop_b200(rows):
+    batch_size = 200
     x = np.arange(len(THETA_KEYS))
     fig, axes = plt.subplots(1, 3, figsize=(15.5, 5.4), sharey=True)
     y_max = 1.25 * max(
@@ -293,10 +293,10 @@ def plot_n_stop_b100(rows):
         ax.grid(True, alpha=0.28)
 
     axes[0].set_ylabel("Median total packets collected at stop")
-    fig.suptitle("B=100 total packets needed to stop")
+    fig.suptitle("B=200 total packets needed to stop")
     fig.text(0.5, 0.01, "Numbers above points show correctness across 100 seeds.", ha="center")
     fig.tight_layout(rect=[0, 0.04, 1, 1])
-    out = os.path.join(RESULTS_DIR, "n_stop_b100_continuous.png")
+    out = os.path.join(RESULTS_DIR, "n_stop_b200_continuous.png")
     fig.savefig(out, dpi=200, bbox_inches="tight")
     plt.close(fig)
     return out
@@ -368,8 +368,8 @@ def stop_continuous(dist, params, batch_size, theta, seed, max_samples):
     return stop, trace
 
 
-def plot_stopped_distribution_b100():
-    batch_size = 100
+def plot_stopped_distribution_b200():
+    batch_size = 200
     theta = DELTA / 6
     seed = 4
     max_samples = 12_000
@@ -385,7 +385,7 @@ def plot_stopped_distribution_b100():
         ax.fill_between(GRID, stop["estimate"], color=cfg["color"], alpha=0.18)
         ax.set_xlim(*STOPPED_XLIMS[dist])
         ax.set_title(
-            f"{cfg['label']} stopped reconstruction, B=100\n"
+            f"{cfg['label']} stopped reconstruction, B=200\n"
             f"stop n={stop['n']:,}, TVD={stop['truth_tvd']:.3f}, "
             r"$\theta=\delta/6$"
         )
@@ -394,7 +394,7 @@ def plot_stopped_distribution_b100():
         ax.grid(True, alpha=0.25)
         ax.legend(loc="upper right")
 
-        out = os.path.join(RESULTS_DIR, f"stopped_distribution_{dist}_b100.png")
+        out = os.path.join(RESULTS_DIR, f"stopped_distribution_{dist}_b200.png")
         fig.savefig(out, dpi=220, bbox_inches="tight")
         plt.close(fig)
         paths.append(out)
@@ -533,8 +533,8 @@ def main():
         )
     )
     paths.append(plot_n_stop_summary_all(cont_rows))
-    paths.append(plot_n_stop_b100(cont_rows))
-    paths.extend(plot_stopped_distribution_b100())
+    paths.append(plot_n_stop_b200(cont_rows))
+    paths.extend(plot_stopped_distribution_b200())
     paths.append(plot_early_stop_traces())
     paths.append(plot_packet_timing_table())
 
