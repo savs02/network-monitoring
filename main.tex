@@ -81,24 +81,59 @@ Knowing how much additional traffic a path can absorb before performance degrade
 
 \chapter{Methodology}
 
-\chapter{Evaluation}
+\section{Evaluation structure}
 
-The evaluation and methodology go hand-in-hand since it was quite an iterative process. This section looks at sample complexity and related experiments, which is at the core of the idea of distribution-based path profiling.
+The methodology and evaluation are organised around the same set of questions. The full evaluation plan has five parts: statistical sample complexity, adaptive stopping, the motivating use case, multi-hop topologies, and multi-path topologies. The first two parts are developed here because they establish the statistical basis of the monitor before the network scenarios become more complex. The later use-case, multi-hop, and multi-path studies are left as separate sections so that their methodology and evaluation can follow the same structure once their experiments are complete.
 
 \section{Statistical sample complexity}
+\label{sec:method-statistical}
 
-The first part of the evaluation asks whether the observed behaviour of the monitor matches the statistical theory behind distribution learning. The relevant learning task is the following. There is an unknown distribution \(P\) over a finite domain of size \(k\). From \(n\) independent samples, the monitor constructs an estimate \(\widehat{P}\). The reconstruction is considered successful if the total variation distance (TVD)
+The first methodological question is how many passive delay samples are needed before the reconstructed delay distribution is accurate. The monitor observes independent packet delay samples from an unknown distribution and constructs an empirical reconstruction without being told which parametric family generated the samples. The main accuracy metric is total variation distance (TVD). For an unknown distribution \(P\) and an estimate \(\widehat{P}\) over a finite domain \(\mathcal{X}\), this is
 \[
 d_{\mathrm{TV}}(P,\widehat{P}) =
-\frac{1}{2}\sum_{x \in \mathcal{X}} |P(x)-\widehat{P}(x)|
+\frac{1}{2}\sum_{x \in \mathcal{X}} |P(x)-\widehat{P}(x)|.
 \]
-is at most a target error \(\delta\), with failure probability at most \(\varepsilon\). Standard distribution learning results give the tight finite-domain sample complexity
+A reconstruction is treated as successful when this distance is at most a target error \(\delta\), with failure probability at most \(\varepsilon\).
+
+The theoretical baseline comes from finite-domain distribution learning. If the distribution has support size \(k\), standard results show that the sample complexity for learning the distribution in TVD is
 \[
 n = \Theta\left(\frac{k+\log(1/\varepsilon)}{\delta^2}\right).
 \]
-This result is the main theoretical justification for the \(n\)-theory experiments. It also clarifies why the sample requirement should grow linearly with the number of resolution cells and quadratically as the requested error tolerance becomes tighter \cite{canonneShort,devroyeLugosi}. Canonne's distribution testing survey is also useful context, because it distinguishes full distribution learning from identity testing \cite{canonneSurvey}. Identity testing can be cheaper, with dependence on \(\sqrt{k}\) rather than \(k\), but it answers a different question. In this project the monitor must reconstruct a distribution, not merely reject a known candidate, so the learning bound is the relevant baseline.
+This result gives the statistical backing for the \(n\)-theory experiments. It predicts that the required number of samples should grow linearly with the number of resolution cells and quadratically as the target error becomes stricter \cite{canonneShort,devroyeLugosi}. Canonne's survey also distinguishes this reconstruction task from identity testing, where the goal is only to decide whether samples match a known distribution \cite{canonneSurvey}. This project needs reconstruction rather than rejection of a candidate distribution, so the finite-domain learning result is the relevant point of comparison.
 
-The experiments apply this bound to delay reconstruction by choosing an observation resolution. For the continuous delay distributions, kernel density estimation (KDE) is evaluated on a 1 millisecond (ms) grid over the interval from 0 ms to 150 ms, giving \(K=150\) grid cells. For the discrete probability mass function (PMF) estimator, the same delay range is quantised into bins of width 1 ms, 2 ms, 5 ms, or 10 ms. This gives \(k=150\), \(k=75\), \(k=30\), and \(k=15\), respectively. The confidence parameter is fixed at \(\varepsilon=0.05\), and the accuracy target \(\delta\) is swept from 0.01 to 0.1. Each empirical point is the smallest tested sample size for which the median TVD across 20 seeds is at most \(\delta\).
+The experiment applies the finite-domain result to packet delays by choosing a delay resolution. For continuous delay distributions, the monitor uses kernel density estimation (KDE) evaluated on a 1 millisecond (ms) grid from 0 ms to 150 ms. This creates \(K=150\) evaluation cells for the theoretical comparison. For the discrete probability mass function (PMF) estimator, the same delay range is quantised into bins of width 1 ms, 2 ms, 5 ms, or 10 ms, giving \(k=150\), \(k=75\), \(k=30\), and \(k=15\). The confidence parameter is fixed at \(\varepsilon=0.05\), and the target error \(\delta\) is swept from 0.01 to 0.1.
+
+The sample-complexity runs use the simple single-link delay setup. The continuous cases are normal, lognormal, and Weibull delay distributions. Each empirical point is the smallest tested sample size for which the median TVD across 20 random seeds is at most the target \(\delta\). This design deliberately separates two questions. The theoretical curve asks what is guaranteed for an arbitrary distribution over the chosen number of cells. The empirical curve asks how many samples are needed for the structured delay distributions used by the monitor. The difference between these curves is therefore expected to be informative rather than problematic.
+
+The methodology also includes two supporting diagnostics. First, the bin-resolution experiment varies the number of delay cells to test the predicted dependence on \(k\). Second, one-sample Kolmogorov-Smirnov tests are used as secondary diagnostics for convergence. These tests are not used as the primary success criterion because the monitor's objective is distribution reconstruction in TVD, but they provide a useful independent check that the empirical samples converge towards the configured ground truth as \(n\) grows.
+
+\section{Adaptive stopping}
+\label{sec:method-adaptive}
+
+The second methodological question is how a passive monitor can decide when to stop collecting samples without access to ground truth. The statistical sample-complexity bound gives a conservative distribution-free reference point, but it cannot be used directly as an efficient deployment rule. The monitor therefore uses a stability-based stopping rule. The rule compares two consecutive reconstructions and stops when the estimate changes by less than a chosen threshold.
+
+Samples are processed in groups of \(B\) packets, where \(B\) is the packets per batch parameter. After each new group of packets, the monitor computes the TVD between the current estimate and the previous estimate. If this inter-estimate TVD falls below a threshold \(\theta\), the monitor stops:
+\[
+\tau = \inf\left\{mB : d_{\mathrm{TV}}\left(\widehat{F}_{mB}, \widehat{F}_{(m-1)B}\right) < \theta\right\}.
+\]
+The stopping rule does not use the true distribution. Ground truth is used only after a run has stopped to evaluate whether the stopped estimate satisfies \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq\delta\), where the target is \(\delta=0.05\).
+
+The adaptive stopping sweep tests eight choices for packets per batch, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six stability thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 random seeds. The continuous group uses the same normal, lognormal, and Weibull distributions as the sample-complexity experiment, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points, reconstructed with a PMF estimator.
+
+This design tests two distinct failure modes. Small values of \(B\) give the monitor more chances to stop, but each decision is based on a noisier change between estimates. Loose thresholds can make an estimate appear stable before it is accurate. The discrete distributions test a harder shape regime, because separated modes can make a PMF estimate look locally stable before enough probability mass has been assigned to every relevant support point.
+
+The primary adaptive metric is correctness, defined as the fraction of seeds where the stopped estimate is within TVD 0.05 of the true distribution. The secondary metric is efficiency, defined as the ratio between the relevant theoretical bound and the median number of packets collected before stopping. Additional diagnostics plot the median stopping sample count, the TVD against truth at the stopping time, and a continued trace beyond an early stopping decision. These diagnostics are included to explain why some stopping settings fail rather than merely reporting that they fail.
+
+\chapter{Evaluation}
+
+This chapter mirrors the methodology. Section \ref{sec:eval-statistical} evaluates the statistical sample-complexity methodology from Section \ref{sec:method-statistical}. Section \ref{sec:eval-adaptive} evaluates the adaptive stopping methodology from Section \ref{sec:method-adaptive}. The use-case, multi-hop, and multi-path evaluations are intentionally left for later sections.
+
+\section{Statistical sample complexity}
+\label{sec:eval-statistical}
+
+The statistical sample-complexity evaluation tests whether the monitor behaves in the way predicted by the learning theory. The purpose is not to show that the worst-case theorem is tight for the tested delay distributions. Instead, the experiment asks whether the qualitative dependencies in the theory are visible in practice. If the empirical sample requirement rises as \(\delta\) becomes smaller and falls as the number of delay cells decreases, then the \(n\)-theory analysis is a useful guide for the design of the monitor even when the absolute bound is conservative.
+
+The experiment is motivated by two design choices. The first is the choice of estimator. KDE can share information across neighbouring delay values, while PMF estimation treats each bin as a separate category. The second is the choice of resolution. A fine grid preserves more distributional detail, but it increases the number of probabilities that must be estimated. The plots in this section therefore compare KDE and PMF estimation across both target error and bin width.
 
 \begin{figure}[htbp]
 \centering
@@ -147,16 +182,11 @@ Overall, the statistical evaluation validates the use of total variation distanc
 \clearpage
 
 \section{Adaptive stopping}
+\label{sec:eval-adaptive}
 
-The second part of the evaluation studies an adaptive stopping rule. The previous section used ground truth to ask how many samples were needed to reach a target TVD. In deployment, ground truth is unavailable. The monitor therefore needs a stopping rule that depends only on the samples it has already observed.
+The adaptive stopping evaluation tests whether stability between consecutive estimates is a reliable proxy for accuracy against the true distribution. This matters because the previous section uses ground truth to measure when a reconstruction becomes accurate, but a deployed passive monitor cannot observe ground truth. The stopping rule is therefore useful only if it stops early while still meeting the TVD target with high probability.
 
-The rule evaluated here collects samples in batches of size \(B\). After each new batch, the monitor computes the TVD between the current estimate and the previous estimate. If this inter-estimate TVD is below a threshold \(\theta\), the monitor stops:
-\[
-\tau = \inf\left\{mB : d_{\mathrm{TV}}\left(\widehat{F}_{mB}, \widehat{F}_{(m-1)B}\right) < \theta\right\}.
-\]
-The rule does not use the true distribution when deciding to stop. Ground truth is used only after the run to measure whether \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq \delta\), where \(\delta=0.05\). The experiment sweeps eight batch sizes, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 seeds.
-
-The evaluation uses two groups of distributions. The continuous group uses the same normal, lognormal, and Weibull delay distributions as the previous section, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points. This second group is important because it tests whether the stopping rule still works when the distribution has separated modes rather than a smooth single peak.
+The experiment focuses on the trade-off between reliability and packet cost. Small values of \(B\) can stop quickly but are more vulnerable to noisy local stability. Loose thresholds stop quickly for the same reason, but they can accept a reconstruction before it has converged globally. The continuous and discrete distribution groups are evaluated separately because they stress different aspects of the estimator. Continuous KDE benefits from smoothness, while discrete PMF estimation must place mass correctly across separate support points.
 
 \begin{figure}[htbp]
 \centering
@@ -165,7 +195,7 @@ The evaluation uses two groups of distributions. The continuous group uses the s
 \label{fig:adaptive-cont-correctness}
 \end{figure}
 
-Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid. Loose thresholds and small batches can stop too early. With \(B=100\) and \(\theta=\delta\), correctness is 0.53 for normal, 0.42 for lognormal, and 0.49 for Weibull. Tightening the threshold to \(\theta=\delta/6\) at the same batch size raises correctness to 0.98, 0.95, and 0.97. Increasing the batch size makes the rule more reliable because the change between successive estimates is less dominated by sampling noise. At \(B=200\) and \(\theta=\delta/6\), correctness is 1.00 for normal, 1.00 for lognormal, and 0.99 for Weibull. From \(B=500\) onwards, the continuous grid is almost entirely correct even for looser thresholds.
+Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid. Loose thresholds and small values of \(B\) can stop too early. With \(B=100\) and \(\theta=\delta\), correctness is 0.53 for normal, 0.42 for lognormal, and 0.49 for Weibull. Tightening the threshold to \(\theta=\delta/6\) at the same value of \(B\) raises correctness to 0.98, 0.95, and 0.97. Increasing \(B\) makes the rule more reliable because the change between successive estimates is less dominated by sampling noise. At \(B=200\) and \(\theta=\delta/6\), correctness is 1.00 for normal, 1.00 for lognormal, and 0.99 for Weibull. From \(B=500\) onwards, the continuous grid is almost entirely correct even for looser thresholds.
 
 \begin{figure}[htbp]
 \centering
@@ -183,7 +213,7 @@ Figure \ref{fig:adaptive-normal-efficiency} shows why the stopping problem is a 
 \label{fig:n-stop-summary-normal}
 \end{figure}
 
-Figure \ref{fig:n-stop-summary-normal} separates the packet cost from the correctness heatmap. Larger batches usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The curve shows why \(B=200,\theta=\delta/6\) is a conservative operating point: it uses more packets than the aggressive \(B=100\) setting, but it remains orders of magnitude below the theoretical bound while reaching full correctness in the normal and lognormal cases.
+Figure \ref{fig:n-stop-summary-normal} separates the packet cost from the correctness heatmap. Larger values of \(B\) usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The curve shows why \(B=200,\theta=\delta/6\) is a conservative operating point: it uses more packets than the aggressive \(B=100\) setting, but it remains orders of magnitude below the theoretical bound while reaching full correctness in the normal and lognormal cases.
 
 \begin{figure}[htbp]
 \centering
@@ -192,7 +222,7 @@ Figure \ref{fig:n-stop-summary-normal} separates the packet cost from the correc
 \label{fig:early-stop-trace-normal}
 \end{figure}
 
-Figure \ref{fig:early-stop-trace-normal} shows the mechanism behind early stopping. The lower panel plots the TVD between successive estimates, which is the quantity the stopping rule actually observes. With \(B=100\) and \(\theta=\delta\), this quantity falls below the threshold after 200 packets, so the rule stops. The upper panel shows the post-hoc truth: at that point the true reconstruction error is still above 0.05. Continuing the same run shows that the true TVD falls below the target after more packets. The strict \(B=100,\theta=\delta/6\) rule and the larger-batch rules therefore avoid the failure by requiring stronger evidence of stability.
+Figure \ref{fig:early-stop-trace-normal} shows the mechanism behind early stopping. The lower panel plots the TVD between successive estimates, which is the quantity the stopping rule actually observes. With \(B=100\) and \(\theta=\delta\), this quantity falls below the threshold after 200 packets, so the rule stops. The upper panel shows the post-hoc truth: at that point the true reconstruction error is still above 0.05. Continuing the same run shows that the true TVD falls below the target after more packets. The strict \(B=100,\theta=\delta/6\) rule and the larger values of \(B\) therefore avoid the failure by requiring stronger evidence of stability.
 
 \begin{table}[htbp]
 \centering
@@ -231,9 +261,9 @@ The packet counts in Table \ref{tab:adaptive-operating-points} are small enough 
 
 Figure \ref{fig:adaptive-disc-correctness} shows that the discrete distributions are more demanding. At \(B=100\) and \(\theta=\delta\), correctness is only 0.13 for binomial, 0.12 for Zipf, and 0.02 for the piecewise distribution. The reason is that the PMF estimate can appear stable before enough mass has been allocated to each support point, especially when the distribution has several separated modes. Tightening the threshold helps, but the safest region is reached later than in the continuous case. With \(B=300\) and \(\theta=\delta/5\), all three discrete distributions reach 100 percent correctness, with median stopping times between 2,250 and 3,000 samples. This is still far below the corresponding worst-case learning bounds, but the efficiency gains are naturally smaller than in the continuous KDE case because the theoretical bounds for these 20-point discrete distributions are already much lower.
 
-Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets plot and stopping-time TVD plot for the piecewise distribution. Those diagnostics show that the piecewise case is hard because loose thresholds and small batches leave many stopped estimates near or above the target line. With tighter thresholds or larger batches, the stopped TVD moves safely below 0.05, often around 0.02 to 0.03, leaving useful safety margin.
+Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets plot and stopping-time TVD plot for the piecewise distribution. Those diagnostics show that the piecewise case is hard because loose thresholds and small values of \(B\) leave many stopped estimates near or above the target line. With tighter thresholds or larger values of \(B\), the stopped TVD moves safely below 0.05, often around 0.02 to 0.03, leaving useful safety margin.
 
-The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A modestly stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger batch size, with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution.
+The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A modestly stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger value of \(B\), with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution.
 
 \chapter{Conclusion and Future Work}
 
