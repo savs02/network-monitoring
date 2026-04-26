@@ -357,7 +357,7 @@ The older delta-sweep, bin-resolution, KDE-disagreement, and Kolmogorov-Smirnov 
 \section{Adaptive stopping}
 \label{sec:eval-adaptive}
 
-The second evaluation asks how a passive monitor can decide when to stop collecting samples without access to ground truth. The statistical sample-complexity bound gives a conservative distribution-free reference point, but it cannot be used directly as an efficient deployment rule. The monitor therefore uses a stability-based stopping rule. The rule compares two consecutive reconstructions and stops when the estimate changes by less than a chosen threshold.
+The second evaluation asks how a passive monitor can decide when to stop collecting samples without access to ground truth. The statistical sample-complexity bound gives a conservative distribution-free reference point, but it is deliberately worst case. Used directly, it would turn the monitor into a system that waits for a guarantee long after the tested distributions have usually become accurate. The adaptive stopping rule tests a more operational idea: if adding more passive observations no longer changes the reconstructed distribution much, the estimate may be accurate enough to trust.
 
 Samples are processed in groups of \(B\) packets, where \(B\) is the packets per batch parameter. After each new group of packets, the monitor computes the TVD between the current estimate and the previous estimate. If this inter-estimate TVD falls below a threshold \(\theta\), the monitor stops:
 \[
@@ -367,13 +367,11 @@ The stopping rule does not use the true distribution. Ground truth is used only 
 
 The estimates in this rule are cumulative. With \(B=100\), the first comparison is between the reconstruction from samples 1 to 100 and the reconstruction from samples 1 to 200. The next comparison is between samples 1 to 200 and samples 1 to 300. The rule is therefore not comparing disjoint batches. It asks whether adding another batch changes the accumulated reconstruction enough to justify continuing. The batch size controls the spacing of these decisions: small batches give more opportunities to stop, while larger batches make each stability check less noisy.
 
-The adaptive stopping sweep tests eight choices for packets per batch, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six stability thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 random seeds. The continuous group uses the same normal, lognormal, and Weibull distributions as the sample-complexity experiment, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points, reconstructed with a PMF estimator.
+The adaptive stopping sweep tests eight choices for packets per batch, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six stability thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 random seeds. The continuous group uses the same normal, lognormal, and Weibull distributions as the sample-complexity experiment, reconstructed with a kernel density estimate (KDE) on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points, reconstructed with a probability mass function (PMF) estimator.
 
 The evaluation tests whether stability between consecutive estimates is a reliable proxy for accuracy against the true distribution. This matters because the previous section uses ground truth to measure when a reconstruction becomes accurate, but a deployed passive monitor cannot observe ground truth. The stopping rule is therefore useful only if it stops early while still meeting the TVD target with high probability.
 
-The experiment focuses on the trade-off between reliability and packet cost. Small values of \(B\) can stop quickly but are more vulnerable to noisy local stability. Loose thresholds stop quickly for the same reason, but they can accept a reconstruction before it has converged globally. The continuous and discrete distribution groups are evaluated separately because they stress different aspects of the estimator. Continuous KDE benefits from smoothness, while discrete PMF estimation must place mass correctly across separate support points.
-
-This design tests two distinct failure modes. Small values of \(B\) give the monitor more chances to stop, but each decision is based on a noisier change between estimates. Loose thresholds can make an estimate appear stable before it is accurate. The discrete distributions test a harder shape regime, because separated modes can make a PMF estimate look locally stable before enough probability mass has been assigned to every relevant support point.
+The central trade-off is not simply speed against accuracy. It is the risk of mistaking local stability for global correctness. Small values of \(B\) give the monitor more opportunities to stop, but each decision is based on a small increment of new evidence. Loose thresholds amplify the same problem by accepting weak signs of stability. Continuous reconstruction and discrete reconstruction are separated because they fail for different reasons: the kernel density estimate can look stable while the smoothed peak or tail is still wrong, while the probability mass function estimate can look stable before enough mass has reached separated support points.
 
 The primary adaptive metric is correctness, defined as the fraction of seeds where the stopped estimate is within TVD 0.05 of the true distribution. The secondary metric is efficiency, defined as the ratio between the relevant theoretical bound and the median number of packets collected before stopping. Additional diagnostics plot the median stopping sample count, the TVD against truth at the stopping time, and a continued trace beyond an early stopping decision. These diagnostics are included to explain why some stopping settings fail rather than merely reporting that they fail.
 
@@ -384,7 +382,7 @@ The primary adaptive metric is correctness, defined as the fraction of seeds whe
 \label{fig:packet-timing-table}
 \end{figure}
 
-The evaluation reports packet counts because the monitor is passive and the time needed to collect a given number of samples depends on the traffic rate already present on the path. Figure \ref{fig:packet-timing-table} gives a mental model for the scale. For 1500-byte packets sent back-to-back on a 100 gigabit per second link, 1,600 packets correspond to about 192 microseconds and 3,000 packets to about 360 microseconds. On a 1 gigabit per second link the same counts correspond to 19.2 milliseconds and 36.0 milliseconds. These figures are not probe times, but they show that the stopping counts in the successful configurations are operationally small in high-rate settings.
+The evaluation reports packet counts as the primary cost because the monitor is passive. The time needed to collect a given number of samples depends on the traffic that already traverses the path. Figure \ref{fig:packet-timing-table} is therefore only a scale conversion, not an assumption that the monitor sends probes. For 1500-byte packets sent back-to-back on a 100 gigabit per second link, 1,600 packets correspond to about 192 microseconds and 3,000 packets to about 360 microseconds. On a 1 gigabit per second link the same counts correspond to 19.2 milliseconds and 36.0 milliseconds. This makes the sample counts easier to interpret: in a high-rate setting, the successful stopping configurations are not waiting for a long measurement interval, but for enough naturally observed packets to make the distribution stable.
 
 \begin{figure}[htbp]
 \centering
@@ -393,7 +391,7 @@ The evaluation reports packet counts because the monitor is passive and the time
 \label{fig:adaptive-cont-correctness}
 \end{figure}
 
-Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid. Loose thresholds and small values of \(B\) can stop too early. With \(B=100\) and \(\theta=\delta\), correctness is 0.53 for normal, 0.42 for lognormal, and 0.49 for Weibull. Tightening the threshold to \(\theta=\delta/6\) at the same value of \(B\) raises correctness to 0.98, 0.95, and 0.97. Increasing \(B\) makes the rule more reliable because the change between successive estimates is less dominated by sampling noise. At \(B=200\) and \(\theta=\delta/6\), correctness is 1.00 for normal, 1.00 for lognormal, and 0.99 for Weibull. From \(B=500\) onwards, the continuous grid is almost entirely correct even for looser thresholds.
+Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid, with larger batch sizes higher on the vertical axis. The unsafe region is concentrated in the lower-right corner, where the monitor checks too often and accepts too much change between estimates. With \(B=100\) and \(\theta=\delta\), correctness is 0.53 for normal, 0.42 for lognormal, and 0.49 for Weibull. This is not a marginal loss. It means the rule accepts inaccurate estimates in roughly half of the trials while appearing highly efficient. Tightening the threshold to \(\theta=\delta/6\) at the same value of \(B\) raises correctness to 0.98, 0.95, and 0.97. Increasing \(B\) has a similar stabilising effect because each comparison is made after a larger cumulative sample. At \(B=200\) and \(\theta=\delta/6\), correctness is 1.00 for normal, 1.00 for lognormal, and 0.99 for Weibull. The safe region is therefore not found by maximising speed, but by excluding the part of the grid where local stability is too easy to trigger.
 
 \begin{figure}[htbp]
 \centering
@@ -413,7 +411,7 @@ Figure \ref{fig:adaptive-normal-efficiency} shows why the stopping problem is a 
 \label{fig:adaptive-lognormal-weibull-efficiency}
 \end{figure}
 
-Figure \ref{fig:adaptive-lognormal-weibull-efficiency} adds the two continuous distributions that are hidden inside the aggregate correctness grid. Lognormal behaves similarly to normal in the safe region, but the loose \(B=100,\theta=\delta\) configuration is correct in only 42 percent of seeds. Weibull is slightly more robust under tight thresholds, with 97 percent correctness at \(B=100,\theta=\delta/6\), but it also fails under loose thresholds because the early KDE can stabilise around an oversmoothed peak before the tail is well estimated. The common pattern is that \(B=200,\theta=\delta/6\) is the first conservative continuous setting: it reaches 1.00 correctness for normal, 1.00 for lognormal, and 0.99 for Weibull.
+Figure \ref{fig:adaptive-lognormal-weibull-efficiency} adds the two continuous distributions that are hidden inside the aggregate correctness grid. Lognormal behaves similarly to normal in the safe region, but the loose \(B=100,\theta=\delta\) configuration is correct in only 42 percent of seeds. Weibull is slightly more robust under tight thresholds, with 97 percent correctness at \(B=100,\theta=\delta/6\), but it also fails under loose thresholds because the early KDE can stabilise around an oversmoothed peak before the tail is well estimated. The important point is that the failure mode is not tied to one distributional shape. Normal, lognormal, and Weibull have different geometry, but all can produce early apparent stability when the rule is too permissive. The common safe pattern is \(B=200,\theta=\delta/6\), which reaches 1.00 correctness for normal, 1.00 for lognormal, and 0.99 for Weibull.
 
 \begin{figure}[htbp]
 \centering
@@ -422,16 +420,39 @@ Figure \ref{fig:adaptive-lognormal-weibull-efficiency} adds the two continuous d
 \label{fig:n-stop-summary-cont-all}
 \end{figure}
 
-Figure \ref{fig:n-stop-summary-cont-all} separates the packet cost from the correctness heatmaps. Larger values of \(B\) usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The three distributions have similar stopping-count curves, which is useful: the operating point does not need to be tuned separately for every smooth continuous family. The difference is not mainly how long the safe settings take, but how often the unsafe settings stop before the estimate is accurate.
+Figure \ref{fig:n-stop-summary-cont-all} separates packet cost from correctness. Larger values of \(B\) usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The three distributions have similar stopping-count curves, which is useful: the operating point does not need to be tuned separately for every smooth continuous family. The difference is not mainly how long the safe settings take, but how often the unsafe settings stop before the estimate is accurate.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{stopped_distribution_continuous_batches.png}
-\caption{Stopped KDE reconstructions for one illustrative seed at \(\theta=\delta/6\). Each panel overlays the stopped reconstruction with the true binned distribution, showing the actual distributional error behind the TVD value.}
-\label{fig:stopped-distribution-continuous}
+\includegraphics[width=\textwidth]{n_stop_b100_continuous.png}
+\caption{Median total packets collected before stopping at \(B=100\) for the continuous distributions. Error bars show the interquartile range across seeds, and the number above each point is the correctness over 100 seeds.}
+\label{fig:n-stop-b100-continuous}
 \end{figure}
 
-Figure \ref{fig:stopped-distribution-continuous} shows what the stopping decision means visually. At the safe threshold \(\theta=\delta/6\), the stopped KDE is already close to the true distribution for all three continuous shapes. Changing \(B\) affects when the rule checks for stability, but in these safe examples it changes the qualitative shape of the final estimate much less than it changes the stopping count. This is the practical reason for using TVD at stop rather than only reporting \(n_{\mathrm{stop}}\): two configurations can stop at different packet counts but still produce reconstructions that are effectively indistinguishable for the intended use case.
+Figure \ref{fig:n-stop-b100-continuous} isolates the smallest batch size. This is the most aggressive setting and therefore the clearest place to see the cost of reliability. Moving from \(\theta=\delta\) to \(\theta=\delta/6\) increases the median stopping count from 200 packets to 900 packets, but it also moves correctness from unreliable to almost complete across all three continuous distributions. The extra cost is only a few hundred naturally observed packets, while the benefit is the removal of the false-stability regime. The monitor should therefore pay a modest sample cost to avoid accepting an estimate whose accuracy is still largely accidental.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{stopped_distribution_normal_b100.png}
+\caption{Zoomed stopped KDE reconstruction for the normal distribution at \(B=100\) and \(\theta=\delta/6\). The stopped estimate is overlaid with the true binned distribution for the same 1 ms grid.}
+\label{fig:stopped-distribution-normal-b100}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{stopped_distribution_lognormal_b100.png}
+\caption{Zoomed stopped KDE reconstruction for the lognormal distribution at \(B=100\) and \(\theta=\delta/6\). The plot shows whether the skewed peak and right tail are preserved at the stopping time.}
+\label{fig:stopped-distribution-lognormal-b100}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{stopped_distribution_weibull_b100.png}
+\caption{Zoomed stopped KDE reconstruction for the Weibull distribution at \(B=100\) and \(\theta=\delta/6\). The plot shows whether the asymmetric rise, peak, and tail are preserved at the stopping time.}
+\label{fig:stopped-distribution-weibull-b100}
+\end{figure}
+
+Figures \ref{fig:stopped-distribution-normal-b100}, \ref{fig:stopped-distribution-lognormal-b100}, and \ref{fig:stopped-distribution-weibull-b100} show what the safe \(B=100,\theta=\delta/6\) decision means in distributional terms. The normal and lognormal estimates stop after 600 packets for the illustrative seed, while the Weibull estimate stops after 1,000 packets. In all three cases the TVD is comfortably below 0.05, but the plots are more informative than the scalar value alone. The normal case shows that the centre and shoulders are already aligned. The lognormal case shows that the skew and right tail are not erased by smoothing. The Weibull case shows the hardest visual feature: the estimate must capture both a steep left rise and a longer right tail. These figures support the use of \(B=100,\theta=\delta/6\) as an aggressive continuous setting, while the earlier correctness grid explains why the same batch size becomes unsafe when the threshold is loosened.
 
 \begin{figure}[htbp]
 \centering
@@ -440,7 +461,7 @@ Figure \ref{fig:stopped-distribution-continuous} shows what the stopping decisio
 \label{fig:early-stop-trace-cont-all}
 \end{figure}
 
-Figure \ref{fig:early-stop-trace-cont-all} explains why the loose \(B=100,\theta=\delta\) rule fails. In the examples shown, the observed TVD to the previous estimate falls below the stopping threshold at 200 packets, so the rule stops. The upper row shows that the true TVD is still above 0.05 at that point. If the same run is continued, the true TVD usually falls below the target after several more batches. The failure is therefore not that the estimator cannot learn the distribution. It is that the first two cumulative estimates can look similar by chance before they are both accurate. Tightening \(\theta\) or increasing \(B\) reduces this false-stability event.
+Figure \ref{fig:early-stop-trace-cont-all} explains why the loose \(B=100,\theta=\delta\) rule fails. In the examples shown, the observed TVD to the previous estimate falls below the stopping threshold at 200 packets, so the rule stops. The upper row shows that the true TVD is still above 0.05 at that point. Continuing the same run beyond the stopping decision shows the TVD against truth falling below the target after later batches. This is the key diagnosis. The estimator is not fundamentally unable to learn the distribution, and the batch mechanism is not wrong because it compares cumulative estimates. The problem is premature trust: the first two cumulative reconstructions can be close to one another because both are under-sampled, not because both are correct. Tightening \(\theta\) or increasing \(B\) reduces this false-stability event by requiring a stronger sign of convergence before stopping.
 
 \begin{table}[htbp]
 \centering
@@ -472,7 +493,7 @@ Figure \ref{fig:adaptive-disc-correctness} shows that the discrete distributions
 
 Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets plot and stopping-time TVD plot for the piecewise distribution. Those diagnostics show that the piecewise case is hard because loose thresholds and small values of \(B\) leave many stopped estimates near or above the target line. With tighter thresholds or larger values of \(B\), the stopped TVD moves safely below 0.05, often around 0.02 to 0.03, leaving useful safety margin.
 
-The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A modestly stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger value of \(B\), with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution.
+The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures at a small sample cost compared with the theoretical bound. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger value of \(B\), with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution. The evaluation also gives the later experiments a diagnostic tool. If the use case fails after this stopping rule has accepted a distribution, the likely cause is no longer basic sample convergence, but the identification boundary or the network mechanism that generated the observed delays.
 
 This also sets up the use-case evaluation. The stopping rule is not the final operational decision. It decides when the distribution estimate is stable enough to be trusted. The use case then performs the identification step: comparing that stable estimate with a reference state or decision boundary for remaining capacity. This separation is important because it keeps two errors distinct. Early stopping error is the risk of trusting an unstable estimate, while identification error is the risk of drawing the wrong operational conclusion from a stable estimate.
 

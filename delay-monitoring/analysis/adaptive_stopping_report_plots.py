@@ -6,7 +6,7 @@ results/adaptive-stopping-v2 and adds report-specific diagnostics:
 
 * heatmaps with batch size increasing upwards;
 * continuous stopping summaries for normal, lognormal, and Weibull;
-* stopped KDE reconstructions with true distributions overlaid;
+* zoomed B=100 stopped KDE reconstructions with true distributions overlaid;
 * continued traces after an early B=100 stop.
 
 The additional stopped-distribution and trace plots are illustrative follow-up
@@ -17,12 +17,24 @@ import csv
 import math
 import os
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+os.environ.setdefault("MPLCONFIGDIR", os.path.join(SCRIPT_DIR, "../results/.matplotlib"))
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
+plt.rcParams.update(
+    {
+        "axes.titlesize": 13,
+        "axes.labelsize": 11,
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
+        "legend.fontsize": 10,
+        "figure.titlesize": 15,
+    }
+)
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 V2_RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/adaptive-stopping-v2")
 RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results/adaptive-stopping-report")
 
@@ -61,6 +73,12 @@ CONTINUOUS_DISTS = {
         "params": {"scale": 10.0, "shape": 2.0},
         "color": "#d68910",
     },
+}
+
+STOPPED_XLIMS = {
+    "normal": (32, 48),
+    "lognormal": (5, 16),
+    "weibull": (0, 24),
 }
 
 DISCRETE_LABELS = {
@@ -146,9 +164,9 @@ def plot_combined_correctness(rows, dist_labels, out_name, title):
                 ax.text(j, i, f"{value:.2f}", ha="center", va="center", fontsize=7, color=color)
         fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
-    axes[0].set_ylabel("Packets per batch")
+    axes[0].set_ylabel("Packets per batch, increasing upward")
     fig.suptitle(title)
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0.04, 1, 1])
     out = os.path.join(RESULTS_DIR, out_name)
     fig.savefig(out, dpi=180, bbox_inches="tight")
     plt.close(fig)
@@ -175,7 +193,7 @@ def plot_individual_heatmaps(rows, dist_labels, prefix):
             ax.set_yticks(range(len(BATCH_SIZES)))
             ax.set_yticklabels(BATCH_SIZES)
             ax.set_xlabel("Stopping threshold")
-            ax.set_ylabel("Packets per batch")
+            ax.set_ylabel("Packets per batch, increasing upward")
 
         for i in range(len(BATCH_SIZES)):
             for j in range(len(THETA_KEYS)):
@@ -234,6 +252,52 @@ def plot_n_stop_summary_all(rows):
     fig.tight_layout()
     out = os.path.join(RESULTS_DIR, "n_stop_summary_cont_all.png")
     fig.savefig(out, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    return out
+
+
+def plot_n_stop_b100(rows):
+    batch_size = 100
+    x = np.arange(len(THETA_KEYS))
+    fig, axes = plt.subplots(1, 3, figsize=(15.5, 5.4), sharey=True)
+    y_max = 1.25 * max(
+        row_lookup(rows, dist, batch_size, key)["q75_n_stop"]
+        for dist in CONTINUOUS_DISTS
+        for key in THETA_KEYS
+    )
+
+    for ax, (dist, cfg) in zip(axes, CONTINUOUS_DISTS.items()):
+        vals = [row_lookup(rows, dist, batch_size, key) for key in THETA_KEYS]
+        med = np.array([v["median_n_stop"] for v in vals])
+        q25 = np.array([v["q25_n_stop"] for v in vals])
+        q75 = np.array([v["q75_n_stop"] for v in vals])
+        correctness = np.array([v["correctness"] for v in vals])
+
+        ax.errorbar(
+            x,
+            med,
+            yerr=[med - q25, q75 - med],
+            marker="o",
+            linewidth=2.4,
+            capsize=4,
+            color=cfg["color"],
+        )
+        for xi, yi, corr in zip(x, med, correctness):
+            ax.text(xi, yi * 1.1, f"{corr:.2f}", ha="center", va="bottom", fontsize=9.5)
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(THETA_DISPLAY)
+        ax.set_xlabel("Stopping threshold")
+        ax.set_title(cfg["label"])
+        ax.set_ylim(0, y_max)
+        ax.grid(True, alpha=0.28)
+
+    axes[0].set_ylabel("Median total packets collected at stop")
+    fig.suptitle("B=100 total packets needed to stop")
+    fig.text(0.5, 0.01, "Numbers above points show correctness across 100 seeds.", ha="center")
+    fig.tight_layout(rect=[0, 0.04, 1, 1])
+    out = os.path.join(RESULTS_DIR, "n_stop_b100_continuous.png")
+    fig.savefig(out, dpi=200, bbox_inches="tight")
     plt.close(fig)
     return out
 
@@ -304,38 +368,38 @@ def stop_continuous(dist, params, batch_size, theta, seed, max_samples):
     return stop, trace
 
 
-def plot_stopped_distributions():
-    batch_sizes = [100, 200, 500]
+def plot_stopped_distribution_b100():
+    batch_size = 100
     theta = DELTA / 6
     seed = 4
     max_samples = 12_000
-    fig, axes = plt.subplots(3, 3, figsize=(14.5, 9), sharex=False)
+    paths = []
 
-    for row, (dist, cfg) in enumerate(CONTINUOUS_DISTS.items()):
+    for dist, cfg in CONTINUOUS_DISTS.items():
         true_m = true_continuous_masses(dist, cfg["params"])
-        for col, batch_size in enumerate(batch_sizes):
-            stop, _ = stop_continuous(dist, cfg["params"], batch_size, theta, seed, max_samples)
-            ax = axes[row, col]
-            ax.plot(GRID, true_m, color="black", linewidth=2, label="True")
-            ax.plot(GRID, stop["estimate"], color=cfg["color"], linewidth=2, label="Stopped KDE")
-            ax.fill_between(GRID, stop["estimate"], color=cfg["color"], alpha=0.18)
-            ax.set_title(
-                f"{cfg['label']}, B={batch_size}\n"
-                f"stop n={stop['n']:,}, TVD={stop['truth_tvd']:.3f}"
-            )
-            ax.set_xlabel("Delay")
-            if col == 0:
-                ax.set_ylabel("Probability mass")
-            ax.grid(True, alpha=0.25)
-            if row == 0 and col == 0:
-                ax.legend(fontsize=8)
+        stop, _ = stop_continuous(dist, cfg["params"], batch_size, theta, seed, max_samples)
+        fig, ax = plt.subplots(figsize=(8.7, 5.6))
 
-    fig.suptitle("Stopped continuous reconstructions with true distributions overlaid")
-    fig.tight_layout()
-    out = os.path.join(RESULTS_DIR, "stopped_distribution_continuous_batches.png")
-    fig.savefig(out, dpi=180, bbox_inches="tight")
-    plt.close(fig)
-    return out
+        ax.plot(GRID, true_m, color="black", linewidth=2.8, label="True distribution")
+        ax.plot(GRID, stop["estimate"], color=cfg["color"], linewidth=2.8, label="Stopped KDE")
+        ax.fill_between(GRID, stop["estimate"], color=cfg["color"], alpha=0.18)
+        ax.set_xlim(*STOPPED_XLIMS[dist])
+        ax.set_title(
+            f"{cfg['label']} stopped reconstruction, B=100\n"
+            f"stop n={stop['n']:,}, TVD={stop['truth_tvd']:.3f}, "
+            r"$\theta=\delta/6$"
+        )
+        ax.set_xlabel("Delay on 1 ms grid")
+        ax.set_ylabel("Probability mass")
+        ax.grid(True, alpha=0.25)
+        ax.legend(loc="upper right")
+
+        out = os.path.join(RESULTS_DIR, f"stopped_distribution_{dist}_b100.png")
+        fig.savefig(out, dpi=220, bbox_inches="tight")
+        plt.close(fig)
+        paths.append(out)
+
+    return paths
 
 
 def find_bad_seed(dist, params, max_samples):
@@ -349,7 +413,7 @@ def find_bad_seed(dist, params, max_samples):
 
 def plot_early_stop_traces():
     max_samples = 5_000
-    fig, axes = plt.subplots(2, 3, figsize=(15, 7.5), sharex=False)
+    fig, axes = plt.subplots(2, 3, figsize=(16, 8.4), sharex=False)
 
     for col, (dist, cfg) in enumerate(CONTINUOUS_DISTS.items()):
         seed, stop, trace = find_bad_seed(dist, cfg["params"], max_samples)
@@ -469,7 +533,8 @@ def main():
         )
     )
     paths.append(plot_n_stop_summary_all(cont_rows))
-    paths.append(plot_stopped_distributions())
+    paths.append(plot_n_stop_b100(cont_rows))
+    paths.extend(plot_stopped_distribution_b100())
     paths.append(plot_early_stop_traces())
     paths.append(plot_packet_timing_table())
 
