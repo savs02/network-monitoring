@@ -400,7 +400,7 @@ Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid
 \label{fig:adaptive-normal-efficiency}
 \end{figure}
 
-Figure \ref{fig:adaptive-normal-efficiency} shows why the stopping problem is a trade-off rather than a single optimum. For the normal distribution, the most aggressive configuration, \(B=100\) and \(\theta=\delta\), has very high apparent efficiency because the median stopping time is only 200 samples. However, it is correct in only 53 percent of seeds, so it is not usable. The configuration \(B=100\) and \(\theta=\delta/6\) is much better: it reaches 98 percent correctness with median stopping time 900 and an efficiency of roughly 200 times relative to the 179,744-sample theoretical bound. The more conservative \(B=200\) and \(\theta=\delta/6\) reaches 100 percent correctness with median stopping time 1,600 and efficiency about 112 times. This is a useful operating point when reliability matters more than the last factor of efficiency.
+Figure \ref{fig:adaptive-normal-efficiency} shows why the stopping problem is a trade-off rather than a single optimum. For the normal distribution, the most aggressive configuration, \(B=100\) and \(\theta=\delta\), has very high apparent efficiency because the median stopping time is only 200 samples. However, it is correct in only 53 percent of seeds, so it is not usable. The configuration \(B=100\) and \(\theta=\delta/6\) is much better: it reaches 98 percent correctness with median stopping time 900 and an efficiency of roughly 200 times relative to the 179,744-sample theoretical bound. The more conservative \(B=200\) and \(\theta=\delta/6\) reaches 100 percent correctness with median stopping time 1,600 and efficiency about 112 times. Since the aim of this section is to choose a stopping rule that can be trusted before the use-case evaluation, the latter is the more defensible continuous operating point.
 
 \begin{figure}[htbp]
 \centering
@@ -424,35 +424,35 @@ Figure \ref{fig:n-stop-summary-cont-all} separates packet cost from correctness.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{n_stop_b100_continuous.png}
-\caption{Median total packets collected before stopping at \(B=100\) for the continuous distributions. Error bars show the interquartile range across seeds, and the number above each point is the correctness over 100 seeds.}
-\label{fig:n-stop-b100-continuous}
+\includegraphics[width=\textwidth]{n_stop_b200_continuous.png}
+\caption{Median total packets collected before stopping at \(B=200\) for the continuous distributions. Error bars show the interquartile range across seeds, and the number above each point is the correctness over 100 seeds.}
+\label{fig:n-stop-b200-continuous}
 \end{figure}
 
-Figure \ref{fig:n-stop-b100-continuous} isolates the smallest batch size. This is the most aggressive setting and therefore the clearest place to see the cost of reliability. Moving from \(\theta=\delta\) to \(\theta=\delta/6\) increases the median stopping count from 200 packets to 900 packets, but it also moves correctness from unreliable to almost complete across all three continuous distributions. The extra cost is only a few hundred naturally observed packets, while the benefit is the removal of the false-stability regime. The monitor should therefore pay a modest sample cost to avoid accepting an estimate whose accuracy is still largely accidental.
+Figure \ref{fig:n-stop-b200-continuous} isolates \(B=200\), the first clearly conservative continuous batch size suggested by the heatmap. The batch size alone is not enough: at \(\theta=\delta\), the median stopping count is only 400 packets and correctness remains between 0.74 and 0.79. With \(\theta=\delta/6\), the median stopping count rises to 1,600 packets for normal and lognormal, and 1,400 packets for Weibull. The corresponding correctness values are 1.00, 1.00, and 0.99. This is the stronger operating point because it pays a moderate sample cost for a large reduction in false stability, while still stopping far below the theoretical bound.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.92\textwidth]{stopped_distribution_normal_b100.png}
-\caption{Zoomed stopped KDE reconstruction for the normal distribution at \(B=100\) and \(\theta=\delta/6\). The stopped estimate is overlaid with the true binned distribution for the same 1 ms grid.}
-\label{fig:stopped-distribution-normal-b100}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.92\textwidth]{stopped_distribution_lognormal_b100.png}
-\caption{Zoomed stopped KDE reconstruction for the lognormal distribution at \(B=100\) and \(\theta=\delta/6\). The plot shows whether the skewed peak and right tail are preserved at the stopping time.}
-\label{fig:stopped-distribution-lognormal-b100}
+\includegraphics[width=0.92\textwidth]{stopped_distribution_normal_b200.png}
+\caption{Zoomed stopped KDE reconstruction for the normal distribution at \(B=200\) and \(\theta=\delta/6\). The stopped estimate is overlaid with the true binned distribution for the same 1 ms grid.}
+\label{fig:stopped-distribution-normal-b200}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.92\textwidth]{stopped_distribution_weibull_b100.png}
-\caption{Zoomed stopped KDE reconstruction for the Weibull distribution at \(B=100\) and \(\theta=\delta/6\). The plot shows whether the asymmetric rise, peak, and tail are preserved at the stopping time.}
-\label{fig:stopped-distribution-weibull-b100}
+\includegraphics[width=0.92\textwidth]{stopped_distribution_lognormal_b200.png}
+\caption{Zoomed stopped KDE reconstruction for the lognormal distribution at \(B=200\) and \(\theta=\delta/6\). The plot shows whether the skewed peak and right tail are preserved at the stopping time.}
+\label{fig:stopped-distribution-lognormal-b200}
 \end{figure}
 
-Figures \ref{fig:stopped-distribution-normal-b100}, \ref{fig:stopped-distribution-lognormal-b100}, and \ref{fig:stopped-distribution-weibull-b100} show what the safe \(B=100,\theta=\delta/6\) decision means in distributional terms. The normal and lognormal estimates stop after 600 packets for the illustrative seed, while the Weibull estimate stops after 1,000 packets. In all three cases the TVD is comfortably below 0.05, but the plots are more informative than the scalar value alone. The normal case shows that the centre and shoulders are already aligned. The lognormal case shows that the skew and right tail are not erased by smoothing. The Weibull case shows the hardest visual feature: the estimate must capture both a steep left rise and a longer right tail. These figures support the use of \(B=100,\theta=\delta/6\) as an aggressive continuous setting, while the earlier correctness grid explains why the same batch size becomes unsafe when the threshold is loosened.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{stopped_distribution_weibull_b200.png}
+\caption{Zoomed stopped KDE reconstruction for the Weibull distribution at \(B=200\) and \(\theta=\delta/6\). The plot shows whether the asymmetric rise, peak, and tail are preserved at the stopping time.}
+\label{fig:stopped-distribution-weibull-b200}
+\end{figure}
+
+Figures \ref{fig:stopped-distribution-normal-b200}, \ref{fig:stopped-distribution-lognormal-b200}, and \ref{fig:stopped-distribution-weibull-b200} show what the conservative \(B=200,\theta=\delta/6\) decision means in distributional terms. The normal and lognormal estimates stop after 1,200 packets for the illustrative seed, while the Weibull estimate stops after 1,400 packets. In all three cases the TVD is comfortably below 0.05, but the plots are more informative than the scalar value alone. The normal case shows that the centre and shoulders are aligned. The lognormal case shows that the skew and right tail are not erased by smoothing. The Weibull case shows the hardest visual feature: the estimate must capture both a steep left rise and a longer right tail. These figures make the heatmap conclusion concrete: \(B=200,\theta=\delta/6\) is not merely slower than \(B=100\), it is a visibly stable reconstruction at the point where the stopping rule accepts the estimate.
 
 \begin{figure}[htbp]
 \centering
@@ -493,7 +493,7 @@ Figure \ref{fig:adaptive-disc-correctness} shows that the discrete distributions
 
 Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets plot and stopping-time TVD plot for the piecewise distribution. Those diagnostics show that the piecewise case is hard because loose thresholds and small values of \(B\) leave many stopped estimates near or above the target line. With tighter thresholds or larger values of \(B\), the stopped TVD moves safely below 0.05, often around 0.02 to 0.03, leaving useful safety margin.
 
-The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures at a small sample cost compared with the theoretical bound. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger value of \(B\), with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution. The evaluation also gives the later experiments a diagnostic tool. If the use case fails after this stopping rule has accepted a distribution, the likely cause is no longer basic sample convergence, but the identification boundary or the network mechanism that generated the observed delays.
+The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures at a small sample cost compared with the theoretical bound. For continuous KDE reconstruction, the main operating point should be \(B=200,\theta=\delta/6\). The \(B=100\) setting is useful as an aggressive comparison and as a failure diagnostic under loose thresholds, but the heatmap shows that \(B=200\) gives a cleaner reliability story across normal, lognormal, and Weibull delays. Discrete PMF reconstruction should use a larger value of \(B\), with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution. The evaluation also gives the later experiments a diagnostic tool. If the use case fails after this stopping rule has accepted a distribution, the likely cause is no longer basic sample convergence, but the identification boundary or the network mechanism that generated the observed delays.
 
 This also sets up the use-case evaluation. The stopping rule is not the final operational decision. It decides when the distribution estimate is stable enough to be trusted. The use case then performs the identification step: comparing that stable estimate with a reference state or decision boundary for remaining capacity. This separation is important because it keeps two errors distinct. Early stopping error is the risk of trusting an unstable estimate, while identification error is the risk of drawing the wrong operational conclusion from a stable estimate.
 
