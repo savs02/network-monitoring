@@ -1,4 +1,4 @@
-\documentclass[a4paper]{report}
+\documentclass[a4paper,12pt]{report}
 \usepackage[a4paper, margin=3cm, bottom=2.5cm]{geometry}
 \usepackage{setspace}
 \usepackage{amssymb, amsfonts, amsmath, latexsym}
@@ -34,7 +34,7 @@ $\Box$ \end{quotation}}
 \newcommand{\ints}{\mbox{\(\mathbb Z\)}}
 
 \title{Passive Network Monitoring Through Delay Distribution Reconstruction}
-\date{Submission date: Day Month Year}
+\date{Academic year 2024/25}
 \author{Savani Sawaikar\\
 Master of Engineering Computer Science\\
 Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
@@ -42,14 +42,38 @@ Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
 \begin{document}
 
 \onehalfspacing
-\maketitle
+\pagenumbering{gobble}
+
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+{\Large\bfseries Passive Network Monitoring Through Delay Distribution Reconstruction\par}
+\vspace{1.5cm}
+{\large Savani Sawaikar\par}
+\vspace{0.5cm}
+{Master of Engineering (MEng) Computer Science\par}
+{University College London (UCL)\par}
+\vspace{0.5cm}
+{Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley\par}
+\vspace{0.5cm}
+{Academic year 2024/25\par}
+\vfill
+\begin{minipage}{0.9\textwidth}
+\small
+This report is submitted as part requirement for the MEng Degree in Computer Science at UCL. It is substantially the result of my own work except where explicitly indicated in the text.
+
+The report may be freely copied and distributed provided the source is explicitly acknowledged.
+\end{minipage}
+\end{titlepage}
 
 \begin{abstract}
 This report evaluates a passive network monitoring method that reconstructs path delay distributions from packet delay observations. The evaluation first studies the statistical sample complexity behind the reconstruction problem, then evaluates an adaptive stopping rule that decides when enough samples have been collected without using ground truth at deployment time.
 \end{abstract}
 
-\tableofcontents
+\clearpage
+\pagenumbering{arabic}
 \setcounter{page}{1}
+\tableofcontents
 
 \chapter{Introduction}
 
@@ -130,7 +154,7 @@ The rule evaluated here collects samples in batches of size \(B\). After each ne
 \]
 The rule does not use the true distribution when deciding to stop. Ground truth is used only after the run to measure whether \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq \delta\), where \(\delta=0.05\). The experiment sweeps eight batch sizes, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 seeds.
 
-The experiment is run for two groups of distributions. The continuous group uses the same normal, lognormal, and Weibull delay distributions as the previous section, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points. This second group is important because it tests whether the stopping rule still works when the distribution has separated modes rather than a smooth single peak.
+The evaluation uses two groups of distributions. The continuous group uses the same normal, lognormal, and Weibull delay distributions as the previous section, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points. This second group is important because it tests whether the stopping rule still works when the distribution has separated modes rather than a smooth single peak.
 
 \begin{figure}[htbp]
 \centering
