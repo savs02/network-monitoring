@@ -144,6 +144,17 @@ The stopping rule converts the offline sample-complexity question into an online
 
 This creates the iterative loop used in the dissertation. Theory gives a conservative reference point. Direct sampling checks whether the estimator behaves sensibly before any network effects are introduced. Adaptive stopping then asks how quickly the estimator can be trusted without ground truth. The use case will use that trusted estimate for identification. If a later network experiment fails, the loop makes the failure easier to diagnose: the cause is less likely to be basic distribution learning, and more likely to be the network mechanism, the stopping threshold, or the identification boundary.
 
+\section{Capacity use case setup}
+\label{sec:method-capacity-use-case}
+
+The motivating use case turns distribution reconstruction into a capacity-estimation procedure. The controlled network experiment introduces additional cross traffic on the same link as the monitored flow. This cross traffic is generated using probe packets so that the experiment can deliberately move the path from an uncongested state towards a congested state. The probes are part of the experimental workload used to create different capacity regimes. The monitoring method still observes packet delays and reconstructs their distribution rather than relying on per-packet path tracking or explicit queue measurements.
+
+The use case treats the delay distribution under a low-load or no-added-load condition as the reference distribution for the path. As more probe traffic is added, the observed delay distribution is reconstructed again using the same non-parametric estimator and stopping rule described above. The operational question is then whether the new distribution still has the same identity as the reference state, or whether it has changed enough to indicate that the added traffic is consuming the remaining capacity. In practice, this can be tested by comparing the stopped reconstruction with the reference distribution using TVD or a related distributional distance. A small distance indicates that the path still behaves like the reference state. A large distance indicates that the extra offered load has changed the delay regime.
+
+The capacity search is iterative. The experiment starts with a small number of probe packets per measurement interval and doubles that number until the distributional comparison first indicates congestion. This exponential phase quickly finds a bracket: one offered-load setting that still appears safe, and one higher setting that appears congested. The experiment then refines the bracket with a binary-search style procedure, testing the midpoint number of probes and updating the safe or congested endpoint according to the reconstructed delay distribution. The result is an estimate of the maximum added probe load that can be sent before the path leaves the reference delay regime.
+
+This design keeps the use case aligned with the earlier evaluations. The statistical section justifies that delay distributions can be reconstructed from samples. The adaptive stopping section decides when the reconstruction is trustworthy without ground truth. The capacity use case then uses distribution identity to turn a trusted reconstruction into an operational decision about remaining capacity.
+
 \section{Experimental workflow}
 \label{sec:method-experimental-workflow}
 
@@ -151,7 +162,7 @@ Each experiment follows the same workflow. A ground truth distribution is select
 
 The first evaluation uses direct sampling from discrete and continuous distributions. The discrete cases are binomial, Zipfian, and piecewise distributions. The continuous cases are normal, lognormal, and Weibull distributions. This stage validates the statistical method independently of the network simulator. The second evaluation uses the same distribution families to test adaptive stopping. It asks whether stability between consecutive reconstructions is a reliable proxy for accuracy against ground truth.
 
-The later evaluations will use the same measurement and reconstruction pipeline in increasingly realistic network settings. The motivating use case will connect distribution reconstruction to the operational question of remaining path capacity. The multi-hop and multi-path studies will test whether the method remains informative when the observed delay distribution is produced by multiple links or multiple path components. This structure keeps the dissertation aligned: each evaluation changes the source of the observed samples, while the central object of estimation remains the delay distribution.
+The later evaluations will use the same measurement and reconstruction pipeline in increasingly realistic network settings. The motivating use case will connect distribution reconstruction to the operational question of remaining path capacity using the cross-traffic search described above. The multi-hop and multi-path studies will test whether the method remains informative when the observed delay distribution is produced by multiple links or multiple path components. This structure keeps the dissertation aligned: each evaluation changes the source of the observed samples, while the central object of estimation remains the delay distribution.
 
 \section{Reproducibility}
 \label{sec:method-reproducibility}
