@@ -1,4 +1,4 @@
-\documentclass[a4paper]{report}
+\documentclass[a4paper,12pt]{report}
 \usepackage[a4paper, margin=3cm, bottom=2.5cm]{geometry}
 \usepackage{setspace}
 \usepackage{amssymb, amsfonts, amsmath, latexsym}
@@ -35,40 +35,55 @@ $\Box$ \end{quotation}}
 
 \title{Know Your Limits: Delay-Based Passive Estimation of Remaining Path Capacity}
 \date{May 2026}
-\author{Savani Sawaikar\thanks{
-{\bf Disclaimer:}
-This report is submitted as part requirement for the MEng Computer Science degree at UCL. It is
-substantially the result of my own work except where explicitly indicated in the text.
-The report may be freely copied and distributed provided the source is explicitly acknowledged}
-\\ \\
+\author{Savani Sawaikar\\
 Master of Engineering Computer Science\\
-Supervised by Dr. Stefano Vissicchio}
-
+Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
 
 \begin{document}
 
 \onehalfspacing
-\maketitle
+\pagenumbering{gobble}
+
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+{\Large\bfseries Know Your Limits: Delay-Based Passive Estimation of Remaining Path Capacity\par}
+\vspace{1.5cm}
+{\large Savani Sawaikar\par}
+\vspace{0.5cm}
+{Master of Engineering (MEng) Computer Science\par}
+{University College London (UCL)\par}
+\vspace{0.5cm}
+{Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley\par}
+\vspace{0.5cm}
+{May 2026\par}
+\vfill
+\begin{minipage}{0.9\textwidth}
+\small
+This report is submitted as part requirement for the MEng Degree in Computer Science at UCL. It is substantially the result of my own work except where explicitly indicated in the text.
+
+The report may be freely copied and distributed provided the source is explicitly acknowledged.
+\end{minipage}
+\end{titlepage}
 
 \begin{abstract}
-Knowing how much additional traffic a path can absorb before performance degrades is central to network management, yet current practice answers it by monitoring scalar delay metrics such as mean round-trip time or percentile latency and raising alerts when these cross predefined thresholds. These summaries discard distributional information that encodes how and why path conditions are changing. This report proposes a passive monitoring system that treats the delay distribution itself as the object of interest. 
-
-DO ONCE EVERYTHING ELSE IS DONE
+Knowing how much additional traffic a path can absorb before performance degrades is central to network management, yet current practice often answers this question by monitoring scalar delay metrics such as mean round-trip time or percentile latency and raising alerts when these cross predefined thresholds. These summaries discard distributional information that encodes how path conditions are changing. This report evaluates a passive monitoring system that treats the delay distribution itself as the object of interest. The evaluation first studies the statistical sample complexity behind distribution reconstruction, then evaluates an adaptive stopping rule that decides when enough samples have been collected without using ground truth at deployment time.
 \end{abstract}
 
-\tableofcontents
+\clearpage
+\pagenumbering{arabic}
 \setcounter{page}{1}
+\tableofcontents
 
 \chapter{Introduction}
 
-\section{Overview}
-
-This report accompanies the network monitoring experiments in the repository. The current experimental focus is the simple single-link case in ns-3, where packets traverse a point-to-point path and the link delay is sampled independently from a configured distribution. The monitor observes only the resulting packet delays. It does not know whether the generating distribution is normal, lognormal, Weibull, or a member of any other parametric family. The aim is to reconstruct the delay distribution from samples alone and quantify how many samples are needed before the reconstruction is accurate.
-
 \chapter{Use Case}
+
 \chapter{Methodology}
 
 \chapter{Evaluation}
+
+The evaluation and methodology go hand-in-hand since it was quite an iterative process. This section looks at sample complexity and related experiments, which is at the core of the idea of distribution-based path profiling.
 
 \section{Statistical sample complexity}
 
@@ -141,7 +156,7 @@ The rule evaluated here collects samples in batches of size \(B\). After each ne
 \]
 The rule does not use the true distribution when deciding to stop. Ground truth is used only after the run to measure whether \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq \delta\), where \(\delta=0.05\). The experiment sweeps eight batch sizes, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 seeds.
 
-The experiment is run for two groups of distributions. The continuous group uses the same normal, lognormal, and Weibull delay distributions as the previous section, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points. This second group is important because it tests whether the stopping rule still works when the distribution has separated modes rather than a smooth single peak.
+The evaluation uses two groups of distributions. The continuous group uses the same normal, lognormal, and Weibull delay distributions as the previous section, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points. This second group is important because it tests whether the stopping rule still works when the distribution has separated modes rather than a smooth single peak.
 
 \begin{figure}[htbp]
 \centering
@@ -220,10 +235,9 @@ Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets
 
 The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A modestly stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger batch size, with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution.
 
-\chapter{Conclusion and Future Works}
+\chapter{Conclusion and Future Work}
 
 The evaluation supports the core premise of the project. Passive delay samples contain enough information to reconstruct the delay distribution, and the number of samples needed in the tested cases is much smaller than the distribution-free worst-case bound. The statistical theory explains the scaling with resolution and accuracy, while the adaptive stopping experiments show how to turn that theory into a practical online rule. The next step is to test whether the same behaviour persists in richer topologies, where multiple links, queues, and path mixtures can change the observed delay distribution without changing the monitoring interface.
-
 
 \appendix
 
