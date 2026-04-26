@@ -81,7 +81,7 @@ Knowing how much additional traffic a path can absorb before performance degrade
 
 \chapter{Methodology}
 
-The methodology treats passive delay monitoring as a distribution reconstruction problem. Instead of reducing a path to a scalar delay statistic, the monitor estimates the full distribution of packet delays observed at the receiver. This chapter sets out the common method used across the evaluation. The first two evaluation sections then instantiate this method for statistical sample complexity and adaptive stopping, while later sections will apply the same framework to richer network scenarios.
+The methodology treats passive delay monitoring as two linked statistical tasks: reconstruction and identification. Reconstruction estimates the full distribution of packet delays observed at the receiver, instead of reducing a path to a scalar delay statistic. Identification uses that reconstructed distribution to decide whether the path appears to be in a particular operating state, such as a safe capacity regime or a degraded regime. This chapter sets out the common method used across the evaluation. The first two evaluation sections focus on reconstruction and stopping, while the later use-case section uses identification to turn the reconstructed distribution into an operational decision.
 
 \section{Problem framing}
 \label{sec:method-problem-framing}
@@ -89,6 +89,8 @@ The methodology treats passive delay monitoring as a distribution reconstruction
 The object of interest is the delay distribution induced by a network path over a measurement interval. Let \(X_1,\ldots,X_n\) denote independent delay observations drawn from an unknown distribution \(P\). In the simplest direct-sampling experiments, these observations are generated from a known distribution family in order to isolate the statistical question. In the network experiments, they are packet delays produced by Network Simulator 3 (NS-3). In both cases, the monitor receives only the samples. The distribution family and its parameters are not given to the reconstruction algorithm.
 
 This framing separates estimation from validation. The monitor constructs an estimate \(\widehat{P}_n\) from the observed samples alone. Ground truth is used only after reconstruction, in order to evaluate whether the estimate is accurate. This distinction is central to the project: the deployment setting is passive and distribution-agnostic, while the experimental setting uses known ground truth to measure performance.
+
+Identification enters after this reconstruction step. In the use-case setting, the question is no longer only whether \(\widehat{P}_n\) is close to the hidden ground truth. It is whether the observed delay distribution is consistent with a reference state, or sufficiently different from it to indicate that the path has moved into a different capacity regime. This is closer to identity testing or goodness-of-fit testing in the terminology of distribution testing. The statistical sample-complexity evaluation does not use that testing result directly, because it first has to establish that the reconstructed distribution is reliable enough to support later identification decisions.
 
 The methodology is deliberately staged. Direct sampling is used first because it removes packet scheduling, queueing, and simulator effects. This establishes whether the statistical reconstruction problem behaves as expected. The method is then applied to simulated packet delays, where the same reconstruction and stopping rules are tested under network conditions. The later use-case, multi-hop, and multi-path experiments are intended to increase network complexity without changing the monitoring interface.
 
@@ -140,6 +142,8 @@ The adaptive stopping method addresses that gap. Samples are processed in batche
 
 The stopping rule converts the offline sample-complexity question into an online monitoring question. The offline question asks how many samples would be sufficient if the ground truth were known for evaluation. The online question asks whether the monitor can detect that its estimate has stabilised before collecting a worst-case number of samples. The evaluation tests this by recording both the stopping time and the post-hoc TVD against the true distribution.
 
+This creates the iterative loop used in the dissertation. Theory gives a conservative reference point. Direct sampling checks whether the estimator behaves sensibly before any network effects are introduced. Adaptive stopping then asks how quickly the estimator can be trusted without ground truth. The use case will use that trusted estimate for identification. If a later network experiment fails, the loop makes the failure easier to diagnose: the cause is less likely to be basic distribution learning, and more likely to be the network mechanism, the stopping threshold, or the identification boundary.
+
 \section{Experimental workflow}
 \label{sec:method-experimental-workflow}
 
@@ -174,13 +178,13 @@ A reconstruction is treated as successful when this distance is at most a target
 
 \subsection{The learning bound}
 
-The theoretical reference point comes from finite-domain distribution learning. The statistical learning notes identify this as the relevant distribution reconstruction problem and point to Canonne's treatment of learning and testing discrete distributions. Given independent samples from an unknown distribution over \(k\) possible outcomes, the plug-in histogram estimator can learn the distribution in TVD with sample complexity
+The theoretical reference point comes from finite-domain distribution learning. Canonne's monograph on distribution testing records this as the learning baseline for arbitrary distributions on a known finite domain, and uses it as the benchmark against which sublinear testing algorithms are compared \cite{canonneTopics}. Canonne writes the TVD tolerance as \(\varepsilon\) and the failure probability as \(\delta\). Using this report's notation, where \(\delta\) is the TVD target and \(\varepsilon\) is the failure probability, independent samples from an unknown distribution over \(k\) possible outcomes are sufficient for the plug-in histogram estimator to learn the distribution in TVD with sample complexity
 \[
 n = \Theta\left(\frac{k+\log(1/\varepsilon)}{\delta^2}\right).
 \]
-This is an information-theoretic finite-sample bound, tight up to universal constants for arbitrary distributions on \(k\) categories \cite{canonneShort,canonneTopics,devroyeLugosi}. The \(k\) term is the number of probabilities that must be estimated. The \(1/\delta^2\) term comes from concentration: halving the desired error requires roughly four times as many samples. The \(\log(1/\varepsilon)\) term pays for high probability rather than only average-case accuracy.
+This is an information-theoretic finite-sample bound, tight up to universal constants for arbitrary distributions on \(k\) categories \cite{canonneShort,canonneTopics,devroyeLugosi}. The base of the logarithm affects only constants in the asymptotic theorem; the numerical calculations below use the natural logarithm. The \(k\) term is the number of probabilities that must be estimated. The \(1/\delta^2\) term comes from concentration: halving the desired error requires roughly four times as many samples. The \(\log(1/\varepsilon)\) term pays for high probability rather than only average-case accuracy.
 
-This is the correct baseline because the monitor is reconstructing the full distribution. It is not doing identity testing. Identity testing asks whether samples match a known candidate distribution and has a different sample complexity with a \(\sqrt{k}\) dependence \cite{canonneSurvey}. That easier problem is not enough here, because the deployed monitor does not know a candidate ground truth distribution in advance.
+This is the correct baseline for the first evaluation because that experiment studies reconstruction accuracy. It asks how well the empirical distribution itself has been learned. Identification is still part of the project, but it belongs to the use-case stage rather than to this statistical-theory stage. Once the use case has a reference operating state, the monitor can ask an identity-testing style question: whether the current delay distribution is consistent with that reference, or far enough away to indicate a capacity change \cite{canonneSurvey}. The reconstruction evaluation comes first because identification decisions are only meaningful if the distribution estimate feeding them is stable.
 
 The word finite is important. A discrete distribution already has a finite support. A continuous delay distribution has to be evaluated on a finite grid before TVD can be computed as a sum. A bin is one such grid cell. In the continuous experiments below, one bin corresponds to a one millisecond interval, and all bins from 0 milliseconds to 150 milliseconds are used. This gives \(k=150\) categories. Once the continuous distribution has been converted into bin probabilities, the same finite-domain comparison applies.
 
@@ -194,7 +198,7 @@ With \(\varepsilon=0.05\), \(\log(1/\varepsilon)=\log(20)=2.996\). The correspon
 \delta_{\mathrm{theory}}(n)=
 \sqrt{\frac{k+\log(1/\varepsilon)}{n}}.
 \]
-The curve should be read as a distribution-free reference, not as a prediction that every structured distribution will need exactly that many samples. The main empirical pattern to look for is therefore not equality between the curves, but whether TVD falls with \(n\), whether harder shapes converge more slowly, and whether the target is reached no later than the calculated reference point.
+The curve should be read as a distribution-free reference, not as a prediction that every structured distribution will need exactly that many samples. The main empirical pattern to look for is therefore not equality between the curves, but whether TVD falls with \(n\), whether harder shapes converge more slowly, and whether the target is reached no later than the calculated reference point. The insight is methodological as much as numerical: if direct sampling already failed this check, later network experiments would not be interpretable. Passing it means the later experiments can focus on stopping, use-case identification, and topology effects rather than on whether the estimator is fundamentally mis-specified.
 
 \begin{figure}[htbp]
 \centering
@@ -276,6 +280,8 @@ The Zipfian distribution reaches the target at \(n=920\) and has median TVD 0.01
 
 The piecewise distribution is the hardest discrete case. It is still below the theoretical reference by a wide margin, but it needs \(n=2{,}300\) samples before the median TVD falls below 0.05. This behaviour matches the design of the distribution. Probability mass is spread across separated peaks and troughs, so the empirical PMF has to learn several non-neighbouring support points accurately. The result is useful because it shows that the theoretical bound is not only conservative for smooth distributions. Even an irregular finite distribution reaches the target before the calculated distribution-free sample count, but it does so later than the smoother and more skewed alternatives.
 
+This is the first point where the evaluation feeds back into the experimental design. The support size \(k\) alone does not determine the practical difficulty of reconstruction. The arrangement of mass across the support also matters. The piecewise distribution should therefore remain in the adaptive stopping and use-case experiments, because it is a better stress test for false stability than the binomial distribution. A stopping rule that only works for the smooth case would look good in a headline table but would not be robust enough for the later monitoring problem.
+
 \subsection{Continuous sampling}
 
 The continuous experiment uses the normal, lognormal, and Weibull distributions shown in the bottom row of Figure \ref{fig:statistical-distribution-shapes}. These are the same families used elsewhere in the project because they cover three different delay shapes. The normal distribution is symmetric and concentrated, representing a low-variability delay regime. The lognormal distribution is positive and right-skewed, which is a common shape for multiplicative delay effects. The Weibull distribution is also positive but has a different asymmetric shape, with a sharp rise and a longer decaying tail.
@@ -329,6 +335,8 @@ KDE changes this picture in the low-sample regime. It reaches the 0.05 target at
 
 At the theory point, both estimators are much more accurate than required. The binned PMF medians are 0.0047 for normal, 0.0052 for lognormal, and 0.0073 for Weibull. The KDE medians are 0.0060, 0.0057, and 0.0058. The small reversal for normal and lognormal, where the PMF is slightly closer than KDE at very large \(n\), is also expected. Once many samples have populated the bins, the empirical PMF has little variance left, while KDE still introduces a small amount of smoothing bias. The practical conclusion is therefore not that KDE always dominates PMF. It is that KDE is more sample efficient at the target accuracy used here, while PMF becomes competitive once the sample count is already large.
 
+This comparison gives a concrete design choice for the next iteration. KDE is the right estimator to test for early continuous reconstruction because it buys sample efficiency without using a parametric assumption. The PMF remains useful as a finite-grid audit because it shows what can be learned without smoothing. The small large-\(n\) KDE bias also prevents an over-interpretation of the smoother curve: smoothing helps early stopping, but it should not be treated as ground truth when the use case needs a conservative capacity decision.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.86\textwidth]{statistical_continuous_kde_pmf_gap.png}
@@ -339,6 +347,8 @@ At the theory point, both estimators are much more accurate than required. The b
 Figure \ref{fig:statistical-kde-pmf-gap} directly compares the two continuous reconstructions. The gap between the binned PMF and KDE falls with \(n\), from 0.0704 to 0.0039 in the Weibull case and from roughly 0.03 to 0.003 in the normal and lognormal cases. This shows that KDE is not reconstructing a fundamentally different object. It is a smoothed version of the same empirical information, and the two estimates agree once enough samples are available.
 
 The main implication for the monitor is that the theoretical bound is useful as a statistical backstop but too conservative as a stopping rule. It correctly identifies the dependence on support size, confidence, and error tolerance, and the empirical curves behave in the direction predicted by the theory. However, the direct-sampling distributions are far more structured than an arbitrary distribution over \(k\) unrelated cells. Their smoothness, concentration, and skew all affect how quickly TVD falls. This gap between worst-case theory and observed convergence motivates the adaptive stopping evaluation in the next section: instead of always waiting for \(n_{\mathrm{theory}}\), the monitor should stop when the estimate itself has stabilised.
+
+The stronger lesson is that the project should not use the theory bound as a single answer to the sampling problem. The bound defines the safe outer envelope. The experiments identify which distribution shapes are hard, which estimator is worth using early, and which cases should be carried forward as stress tests. That is the intended iterative loop: theory sets the reference, direct sampling exposes estimator behaviour, adaptive stopping turns that behaviour into an online rule, and the use case then applies identification to decide whether the reconstructed delay distribution implies a capacity change.
 
 The older delta-sweep, bin-resolution, KDE-disagreement, and Kolmogorov-Smirnov diagnostics are kept in Appendix \ref{app:statistical-diagnostics}. They support the same conclusion from a wider set of views: stricter TVD targets and finer grids increase the theoretical sample requirement, while the empirical structured distributions usually converge much earlier than the worst-case finite-domain reference.
 
@@ -441,6 +451,8 @@ Figure \ref{fig:adaptive-disc-correctness} shows that the discrete distributions
 Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets plot and stopping-time TVD plot for the piecewise distribution. Those diagnostics show that the piecewise case is hard because loose thresholds and small values of \(B\) leave many stopped estimates near or above the target line. With tighter thresholds or larger values of \(B\), the stopped TVD moves safely below 0.05, often around 0.02 to 0.03, leaving useful safety margin.
 
 The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A modestly stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger value of \(B\), with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution.
+
+This also sets up the use-case evaluation. The stopping rule is not the final operational decision. It decides when the distribution estimate is stable enough to be trusted. The use case then performs the identification step: comparing that stable estimate with a reference state or decision boundary for remaining capacity. This separation is important because it keeps two errors distinct. Early stopping error is the risk of trusting an unstable estimate, while identification error is the risk of drawing the wrong operational conclusion from a stable estimate.
 
 \chapter{Conclusion and Future Work}
 
@@ -558,8 +570,8 @@ Clement L. Canonne.
 
 \bibitem{canonneTopics}
 Clement L. Canonne.
-\newblock Topics and Techniques in Distribution Testing.
-\newblock Draft monograph.
+\newblock Topics and Techniques in Distribution Testing: A Biased but Representative Sample.
+\newblock Foundations and Trends in Communications and Information Theory, volume 19, number 6, pages 1032 to 1198, 2022.
 \newblock \url{https://ccanonne.github.io/files/misc/main-survey-fnt.pdf}.
 
 \bibitem{devroyeLugosi}
