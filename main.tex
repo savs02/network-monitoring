@@ -365,6 +365,8 @@ Samples are processed in groups of \(B\) packets, where \(B\) is the packets per
 \]
 The stopping rule does not use the true distribution. Ground truth is used only after a run has stopped to evaluate whether the stopped estimate satisfies \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq\delta\), where the target is \(\delta=0.05\).
 
+The estimates in this rule are cumulative. With \(B=100\), the first comparison is between the reconstruction from samples 1 to 100 and the reconstruction from samples 1 to 200. The next comparison is between samples 1 to 200 and samples 1 to 300. The rule is therefore not comparing disjoint batches. It asks whether adding another batch changes the accumulated reconstruction enough to justify continuing. The batch size controls the spacing of these decisions: small batches give more opportunities to stop, while larger batches make each stability check less noisy.
+
 The adaptive stopping sweep tests eight choices for packets per batch, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six stability thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 random seeds. The continuous group uses the same normal, lognormal, and Weibull distributions as the sample-complexity experiment, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points, reconstructed with a PMF estimator.
 
 The evaluation tests whether stability between consecutive estimates is a reliable proxy for accuracy against the true distribution. This matters because the previous section uses ground truth to measure when a reconstruction becomes accurate, but a deployed passive monitor cannot observe ground truth. The stopping rule is therefore useful only if it stops early while still meeting the TVD target with high probability.
@@ -377,8 +379,17 @@ The primary adaptive metric is correctness, defined as the fraction of seeds whe
 
 \begin{figure}[htbp]
 \centering
+\includegraphics[width=0.82\textwidth]{packet_timing_table.png}
+\caption{Back-to-back transmission time for representative packet counts. These times are only a scale reference, since the passive monitor does not inject traffic.}
+\label{fig:packet-timing-table}
+\end{figure}
+
+The evaluation reports packet counts because the monitor is passive and the time needed to collect a given number of samples depends on the traffic rate already present on the path. Figure \ref{fig:packet-timing-table} gives a mental model for the scale. For 1500-byte packets sent back-to-back on a 100 gigabit per second link, 1,600 packets correspond to about 192 microseconds and 3,000 packets to about 360 microseconds. On a 1 gigabit per second link the same counts correspond to 19.2 milliseconds and 36.0 milliseconds. These figures are not probe times, but they show that the stopping counts in the successful configurations are operationally small in high-rate settings.
+
+\begin{figure}[htbp]
+\centering
 \includegraphics[width=\textwidth]{correctness_grid_cont.png}
-\caption{Correctness of the adaptive stopping rule for the continuous distributions. Each cell is the fraction of 100 seeds where the stopped estimate is within TVD 0.05 of the true distribution.}
+\caption{Correctness of the adaptive stopping rule for the continuous distributions. Each cell is the fraction of 100 seeds where the stopped estimate is within TVD 0.05 of the true distribution. The vertical axis increases upwards with batch size.}
 \label{fig:adaptive-cont-correctness}
 \end{figure}
 
@@ -395,21 +406,41 @@ Figure \ref{fig:adaptive-normal-efficiency} shows why the stopping problem is a 
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.92\textwidth]{n_stop_summary_cont_normal.png}
-\caption{Median total packets collected before stopping for the normal distribution. Shading shows the interquartile range across seeds, and the dotted line shows the theoretical sample bound.}
-\label{fig:n-stop-summary-normal}
+\includegraphics[width=\textwidth]{heatmap_cont_lognormal.png}
+\vspace{0.5em}
+\includegraphics[width=\textwidth]{heatmap_cont_weibull.png}
+\caption{Correctness and efficiency for the lognormal and Weibull distributions. Both distributions show the same basic trade-off as the normal case, but the unsafe region is larger for loose thresholds and small batches.}
+\label{fig:adaptive-lognormal-weibull-efficiency}
 \end{figure}
 
-Figure \ref{fig:n-stop-summary-normal} separates the packet cost from the correctness heatmap. Larger values of \(B\) usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The curve shows why \(B=200,\theta=\delta/6\) is a conservative operating point: it uses more packets than the aggressive \(B=100\) setting, but it remains orders of magnitude below the theoretical bound while reaching full correctness in the normal and lognormal cases.
+Figure \ref{fig:adaptive-lognormal-weibull-efficiency} adds the two continuous distributions that are hidden inside the aggregate correctness grid. Lognormal behaves similarly to normal in the safe region, but the loose \(B=100,\theta=\delta\) configuration is correct in only 42 percent of seeds. Weibull is slightly more robust under tight thresholds, with 97 percent correctness at \(B=100,\theta=\delta/6\), but it also fails under loose thresholds because the early KDE can stabilise around an oversmoothed peak before the tail is well estimated. The common pattern is that \(B=200,\theta=\delta/6\) is the first conservative continuous setting: it reaches 1.00 correctness for normal, 1.00 for lognormal, and 0.99 for Weibull.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{early_stop_trace_normal.png}
-\caption{A continued trace after the stopping point for one normal run. The loose \(B=100,\theta=\delta\) rule stops while the true TVD is still above the target, while tighter rules continue until the reconstruction has stabilised.}
-\label{fig:early-stop-trace-normal}
+\includegraphics[width=\textwidth]{n_stop_summary_cont_all.png}
+\caption{Median total packets collected before stopping for the continuous distributions. Shading shows the interquartile range across seeds, and the dotted line shows the theoretical sample bound used in the adaptive sweep.}
+\label{fig:n-stop-summary-cont-all}
 \end{figure}
 
-Figure \ref{fig:early-stop-trace-normal} shows the mechanism behind early stopping. The lower panel plots the TVD between successive estimates, which is the quantity the stopping rule actually observes. With \(B=100\) and \(\theta=\delta\), this quantity falls below the threshold after 200 packets, so the rule stops. The upper panel shows the post-hoc truth: at that point the true reconstruction error is still above 0.05. Continuing the same run shows that the true TVD falls below the target after more packets. The strict \(B=100,\theta=\delta/6\) rule and the larger values of \(B\) therefore avoid the failure by requiring stronger evidence of stability.
+Figure \ref{fig:n-stop-summary-cont-all} separates the packet cost from the correctness heatmaps. Larger values of \(B\) usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The three distributions have similar stopping-count curves, which is useful: the operating point does not need to be tuned separately for every smooth continuous family. The difference is not mainly how long the safe settings take, but how often the unsafe settings stop before the estimate is accurate.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{stopped_distribution_continuous_batches.png}
+\caption{Stopped KDE reconstructions for one illustrative seed at \(\theta=\delta/6\). Each panel overlays the stopped reconstruction with the true binned distribution, showing the actual distributional error behind the TVD value.}
+\label{fig:stopped-distribution-continuous}
+\end{figure}
+
+Figure \ref{fig:stopped-distribution-continuous} shows what the stopping decision means visually. At the safe threshold \(\theta=\delta/6\), the stopped KDE is already close to the true distribution for all three continuous shapes. Changing \(B\) affects when the rule checks for stability, but in these safe examples it changes the qualitative shape of the final estimate much less than it changes the stopping count. This is the practical reason for using TVD at stop rather than only reporting \(n_{\mathrm{stop}}\): two configurations can stop at different packet counts but still produce reconstructions that are effectively indistinguishable for the intended use case.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{early_stop_trace_cont_all.png}
+\caption{Continued traces after the aggressive \(B=100,\theta=\delta\) stopping decision. The upper row shows TVD against truth after the rule would have stopped. The lower row shows the observed TVD to the previous cumulative estimate.}
+\label{fig:early-stop-trace-cont-all}
+\end{figure}
+
+Figure \ref{fig:early-stop-trace-cont-all} explains why the loose \(B=100,\theta=\delta\) rule fails. In the examples shown, the observed TVD to the previous estimate falls below the stopping threshold at 200 packets, so the rule stops. The upper row shows that the true TVD is still above 0.05 at that point. If the same run is continued, the true TVD usually falls below the target after several more batches. The failure is therefore not that the estimator cannot learn the distribution. It is that the first two cumulative estimates can look similar by chance before they are both accurate. Tightening \(\theta\) or increasing \(B\) reduces this false-stability event.
 
 \begin{table}[htbp]
 \centering
@@ -432,17 +463,8 @@ Discrete & \(B=300,\theta=\delta/5\) & 1.00 & 1.00 & 1.00 & 2,250 to 3,000 \\
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.82\textwidth]{packet_timing_table.png}
-\caption{Back-to-back transmission time for representative packet counts. These times are only a scale reference, since the passive monitor does not inject traffic.}
-\label{fig:packet-timing-table}
-\end{figure}
-
-The packet counts in Table \ref{tab:adaptive-operating-points} are small enough to be operationally plausible. Figure \ref{fig:packet-timing-table} gives a timing reference for 1500-byte packets sent back-to-back on 1 gigabit per second (Gbit/s), 10 Gbit/s, and 100 Gbit/s links. These numbers are not part of the passive monitoring model, because the monitor is not injecting probe traffic, but they help interpret the scale of the stopping times.
-
-\begin{figure}[htbp]
-\centering
 \includegraphics[width=\textwidth]{correctness_grid_disc.png}
-\caption{Correctness of adaptive stopping for the discrete distributions. The multi-modal piecewise distribution is the hardest case.}
+\caption{Correctness of adaptive stopping for the discrete distributions. The multi-modal piecewise distribution is the hardest case, and the vertical axis increases upwards with batch size.}
 \label{fig:adaptive-disc-correctness}
 \end{figure}
 
@@ -545,6 +567,20 @@ The evaluation supports the core premise of the project. Passive delay samples c
 \includegraphics[width=\textwidth]{tvd_at_stop_cont_normal.png}
 \caption{Distribution of TVD against truth at the stopping time for the normal distribution.}
 \label{fig:app-tvd-stop-normal}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tvd_at_stop_cont_lognormal.png}
+\caption{Distribution of TVD against truth at the stopping time for the lognormal distribution.}
+\label{fig:app-tvd-stop-lognormal}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tvd_at_stop_cont_weibull.png}
+\caption{Distribution of TVD against truth at the stopping time for the Weibull distribution.}
+\label{fig:app-tvd-stop-weibull}
 \end{figure}
 
 \begin{figure}[htbp]
