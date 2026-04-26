@@ -81,6 +81,81 @@ Knowing how much additional traffic a path can absorb before performance degrade
 
 \chapter{Methodology}
 
+The methodology treats passive delay monitoring as a distribution reconstruction problem. Instead of reducing a path to a scalar delay statistic, the monitor estimates the full distribution of packet delays observed at the receiver. This chapter sets out the common method used across the evaluation. The first two evaluation sections then instantiate this method for statistical sample complexity and adaptive stopping, while later sections will apply the same framework to richer network scenarios.
+
+\section{Problem framing}
+\label{sec:method-problem-framing}
+
+The object of interest is the delay distribution induced by a network path over a measurement interval. Let \(X_1,\ldots,X_n\) denote independent delay observations drawn from an unknown distribution \(P\). In the simplest direct-sampling experiments, these observations are generated from a known distribution family in order to isolate the statistical question. In the network experiments, they are packet delays produced by Network Simulator 3 (NS-3). In both cases, the monitor receives only the samples. The distribution family and its parameters are not given to the reconstruction algorithm.
+
+This framing separates estimation from validation. The monitor constructs an estimate \(\widehat{P}_n\) from the observed samples alone. Ground truth is used only after reconstruction, in order to evaluate whether the estimate is accurate. This distinction is central to the project: the deployment setting is passive and distribution-agnostic, while the experimental setting uses known ground truth to measure performance.
+
+The methodology is deliberately staged. Direct sampling is used first because it removes packet scheduling, queueing, and simulator effects. This establishes whether the statistical reconstruction problem behaves as expected. The method is then applied to simulated packet delays, where the same reconstruction and stopping rules are tested under network conditions. The later use-case, multi-hop, and multi-path experiments are intended to increase network complexity without changing the monitoring interface.
+
+\section{Observation model}
+\label{sec:method-observation-model}
+
+The passive monitor observes packet delays at the receiver. In the non-binning setting used as the clean baseline, each packet contributes one delay sample. This is the least lossy version of the problem because the estimator can use the observed delays directly. Where a finite-domain comparison is required, the observed delays are mapped onto a delay grid. A bin is a fixed-width interval of delay values, and the number of bins determines the number of probabilities that must be estimated.
+
+The main continuous grid used in the evaluation has one millisecond bins from 0 milliseconds to 150 milliseconds, giving 150 cells. This range is wide enough for the configured normal, lognormal, and Weibull delay distributions used in the current experiments. Discrete experiments use their natural finite supports, so no additional delay grid is needed. The binning step is therefore not a claim that delay is intrinsically discrete. It is a measurement and evaluation device that allows continuous reconstructions to be compared using the same finite-domain distance.
+
+In the simple network case, the topology is a two-node, one-link path. Node A sends packets to Node B, and the link delay is sampled independently for each packet from the configured delay distribution. This setup gives direct control over the ground truth while still exercising the packet-level measurement pipeline. More complex topologies can be introduced later by changing how the path generates observed delays, rather than by changing the reconstruction objective.
+
+\section{Distribution reconstruction}
+\label{sec:method-distribution-reconstruction}
+
+The reconstruction method depends on whether the target distribution is being represented as a finite probability mass function or as a smoothed continuous estimate. For discrete data, the estimator is the empirical probability mass function (PMF). If \(\mathcal{X}\) is the support, the estimate assigns each value \(x \in \mathcal{X}\) its observed relative frequency:
+\[
+\widehat{P}_n(x)=\frac{1}{n}\sum_{i=1}^{n}\mathbf{1}\{X_i=x\}.
+\]
+This estimator is simple, distribution-agnostic, and directly aligned with the finite-domain learning theory used in the evaluation.
+
+For continuous delays, two reconstructions are considered. The first is a binned empirical PMF, obtained by counting how many samples fall into each delay bin. This gives a finite representation that can be compared directly with true bin probabilities. The second is a kernel density estimate (KDE). The KDE evaluates a smooth density from the samples, then converts that density back into probability mass on the same delay grid for comparison. This allows the evaluation to test whether smoothing improves sample efficiency without assuming that the monitor knows the generating family.
+
+The estimators are intentionally non-parametric. The monitor does not fit a normal, lognormal, Weibull, binomial, Zipfian, or piecewise model. Those families are used to generate controlled ground truth distributions, not to constrain the reconstruction. This is important because the eventual monitoring setting should not require the operator to know the delay distribution in advance.
+
+\section{Accuracy metrics}
+\label{sec:method-accuracy-metrics}
+
+The primary accuracy metric is total variation distance (TVD). For two distributions \(P\) and \(Q\) over the same finite domain \(\mathcal{X}\),
+\[
+d_{\mathrm{TV}}(P,Q)=\frac{1}{2}\sum_{x\in\mathcal{X}}|P(x)-Q(x)|.
+\]
+TVD is used because it has a direct interpretation as the largest probability difference that the two distributions assign to any event. It is also the distance used by the finite-domain learning bound that motivates the sample-complexity experiments.
+
+For continuous distributions, TVD is computed after both the true distribution and the estimate have been represented on the same finite grid. The true probability of a bin is computed from the known cumulative distribution function in direct-sampling experiments, or from the simulator's configured ground truth where available. The estimated probability is computed either from the empirical bin counts or from the grid-normalised KDE. This keeps the metric consistent across discrete and continuous cases.
+
+Kullback-Leibler divergence and Wasserstein distance are secondary diagnostics. They provide complementary views of reconstruction quality, but they are not the primary success criterion. Kullback-Leibler divergence is sensitive to small probabilities and can become unstable when an estimated bin has zero mass. Wasserstein distance captures geometric movement of probability mass across the delay axis, which is useful for delay distributions, but it is not the distance used in the sample-complexity theorem. The evaluation therefore reports and discusses TVD first.
+
+\section{Sample complexity and stopping}
+\label{sec:method-sample-complexity-stopping}
+
+The statistical part of the methodology uses finite-domain distribution learning as a reference point. For a distribution over \(k\) outcomes, the number of samples needed to learn the distribution within TVD \(\delta\) with failure probability at most \(\varepsilon\) scales as
+\[
+n=\Theta\left(\frac{k+\log(1/\varepsilon)}{\delta^2}\right).
+\]
+This bound is used as a conservative theoretical baseline. It explains why finer grids require more samples and why stricter accuracy targets become expensive quickly. It is not treated as a deployment rule, because it protects against arbitrary worst-case distributions and can be much larger than the empirical requirement for structured delay distributions.
+
+The adaptive stopping method addresses that gap. Samples are processed in batches. After each batch, the monitor compares the current reconstruction with the previous reconstruction using TVD. If the change between the two estimates is below a chosen stability threshold, the monitor stops. The stopping decision uses only observed samples and previous estimates. Ground truth is not used at stopping time.
+
+The stopping rule converts the offline sample-complexity question into an online monitoring question. The offline question asks how many samples would be sufficient if the ground truth were known for evaluation. The online question asks whether the monitor can detect that its estimate has stabilised before collecting a worst-case number of samples. The evaluation tests this by recording both the stopping time and the post-hoc TVD against the true distribution.
+
+\section{Experimental workflow}
+\label{sec:method-experimental-workflow}
+
+Each experiment follows the same workflow. A ground truth distribution is selected, samples are generated, a reconstruction is built from those samples, and the reconstruction is compared with ground truth. Random seeds are used to repeat each configuration so that the reported behaviour reflects sampling variability rather than a single run. Median values and interquartile ranges are used in the plots because they show the central trend and the spread across seeds without being dominated by isolated runs.
+
+The first evaluation uses direct sampling from discrete and continuous distributions. The discrete cases are binomial, Zipfian, and piecewise distributions. The continuous cases are normal, lognormal, and Weibull distributions. This stage validates the statistical method independently of the network simulator. The second evaluation uses the same distribution families to test adaptive stopping. It asks whether stability between consecutive reconstructions is a reliable proxy for accuracy against ground truth.
+
+The later evaluations will use the same measurement and reconstruction pipeline in increasingly realistic network settings. The motivating use case will connect distribution reconstruction to the operational question of remaining path capacity. The multi-hop and multi-path studies will test whether the method remains informative when the observed delay distribution is produced by multiple links or multiple path components. This structure keeps the dissertation aligned: each evaluation changes the source of the observed samples, while the central object of estimation remains the delay distribution.
+
+\section{Reproducibility}
+\label{sec:method-reproducibility}
+
+The implementation separates data generation, analysis, and report figures. Simulation and experiment launch scripts live under the project scripts directory, while analysis scripts live under the analysis directory. Generated data are kept under the results directory, and report-ready figures are copied into the report figure directory. This separation makes it possible to rerun an experiment, regenerate its summary data, and update the dissertation figures without changing the prose manually.
+
+The current methodology relies on fixed parameter choices for comparability across experiments. The main TVD target is 0.05, the main failure probability for the sample-complexity reference is 0.05, and the continuous delay grid uses one millisecond bins over 0 to 150 milliseconds. These choices are not inherent limits of the method. They provide a consistent baseline so that changes in performance can be attributed to the distribution shape, estimator, sample count, or stopping configuration rather than to changing evaluation definitions.
+
 \chapter{Evaluation}
 
 The evaluation has five parts: statistical sample complexity, adaptive stopping, the motivating use case, multi-hop topologies, and multi-path topologies.
