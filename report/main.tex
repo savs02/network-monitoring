@@ -77,15 +77,13 @@ Knowing how much additional traffic a path can absorb before performance degrade
 
 \chapter{Introduction}
 
-\section{Overview}
-
-This report accompanies the network monitoring experiments in the repository. The current experimental focus is the simple single-link case in ns-3, where packets traverse a point-to-point path and the link delay is sampled independently from a configured distribution. The monitor observes only the resulting packet delays. It does not know whether the generating distribution is normal, lognormal, Weibull, or a member of any other parametric family. The aim is to reconstruct the delay distribution from samples alone and quantify how many samples are needed before the reconstruction is accurate.
-
 \chapter{Use Case}
 
 \chapter{Methodology}
 
 \chapter{Evaluation}
+
+The evaluation and methodology go hand-in-hand since it was quite an iterative process. This section looks at sample complexity and related experiments, which is at the core of the idea of distribution-based path profiling.
 
 \section{Statistical sample complexity}
 
