@@ -1,13 +1,14 @@
 \documentclass[a4paper]{report}
+\usepackage[a4paper, margin=3cm, bottom=2.5cm]{geometry}
 \usepackage{setspace}
-%\usepackage{subfigure}
+\usepackage{amssymb, amsfonts, amsmath, latexsym}
+\usepackage{graphicx, color}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
 
+\graphicspath{{figures/evaluation/}}
 \pagestyle{plain}
-\usepackage{amssymb,graphicx,color}
-\usepackage{amsfonts}
-\usepackage{latexsym}
-\usepackage{amsmath}
-\usepackage[a4paper, margin = 3cm, bottom = 2.5cm]{geometry}
 
 \newtheorem{theorem}{THEOREM}
 \newtheorem{lemma}[theorem]{LEMMA}
@@ -16,9 +17,9 @@
 \newtheorem{remark}[theorem]{REMARK}
 \newtheorem{definition}[theorem]{DEFINITION}
 \newtheorem{fact}[theorem]{FACT}
-
 \newtheorem{problem}[theorem]{PROBLEM}
 \newtheorem{exercise}[theorem]{EXERCISE}
+
 \def \set#1{\{#1\} }
 
 \newenvironment{proof}{
@@ -26,150 +27,325 @@ PROOF:
 \begin{quotation}}{
 $\Box$ \end{quotation}}
 
-
-
 \newcommand{\nats}{\mbox{\( \mathbb N \)}}
 \newcommand{\rat}{\mbox{\(\mathbb Q\)}}
 \newcommand{\rats}{\mbox{\(\mathbb Q\)}}
 \newcommand{\reals}{\mbox{\(\mathbb R\)}}
 \newcommand{\ints}{\mbox{\(\mathbb Z\)}}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\title{{\vspace{-14em} \includegraphics[scale=0.4]{ucl_logo.png}}\\
-{{\Huge Project Title}}\\
-{\large Optional Subtitle}\\
-}
-\date{Submission date: Day Month Year}
-\author{Your name\thanks{
+\title{Know Your Limits: Delay-Based Passive Estimation of Remaining Path Capacity}
+\date{May 2026}
+\author{Savani Sawaikar\thanks{
 {\bf Disclaimer:}
-This report is submitted as part requirement for the MY DEGREE at UCL. It is
+This report is submitted as part requirement for the MEng Computer Science degree at UCL. It is
 substantially the result of my own work except where explicitly indicated in the text.
-\emph{Either:} The report may be freely copied and distributed provided the source is explicitly acknowledged
-\newline  %% \\ messes it up
-\emph{Or:}\newline
-The report will be distributed to the internal and external examiners, but thereafter may not be copied or distributed except with permission from the author.}
+The report may be freely copied and distributed provided the source is explicitly acknowledged}
 \\ \\
-Name of your degree\\ \\
-Supervisor's name}
-
+Master of Engineering Computer Science\\
+Supervised by Dr. Stefano Vissicchio}
 
 
 \begin{document}
- 
+
 \onehalfspacing
 \maketitle
+
 \begin{abstract}
-Summarise your report concisely.
+Knowing how much additional traffic a path can absorb before performance degrades is central to network management, yet current practice answers it by monitoring scalar delay metrics such as mean round-trip time or percentile latency and raising alerts when these cross predefined thresholds. These summaries discard distributional information that encodes how and why path conditions are changing. This report proposes a passive monitoring system that treats the delay distribution itself as the object of interest. 
+
+DO ONCE EVERYTHING ELSE IS DONE
 \end{abstract}
+
 \tableofcontents
 \setcounter{page}{1}
 
+\chapter{Introduction}
 
-\chapter{Title of first chapter}
-This is just a bare minimum to get started.  There is unlimited guidance on using latex, e.g., {\tt https://en.wikibooks.org/wiki/LaTeX}.   You are still responsible to check the detailed requirements of a project, including formatting instructions, see \\
-{\tt https://moodle.ucl.ac.uk/pluginfile.php/3591429/mod\_resource/content/7/UGProjects2017.pdf}.
-Leave at least a line of white space when you want to start a new paragraph.
+\section{Overview}
 
-\section{Section 1}
-Chapters should contain numbered sections and sub-sections.
+This report accompanies the network monitoring experiments in the repository. The current experimental focus is the simple single-link case in ns-3, where packets traverse a point-to-point path and the link delay is sampled independently from a configured distribution. The monitor observes only the resulting packet delays. It does not know whether the generating distribution is normal, lognormal, Weibull, or a member of any other parametric family. The aim is to reconstruct the delay distribution from samples alone and quantify how many samples are needed before the reconstruction is accurate.
 
-\subsection{Sub-Section 1}
-Remember that this is a structured technical/academic report, not an essay.
+\chapter{Use Case}
+\chapter{Methodology}
 
-\section{Mathematical Notation}
-Mathematical expressions are placed inline between dollar signs, e.g. $\sqrt 2, \sum_{i=0}^nf(i)$, or in display mode
-\[ e^{i\pi}=-1\] and another way, this time with labels,
-\begin{align}
-\label{line1} A=B\wedge B=C&\rightarrow A=C\\
-&\rightarrow C=A\\
-\intertext{note that}
-n!&=\prod_{1\leq i\leq n}i \\
-\int_{x=1}^y \frac 1 x \mathrm{d}x&=\log y
-\end{align}
-We can refer to labels like this \eqref{line1}.   
+\chapter{Evaluation}
 
-\chapter{Title of second chapter}
+\section{Statistical sample complexity}
 
-The main chapters should start with a brief summary -- this chapter is about, or introduces, some aspect of the work.
+The first part of the evaluation asks whether the observed behaviour of the monitor matches the statistical theory behind distribution learning. The relevant learning task is the following. There is an unknown distribution \(P\) over a finite domain of size \(k\). From \(n\) independent samples, the monitor constructs an estimate \(\widehat{P}\). The reconstruction is considered successful if the total variation distance (TVD)
+\[
+d_{\mathrm{TV}}(P,\widehat{P}) =
+\frac{1}{2}\sum_{x \in \mathcal{X}} |P(x)-\widehat{P}(x)|
+\]
+is at most a target error \(\delta\), with failure probability at most \(\varepsilon\). Standard distribution learning results give the tight finite-domain sample complexity
+\[
+n = \Theta\left(\frac{k+\log(1/\varepsilon)}{\delta^2}\right).
+\]
+This result is the main theoretical justification for the \(n\)-theory experiments. It also clarifies why the sample requirement should grow linearly with the number of resolution cells and quadratically as the requested error tolerance becomes tighter \cite{canonneShort,devroyeLugosi}. Canonne's distribution testing survey is also useful context, because it distinguishes full distribution learning from identity testing \cite{canonneSurvey}. Identity testing can be cheaper, with dependence on \(\sqrt{k}\) rather than \(k\), but it answers a different question. In this project the monitor must reconstruct a distribution, not merely reject a known candidate, so the learning bound is the relevant baseline.
 
-\section{Main Content}
-Often lots of citations here (and elsewhere), e.g. \cite{Rey:D} or \cite[Theorem 2.3]{PriorNOP70}.   Bibtex can help with this, but is not essential. If you want pictures, try
+The experiments apply this bound to delay reconstruction by choosing an observation resolution. For the continuous delay distributions, kernel density estimation (KDE) is evaluated on a 1 millisecond (ms) grid over the interval from 0 ms to 150 ms, giving \(K=150\) grid cells. For the discrete probability mass function (PMF) estimator, the same delay range is quantised into bins of width 1 ms, 2 ms, 5 ms, or 10 ms. This gives \(k=150\), \(k=75\), \(k=30\), and \(k=15\), respectively. The confidence parameter is fixed at \(\varepsilon=0.05\), and the accuracy target \(\delta\) is swept from 0.01 to 0.1. Each empirical point is the smallest tested sample size for which the median TVD across 20 seeds is at most \(\delta\).
 
-\begin{center}
-\includegraphics[scale=.5]{aristotle.jpg}
-\end{center}
-You can use 
-\begin{itemize}
-\item lists
-\item like this
-\end{itemize}
-or numbered
-\begin{enumerate}
-\item like this,
-\item or this
-\end{enumerate}
-but don't overdo it.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{n_vs_delta_main.png}
+\caption{Theoretical and empirical sample requirements as the TVD target varies. The left panel shows the KDE estimator on the 1 ms grid. The right panels show the PMF estimator at 1 ms, 2 ms, 5 ms, and 10 ms bin widths.}
+\label{fig:n-vs-delta-main}
+\end{figure}
 
-\section{More Content}
+Figure \ref{fig:n-vs-delta-main} confirms the expected shape of the theory. Tightening \(\delta\) increases the number of required samples approximately according to the \(1/\delta^2\) rate, and reducing the number of bins lowers the discrete theoretical bound. The important practical result is that the theoretical curves remain conservative for the distributions used in this evaluation. At \(\delta=0.05\), the continuous bound with \(K=150\) is 179,744 samples, while the empirical KDE requirement is 500 samples for all three tested continuous distributions. For the 1 ms PMF estimator, the theoretical bound is 61,199 samples, while the empirical requirement is 1,000 samples for the normal and lognormal cases and 2,000 samples for the Weibull case. At 10 ms resolution, the theoretical bound falls to 7,199 samples and the empirical requirement is already 100 samples for all three distributions.
 
-\section{Summary}
-The main chapters should have a short summary, highlighting what the chapter has covered and any key points that need emphasising.
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Estimator & Resolution & Theory & Normal & Lognormal & Weibull \\
+\midrule
+KDE & 1 ms grid, \(K=150\) & 179,744 & 500 & 500 & 500 \\
+PMF & 1 ms bins, \(k=150\) & 61,199 & 1,000 & 1,000 & 2,000 \\
+PMF & 2 ms bins, \(k=75\) & 31,199 & 500 & 500 & 1,000 \\
+PMF & 5 ms bins, \(k=30\) & 13,199 & 100 & 100 & 500 \\
+PMF & 10 ms bins, \(k=15\) & 7,199 & 100 & 100 & 100 \\
+\bottomrule
+\end{tabular}
+\caption{Theoretical and empirical sample requirements at \(\delta=0.05\) and \(\varepsilon=0.05\). Empirical values are the smallest tested \(n\) for which median TVD is at most 0.05 across 20 seeds.}
+\label{tab:n-theory-delta-005}
+\end{table}
 
-\chapter{Title of third chapter}
-If you have a formal theorem you might try this.
-\begin{definition}\label{def}
-See definition~\ref{def}.
-\end{definition}
-\begin{theorem}
-For all $n\in\nats,\; 1^n=1$.
-\end{theorem}
-\begin{proof}
-By induction over $n$.
-\end{proof}
+The gap between the bound and the empirical curves is not a failure of the theory. The theorem protects against worst-case distributions over \(k\) cells. The tested delay distributions are much more structured than an arbitrary distribution over 150 unrelated categories. The normal and lognormal distributions concentrate their mass smoothly, while the Weibull distribution has a sharper asymmetric peak and a longer region of lower-density tail. This explains why Weibull is consistently the hardest case for the 1 ms PMF estimator. Its mass is spread in a way that makes fine histogram counts noisier, so more samples are needed before every relevant bin has stabilised. Appendix \ref{app:statistical-diagnostics} gives the supporting TVD, bin-resolution, and hypothesis-test plots.
 
-\chapter{etc.}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{n_vs_delta_overlay.png}
+\caption{Comparison between KDE and PMF using 1 ms bins. The empirical KDE lines sit below the empirical PMF lines in the small-sample regime, especially for the Weibull distribution.}
+\label{fig:kde-pmf-overlay}
+\end{figure}
 
+Figure \ref{fig:kde-pmf-overlay} compares the continuous KDE estimator with the 1 ms PMF estimator. KDE is more sample efficient in these experiments because it uses smoothness across neighbouring delay values, while the PMF estimator treats adjacent bins as separate categories. This is most visible for Weibull, where the KDE empirical requirement is 500 samples at \(\delta=0.05\) but the 1 ms PMF requirement is 2,000 samples. The result is useful for the monitoring design because it shows that an estimator can use structure in delay data without assuming the parametric family that generated it.
 
-\chapter{Conclusions}
-\section{Achievements}
-Summarise the achievements to confirm the project goals have been met.
-\section{Evaluation}
-Evaluation of the work (this may be in a separate chapter if there is substantial evaluation).
+The PMF results also show the cost of resolution. Finer bins preserve more detail, but each bin introduces another probability to estimate. Coarser bins reduce the statistical burden, but they also discard within-bin structure. In this experiment, 1 ms bins are already fine enough that the PMF and KDE reconstructions become similar at larger \(n\), while 5 ms and 10 ms bins make the monitor cheaper but less faithful to the continuous shape. The KDE versus PMF comparison therefore suggests a practical rule: use a fine grid when the goal is to reconstruct the delay shape, and use coarser bins only when the application is explicitly tolerant of lower resolution. The supporting estimator-disagreement and KDE-advantage plots are included in Appendix \ref{app:statistical-diagnostics}; they show the same trend without changing the main conclusion.
 
-\section{Future Work}
-How the project might be continued, but don't give the impression you ran out of time!
+The total variation results are also supported by hypothesis-test diagnostics. The one-sample Kolmogorov-Smirnov statistic decreases approximately as \(1/\sqrt{n}\), and the pass-rate view aligns with the sample sizes where median TVD first reaches 0.05. Those plots are useful checks, but they are secondary to the reconstruction metric, so they are included in the appendix rather than in the main evaluation flow.
+
+Overall, the statistical evaluation validates the use of total variation distance as the primary reconstruction metric. The results match the theory in their dependence on \(k\), \(\delta\), and \(n\), but the absolute worst-case bounds are too conservative to be used directly as deployment stopping thresholds. That conservatism motivates the second part of the evaluation. If the monitor can detect when its own estimate has stabilised, it may stop far earlier than the distribution-free bound while still meeting the target TVD in practice.
+
+\clearpage
+
+\section{Adaptive stopping}
+
+The second part of the evaluation studies an adaptive stopping rule. The previous section used ground truth to ask how many samples were needed to reach a target TVD. In deployment, ground truth is unavailable. The monitor therefore needs a stopping rule that depends only on the samples it has already observed.
+
+The rule evaluated here collects samples in batches of size \(B\). After each new batch, the monitor computes the TVD between the current estimate and the previous estimate. If this inter-estimate TVD is below a threshold \(\theta\), the monitor stops:
+\[
+\tau = \inf\left\{mB : d_{\mathrm{TV}}\left(\widehat{F}_{mB}, \widehat{F}_{(m-1)B}\right) < \theta\right\}.
+\]
+The rule does not use the true distribution when deciding to stop. Ground truth is used only after the run to measure whether \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq \delta\), where \(\delta=0.05\). The experiment sweeps eight batch sizes, \(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 seeds.
+
+The experiment is run for two groups of distributions. The continuous group uses the same normal, lognormal, and Weibull delay distributions as the previous section, reconstructed with KDE on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points. This second group is important because it tests whether the stopping rule still works when the distribution has separated modes rather than a smooth single peak.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{correctness_grid_cont.png}
+\caption{Correctness of the adaptive stopping rule for the continuous distributions. Each cell is the fraction of 100 seeds where the stopped estimate is within TVD 0.05 of the true distribution.}
+\label{fig:adaptive-cont-correctness}
+\end{figure}
+
+Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid. Loose thresholds and small batches can stop too early. With \(B=100\) and \(\theta=\delta\), correctness is 0.53 for normal, 0.42 for lognormal, and 0.49 for Weibull. Tightening the threshold to \(\theta=\delta/6\) at the same batch size raises correctness to 0.98, 0.95, and 0.97. Increasing the batch size makes the rule more reliable because the change between successive estimates is less dominated by sampling noise. At \(B=200\) and \(\theta=\delta/6\), correctness is 1.00 for normal, 1.00 for lognormal, and 0.99 for Weibull. From \(B=500\) onwards, the continuous grid is almost entirely correct even for looser thresholds.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{heatmap_cont_normal.png}
+\caption{Correctness and efficiency for the normal distribution. Efficiency is the ratio between the theoretical bound and the median stopping sample size.}
+\label{fig:adaptive-normal-efficiency}
+\end{figure}
+
+Figure \ref{fig:adaptive-normal-efficiency} shows why the stopping problem is a trade-off rather than a single optimum. For the normal distribution, the most aggressive configuration, \(B=100\) and \(\theta=\delta\), has very high apparent efficiency because the median stopping time is only 200 samples. However, it is correct in only 53 percent of seeds, so it is not usable. The configuration \(B=100\) and \(\theta=\delta/6\) is much better: it reaches 98 percent correctness with median stopping time 900 and an efficiency of roughly 200 times relative to the 179,744-sample theoretical bound. The more conservative \(B=200\) and \(\theta=\delta/6\) reaches 100 percent correctness with median stopping time 1,600 and efficiency about 112 times. This is a useful operating point when reliability matters more than the last factor of efficiency.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{n_stop_summary_cont_normal.png}
+\caption{Median total packets collected before stopping for the normal distribution. Shading shows the interquartile range across seeds, and the dotted line shows the theoretical sample bound.}
+\label{fig:n-stop-summary-normal}
+\end{figure}
+
+Figure \ref{fig:n-stop-summary-normal} separates the packet cost from the correctness heatmap. Larger batches usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The curve shows why \(B=200,\theta=\delta/6\) is a conservative operating point: it uses more packets than the aggressive \(B=100\) setting, but it remains orders of magnitude below the theoretical bound while reaching full correctness in the normal and lognormal cases.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{early_stop_trace_normal.png}
+\caption{A continued trace after the stopping point for one normal run. The loose \(B=100,\theta=\delta\) rule stops while the true TVD is still above the target, while tighter rules continue until the reconstruction has stabilised.}
+\label{fig:early-stop-trace-normal}
+\end{figure}
+
+Figure \ref{fig:early-stop-trace-normal} shows the mechanism behind early stopping. The lower panel plots the TVD between successive estimates, which is the quantity the stopping rule actually observes. With \(B=100\) and \(\theta=\delta\), this quantity falls below the threshold after 200 packets, so the rule stops. The upper panel shows the post-hoc truth: at that point the true reconstruction error is still above 0.05. Continuing the same run shows that the true TVD falls below the target after more packets. The strict \(B=100,\theta=\delta/6\) rule and the larger-batch rules therefore avoid the failure by requiring stronger evidence of stability.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Distribution group & Configuration & First & Second & Third & Median \(n_{\mathrm{stop}}\) range \\
+\midrule
+Continuous & \(B=100,\theta=\delta\) & 0.53 & 0.42 & 0.49 & 200 to 200 \\
+Continuous & \(B=100,\theta=\delta/6\) & 0.98 & 0.95 & 0.97 & 900 to 900 \\
+Continuous & \(B=200,\theta=\delta/6\) & 1.00 & 1.00 & 0.99 & 1,400 to 1,600 \\
+Discrete & \(B=100,\theta=\delta\) & 0.13 & 0.12 & 0.02 & 300 to 400 \\
+Discrete & \(B=100,\theta=\delta/6\) & 0.93 & 0.95 & 0.95 & 1,300 to 1,700 \\
+Discrete & \(B=300,\theta=\delta/5\) & 1.00 & 1.00 & 1.00 & 2,250 to 3,000 \\
+\bottomrule
+\end{tabular}
+\caption{Selected adaptive stopping operating points. For the continuous group, the three correctness columns correspond to normal, lognormal, and Weibull. For the discrete group, they correspond to binomial, Zipf, and piecewise.}
+\label{tab:adaptive-operating-points}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.82\textwidth]{packet_timing_table.png}
+\caption{Back-to-back transmission time for representative packet counts. These times are only a scale reference, since the passive monitor does not inject traffic.}
+\label{fig:packet-timing-table}
+\end{figure}
+
+The packet counts in Table \ref{tab:adaptive-operating-points} are small enough to be operationally plausible. Figure \ref{fig:packet-timing-table} gives a timing reference for 1500-byte packets sent back-to-back on 1 gigabit per second (Gbit/s), 10 Gbit/s, and 100 Gbit/s links. These numbers are not part of the passive monitoring model, because the monitor is not injecting probe traffic, but they help interpret the scale of the stopping times.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{correctness_grid_disc.png}
+\caption{Correctness of adaptive stopping for the discrete distributions. The multi-modal piecewise distribution is the hardest case.}
+\label{fig:adaptive-disc-correctness}
+\end{figure}
+
+Figure \ref{fig:adaptive-disc-correctness} shows that the discrete distributions are more demanding. At \(B=100\) and \(\theta=\delta\), correctness is only 0.13 for binomial, 0.12 for Zipf, and 0.02 for the piecewise distribution. The reason is that the PMF estimate can appear stable before enough mass has been allocated to each support point, especially when the distribution has several separated modes. Tightening the threshold helps, but the safest region is reached later than in the continuous case. With \(B=300\) and \(\theta=\delta/5\), all three discrete distributions reach 100 percent correctness, with median stopping times between 2,250 and 3,000 samples. This is still far below the corresponding worst-case learning bounds, but the efficiency gains are naturally smaller than in the continuous KDE case because the theoretical bounds for these 20-point discrete distributions are already much lower.
+
+Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets plot and stopping-time TVD plot for the piecewise distribution. Those diagnostics show that the piecewise case is hard because loose thresholds and small batches leave many stopped estimates near or above the target line. With tighter thresholds or larger batches, the stopped TVD moves safely below 0.05, often around 0.02 to 0.03, leaving useful safety margin.
+
+The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A modestly stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger batch size, with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution.
+
+\chapter{Conclusion and Future Works}
+
+The evaluation supports the core premise of the project. Passive delay samples contain enough information to reconstruct the delay distribution, and the number of samples needed in the tested cases is much smaller than the distribution-free worst-case bound. The statistical theory explains the scaling with resolution and accuracy, while the adaptive stopping experiments show how to turn that theory into a practical online rule. The next step is to test whether the same behaviour persists in richer topologies, where multiple links, queues, and path mixtures can change the observed delay distribution without changing the monitoring interface.
+
 
 \appendix
 
+\chapter{Supporting evaluation plots}
 
-\begin{thebibliography}{HHM99}
+\section{Statistical diagnostics}
+\label{app:statistical-diagnostics}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{n_theory_vs_delta.png}
+\caption{Theoretical sample requirement as the accuracy target changes. This plot makes the \(1/\delta^2\) coupling explicit for both PMF and KDE resolutions.}
+\label{fig:app-n-theory-delta}
+\end{figure}
 
-\bibitem[Pri70]{PriorNOP70}  %%only an example
-A.~Prior.
-\newblock The notion of the present.
-\newblock {\em Studium Generale}, 23:  245--248, 1970.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{n_theory_heatmap.png}
+\caption{Theoretical PMF sample requirement over bin size and TVD target. Very fine bins and tight error tolerances both drive the bound upwards.}
+\label{fig:app-n-theory-heatmap}
+\end{figure}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tvd_vs_n_weibull.png}
+\caption{Median TVD against sample count for the Weibull distribution. The interquartile band narrows as \(n\) increases.}
+\label{fig:app-tvd-vs-n-weibull}
+\end{figure}
 
-\bibitem[Rey97]{Rey:D}
-M.~Reynolds.
-\newblock A decidable temporal logic of parallelism.
-\newblock {\em Notre Dame Journal of Formal Logic}, 38(3):  419--436,
-  1997.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{estimator_gap_all_dists.png}
+\caption{TVD between the KDE and PMF estimates as the number of samples grows. The disagreement shrinks with \(n\).}
+\label{fig:app-estimator-gap}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{kde_advantage_ratio.png}
+\caption{KDE advantage ratio, defined as TVD of PMF against truth divided by TVD of KDE against truth.}
+\label{fig:app-kde-advantage}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{ks_statistic_vs_n.png}
+\caption{One-sample Kolmogorov-Smirnov statistic as \(n\) increases.}
+\label{fig:app-ks-statistic}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{ks_pass_rate_vs_n.png}
+\caption{Fraction of seeds passing each statistical test as \(n\) increases.}
+\label{fig:app-ks-pass-rate}
+\end{figure}
+
+\clearpage
+
+\section{Adaptive stopping diagnostics}
+\label{app:adaptive-diagnostics}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{scatter_cont.png}
+\caption{Continuous correctness against efficiency. Each point is one stopping configuration.}
+\label{fig:app-scatter-cont}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{scatter_disc.png}
+\caption{Discrete correctness against efficiency. The safe region is further left than in the continuous plot.}
+\label{fig:app-scatter-disc}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{n_stop_summary_disc_piecewise.png}
+\caption{Median total packets collected before stopping for the piecewise distribution.}
+\label{fig:app-n-stop-piecewise}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tvd_at_stop_cont_normal.png}
+\caption{Distribution of TVD against truth at the stopping time for the normal distribution.}
+\label{fig:app-tvd-stop-normal}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tvd_at_stop_disc_piecewise.png}
+\caption{Distribution of TVD against truth at the stopping time for the piecewise distribution.}
+\label{fig:app-tvd-stop-piecewise}
+\end{figure}
+
+\begin{thebibliography}{9}
+
+\bibitem{canonneShort}
+Clement L. Canonne.
+\newblock A short note on learning discrete distributions.
+\newblock arXiv:2002.11457, 2020.
+\newblock \url{https://arxiv.org/abs/2002.11457}.
+
+\bibitem{canonneSurvey}
+Clement L. Canonne.
+\newblock A Survey on Distribution Testing: Your Data is Big. But is it Blue?
+\newblock Theory of Computing Library, Graduate Surveys 9, 2020.
+\newblock \url{https://theoryofcomputing.org/articles/gs009/}.
+
+\bibitem{canonneTopics}
+Clement L. Canonne.
+\newblock Topics and Techniques in Distribution Testing.
+\newblock Draft monograph.
+\newblock \url{https://ccanonne.github.io/files/misc/main-survey-fnt.pdf}.
+
+\bibitem{devroyeLugosi}
+Luc Devroye and Gabor Lugosi.
+\newblock Combinatorial Methods in Density Estimation.
+\newblock Springer, 2001.
+
 \end{thebibliography}
-\chapter{Other appendices, e.g., code listing}
-Put your appendix sections here
-
-\end{document}
-\author{savani.sawaikar }
-\date{April 2026}
-
-\begin{document}
-
-\maketitle
-
-\section{Introduction}
 
 \end{document}
