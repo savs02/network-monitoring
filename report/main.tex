@@ -33,8 +33,8 @@ $\Box$ \end{quotation}}
 \newcommand{\reals}{\mbox{\(\mathbb R\)}}
 \newcommand{\ints}{\mbox{\(\mathbb Z\)}}
 
-\title{Passive Network Monitoring Through Delay Distribution Reconstruction}
-\date{Academic year 2024/25}
+\title{Know Your Limits: Delay-Based Passive Estimation of Remaining Path Capacity}
+\date{May 2026}
 \author{Savani Sawaikar\\
 Master of Engineering Computer Science\\
 Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
@@ -47,7 +47,7 @@ Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
 \begin{titlepage}
 \centering
 \vspace*{2cm}
-{\Large\bfseries Passive Network Monitoring Through Delay Distribution Reconstruction\par}
+{\Large\bfseries Know Your Limits: Delay-Based Passive Estimation of Remaining Path Capacity\par}
 \vspace{1.5cm}
 {\large Savani Sawaikar\par}
 \vspace{0.5cm}
@@ -56,7 +56,7 @@ Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
 \vspace{0.5cm}
 {Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley\par}
 \vspace{0.5cm}
-{Academic year 2024/25\par}
+{May 2026\par}
 \vfill
 \begin{minipage}{0.9\textwidth}
 \small
@@ -67,7 +67,7 @@ The report may be freely copied and distributed provided the source is explicitl
 \end{titlepage}
 
 \begin{abstract}
-This report evaluates a passive network monitoring method that reconstructs path delay distributions from packet delay observations. The evaluation first studies the statistical sample complexity behind the reconstruction problem, then evaluates an adaptive stopping rule that decides when enough samples have been collected without using ground truth at deployment time.
+Knowing how much additional traffic a path can absorb before performance degrades is central to network management, yet current practice often answers this question by monitoring scalar delay metrics such as mean round-trip time or percentile latency and raising alerts when these cross predefined thresholds. These summaries discard distributional information that encodes how path conditions are changing. This report evaluates a passive monitoring system that treats the delay distribution itself as the object of interest. The evaluation first studies the statistical sample complexity behind distribution reconstruction, then evaluates an adaptive stopping rule that decides when enough samples have been collected without using ground truth at deployment time.
 \end{abstract}
 
 \clearpage
@@ -80,6 +80,10 @@ This report evaluates a passive network monitoring method that reconstructs path
 \section{Overview}
 
 This report accompanies the network monitoring experiments in the repository. The current experimental focus is the simple single-link case in ns-3, where packets traverse a point-to-point path and the link delay is sampled independently from a configured distribution. The monitor observes only the resulting packet delays. It does not know whether the generating distribution is normal, lognormal, Weibull, or a member of any other parametric family. The aim is to reconstruct the delay distribution from samples alone and quantify how many samples are needed before the reconstruction is accurate.
+
+\chapter{Use Case}
+
+\chapter{Methodology}
 
 \chapter{Evaluation}
 
@@ -233,7 +237,7 @@ Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets
 
 The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A modestly stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures. Continuous KDE reconstruction can use \(B=100\) with a tight threshold for an aggressive configuration, or \(B=200\) with a tight threshold for a conservative one. Discrete PMF reconstruction should use a larger batch size, with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions. The rule is therefore distribution-agnostic in the same sense as the estimator itself: it does not need to know the generating family, but the chosen operating point should reflect the desired reliability level and the estimator resolution.
 
-\chapter{Conclusion}
+\chapter{Conclusion and Future Work}
 
 The evaluation supports the core premise of the project. Passive delay samples contain enough information to reconstruct the delay distribution, and the number of samples needed in the tested cases is much smaller than the distribution-free worst-case bound. The statistical theory explains the scaling with resolution and accuracy, while the adaptive stopping experiments show how to turn that theory into a practical online rule. The next step is to test whether the same behaviour persists in richer topologies, where multiple links, queues, and path mixtures can change the observed delay distribution without changing the monitoring interface.
 
