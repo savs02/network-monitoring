@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Capacity motivation network setting</title>
+  <desc id="desc">A network scenario in which traffic is shifted onto a monitored path because another link is under maintenance, creating a need to estimate spare capacity from packet delay observations.</desc>
+  <defs>
+    <marker id="arrow-blue" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L12,7 L2,12 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L12,7 L2,12 Z" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-slate" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L12,7 L2,12 Z" fill="#475569"/>
+    </marker>
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #d9e2ec; stroke-width: 2; }
+      .panel-soft { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 2; }
+      .title { font: 700 42px Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 24px Arial, Helvetica, sans-serif; fill: #475569; }
+      .label { font: 700 25px Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .small { font: 400 21px Arial, Helvetica, sans-serif; fill: #334155; }
+      .small-bold { font: 700 21px Arial, Helvetica, sans-serif; fill: #0f172a; }
+      .tiny { font: 400 17px Arial, Helvetica, sans-serif; fill: #475569; }
+      .node-label { font: 700 32px Arial, Helvetica, sans-serif; fill: #ffffff; }
+      .path-label { font: 700 24px Arial, Helvetica, sans-serif; fill: #1d4ed8; }
+      .warn { fill: #b91c1c; font: 700 22px Arial, Helvetica, sans-serif; }
+      .ok { fill: #047857; font: 700 22px Arial, Helvetica, sans-serif; }
+      .muted-line { stroke: #94a3b8; stroke-width: 7; stroke-linecap: round; fill: none; }
+      .main-line { stroke: #2563eb; stroke-width: 12; stroke-linecap: round; fill: none; marker-end: url(#arrow-blue); }
+      .shift-line { stroke: #dc2626; stroke-width: 9; stroke-linecap: round; stroke-dasharray: 18 14; fill: none; marker-end: url(#arrow-red); }
+      .obs-line { stroke: #475569; stroke-width: 5; stroke-linecap: round; fill: none; marker-end: url(#arrow-slate); }
+      .axis { stroke: #64748b; stroke-width: 2; }
+      .curve-base { stroke: #16a34a; stroke-width: 5; fill: none; }
+      .curve-load { stroke: #dc2626; stroke-width: 5; fill: none; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="900"/>
+
+  <text x="80" y="82" class="title">Why estimate spare capacity on a path?</text>
+  <text x="80" y="123" class="subtitle">Traffic may need to move onto a monitored path when another link is under maintenance or near its limit.</text>
+
+  <rect x="70" y="165" width="1460" height="530" rx="16" class="panel" filter="url(#soft-shadow)"/>
+
+  <!-- Network nodes -->
+  <circle cx="190" cy="430" r="58" fill="#0f766e"/>
+  <text x="179" y="442" class="node-label">S</text>
+  <text x="122" y="520" class="small-bold">Source</text>
+
+  <circle cx="1410" cy="430" r="58" fill="#0f766e"/>
+  <text x="1398" y="442" class="node-label">D</text>
+  <text x="1338" y="520" class="small-bold">Destination</text>
+
+  <circle cx="555" cy="430" r="44" fill="#334155"/>
+  <text x="539" y="441" class="node-label">R1</text>
+
+  <circle cx="915" cy="430" r="44" fill="#334155"/>
+  <text x="899" y="441" class="node-label">R2</text>
+
+  <circle cx="555" cy="260" r="40" fill="#64748b"/>
+  <text x="539" y="271" class="node-label">R3</text>
+
+  <circle cx="915" cy="260" r="40" fill="#64748b"/>
+  <text x="899" y="271" class="node-label">R4</text>
+
+  <!-- Main monitored path -->
+  <path d="M248 430 C340 430, 405 430, 508 430" class="main-line"/>
+  <path d="M599 430 C698 430, 773 430, 866 430" class="main-line"/>
+  <path d="M958 430 C1060 430, 1230 430, 1352 430" class="main-line"/>
+  <text x="680" y="392" class="path-label">Monitored path P1</text>
+  <text x="615" y="475" class="small">Current traffic plus possible extra load</text>
+
+  <!-- Alternative path under maintenance -->
+  <path d="M230 390 C345 285, 420 260, 514 260" class="muted-line"/>
+  <path d="M596 260 C705 260, 772 260, 874 260" class="muted-line"/>
+  <path d="M955 260 C1075 265, 1240 315, 1370 392" class="muted-line"/>
+  <line x1="680" y1="226" x2="800" y2="294" stroke="#dc2626" stroke-width="12" stroke-linecap="round"/>
+  <line x1="800" y1="226" x2="680" y2="294" stroke="#dc2626" stroke-width="12" stroke-linecap="round"/>
+  <text x="620" y="198" class="warn">Other link under maintenance</text>
+
+  <!-- Traffic shift arrow -->
+  <path d="M1010 285 C1080 335, 1040 375, 955 407" class="shift-line"/>
+  <text x="1052" y="342" class="warn">Traffic shifted onto P1</text>
+
+  <!-- Monitoring box -->
+  <rect x="1080" y="542" width="360" height="112" rx="12" class="panel-soft"/>
+  <text x="1107" y="582" class="small-bold">Passive monitor</text>
+  <text x="1107" y="616" class="small">Observes packet delays at D</text>
+  <text x="1107" y="646" class="small">No direct queue or capacity view</text>
+  <path d="M1348 535 C1362 512, 1374 492, 1387 470" class="obs-line"/>
+
+  <!-- Question box -->
+  <rect x="360" y="565" width="600" height="90" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="390" y="605" class="label">Operational question</text>
+  <text x="390" y="638" class="small">Can P1 absorb the extra traffic without degrading delay behaviour?</text>
+
+  <!-- Bottom explanation panels -->
+  <rect x="70" y="735" width="455" height="112" rx="14" class="panel"/>
+  <text x="100" y="777" class="ok">Too conservative</text>
+  <text x="100" y="811" class="small">Usable capacity is left idle, or upgrades</text>
+  <text x="100" y="840" class="small">are made earlier than necessary.</text>
+
+  <rect x="572" y="735" width="455" height="112" rx="14" class="panel"/>
+  <text x="602" y="777" class="warn">Too optimistic</text>
+  <text x="602" y="811" class="small">The path becomes congested, increasing</text>
+  <text x="602" y="840" class="small">delay and risking Service Level Agreement violations.</text>
+
+  <rect x="1074" y="735" width="455" height="112" rx="14" class="panel"/>
+  <text x="1104" y="777" class="small-bold">Distributional signal</text>
+  <line x1="1122" y1="824" x2="1478" y2="824" class="axis"/>
+  <line x1="1122" y1="824" x2="1122" y2="792" class="axis"/>
+  <path d="M1135 824 C1175 818, 1190 786, 1228 785 C1268 785, 1282 816, 1320 824" class="curve-base"/>
+  <path d="M1250 824 C1305 820, 1326 781, 1377 778 C1438 775, 1452 812, 1480 824" class="curve-load"/>
+  <text x="1135" y="802" class="tiny">low load</text>
+  <text x="1360" y="802" class="tiny">extra load</text>
+  <text x="1104" y="842" class="tiny">Estimate capacity from how the delay distribution changes.</text>
+</svg>
