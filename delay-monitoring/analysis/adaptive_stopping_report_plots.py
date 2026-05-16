@@ -21,6 +21,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 os.environ.setdefault("MPLCONFIGDIR", os.path.join(SCRIPT_DIR, "../results/.matplotlib"))
 
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as pe
 import numpy as np
 from scipy import stats
 
@@ -56,6 +57,8 @@ THETA_DISPLAY = [
     r"$\delta/2$",
     r"$\delta$",
 ]
+
+LABEL_OUTLINE = [pe.withStroke(linewidth=2.2, foreground="white", alpha=0.95)]
 
 CONTINUOUS_DISTS = {
     "normal": {
@@ -160,8 +163,16 @@ def plot_combined_correctness(rows, dist_labels, out_name, title):
         for i in range(len(BATCH_SIZES)):
             for j in range(len(THETA_KEYS)):
                 value = corr[i, j]
-                color = "black" if 0.25 < value < 0.75 else "white"
-                ax.text(j, i, f"{value:.2f}", ha="center", va="center", fontsize=7, color=color)
+                ax.text(
+                    j,
+                    i,
+                    f"{value:.2f}",
+                    ha="center",
+                    va="center",
+                    fontsize=7,
+                    color="black",
+                    path_effects=LABEL_OUTLINE,
+                )
         fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
     axes[0].set_ylabel("Packets per batch, increasing upward")
@@ -205,7 +216,8 @@ def plot_individual_heatmaps(rows, dist_labels, prefix):
                     ha="center",
                     va="center",
                     fontsize=8,
-                    color="black" if 0.25 < c < 0.75 else "white",
+                    color="black",
+                    path_effects=LABEL_OUTLINE,
                 )
                 axes[1].text(
                     j,
@@ -214,7 +226,8 @@ def plot_individual_heatmaps(rows, dist_labels, prefix):
                     ha="center",
                     va="center",
                     fontsize=8,
-                    color="white",
+                    color="black",
+                    path_effects=LABEL_OUTLINE,
                 )
 
         fig.suptitle(f"{label}: correctness and efficiency")

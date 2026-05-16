@@ -52,7 +52,7 @@ GRID_MAX = 150.0
 BIN_WIDTH = 1.0
 GRID = np.arange(BIN_WIDTH / 2, GRID_MAX, BIN_WIDTH)
 K = len(GRID)
-N_THEORY_CONT = math.ceil(K * math.log(1.0 / EPSILON) / DELTA**2)
+N_THEORY_CONT = math.ceil((K + math.log(1.0 / EPSILON)) / DELTA**2)
 
 NORMAL_PARAMS = {"mean": 40.0, "variance": 4.0}
 

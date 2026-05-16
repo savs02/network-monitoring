@@ -112,7 +112,7 @@ def n_test_formula():
 def n_reconstruct_formula():
     """Distribution reconstruction sample complexity."""
     return math.ceil(
-        (K * math.log(1.0 / EPSILON)) / DELTA ** 2
+        (K + math.log(1.0 / EPSILON)) / DELTA ** 2
     )
 
 

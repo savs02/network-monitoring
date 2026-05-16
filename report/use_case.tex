@@ -1,0 +1,79 @@
+The motivating use case asks how much additional traffic a path can sustain before its delay behaviour changes. This is a capacity-headroom question, but it is not treated as direct capacity measurement. The monitor is not given the true link capacity, the bottleneck queue state, or a reference delay distribution supplied by the operator. It observes packet delays under a chosen sequence of offered-load levels and asks how the stopped empirical distribution moves away from an observed low-load state.
+
+A capacity estimator that begins from a ground-truth baseline has already been given the hardest part of the monitoring problem. The first observed state is only an empirical reference produced by the measurement procedure. It is not a statement about how the path ought to behave, and it is not assumed to be globally valid for all future time. The evaluated capacity experiments keep this low-load estimate fixed so that the response curve can be traced against one common origin. The reported boundary is the point where movement away from the initial operating state accelerates, not the point where an operator-supplied reference is violated.
+
+\section{Problem framing}
+
+As introduced in Chapter 1, the monitor is treated as two linked statistical tasks: reconstruction of a receiver-side delay distribution, followed by identification against an empirical operating state. This chapter develops the identification step for the capacity-headroom use case. A poor reconstruction means the monitor has not yet learnt the delay process. A poor identification decision means a stable estimate has been interpreted incorrectly.
+
+This separation keeps the experimental and deployment roles distinct. In the controlled experiments, the simulator knows the configured delay family, link rate, and offered load. The monitor does not. It constructs \(\widehat{P}\) only from observed packet delays, while the hidden configuration is used later to score the result. A monitor that is given the true link rate, the queue state, or the correct reference distribution would not be demonstrating passive inference. It would be verifying information already supplied by the experiment.
+
+The work therefore follows a staged structure. Direct sampling first checks whether the delay distribution can be learnt when network effects are removed. Adaptive stopping then asks whether a monitor can decide that the estimate is stable without seeing ground truth. The capacity use case adds identification, because the stopped distribution must be compared with an empirical operating state. The later network chapters increase the difficulty of the sample source while preserving the same interface, where received packet delays are observed, a distribution is reconstructed, and a distributional decision is made.
+
+\section{System design}
+
+Figure \ref{fig:system-design-iteration} shows the system design used throughout the report. The top row is the runtime monitoring pipeline. A receiver observes packet delays, reconstructs a non-parametric delay distribution, waits until adaptive stopping says that the estimate is stable, compares the stopped distribution with an empirical low-load state, and then interprets the comparison as evidence about a capacity boundary. Ground truth does not enter this pipeline. It is used only after an experiment has finished, when the result is scored against the simulator configuration.
+
+The lower row explains the structure of the evaluation. The work does not begin with the full capacity experiment because a failure there would be hard to diagnose. Direct sampling first tests the reconstruction step in isolation. Adaptive stopping then tests whether the estimate can be trusted online. The single-link chapter tests whether a stopped distribution can support the capacity decision in the cleanest network setting. The multi-hop chapter then keeps the same interface and increases the path complexity. Each stage preserves the same measurement object while changing one source of difficulty.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{system_design_iteration.png}
+\caption{System pipeline and evaluation decomposition. Runtime monitoring uses only receiver-side delay samples; simulator configuration is used only after each run for scoring. The evaluation isolates reconstruction, stopping, and capacity interpretation before increasing network complexity.}
+\label{fig:system-design-iteration}
+\end{figure}
+
+The design bridges this chapter and the statistical evaluation that follows. The use case defines what the monitor is trying to do, but it does not yet prove that the first block in the pipeline is reliable. Chapter 3 therefore asks the narrower question of how many samples are needed to reconstruct a delay distribution at all. Chapter 4 then asks when the reconstruction can stop without access to ground truth. Only after those two questions are answered does it become meaningful to interpret a distributional difference as a capacity signal.
+
+\section{Implementation and reproducibility}
+
+The implementation consists of Network Simulator 3 (NS-3) 3.46 simulation programs for the single-link, multi-hop, heterogeneous-link, bursty-traffic, and multi-path input-generation experiments, together with Python analysis scripts for empirical probability mass function reconstruction, kernel density estimation, adaptive stopping, total variation distance computation, scalar baselines, response-rate detection, modal splitting, and plotting. The main simulation code lives under the repository's delay-monitoring experiment directories, while the analysis and plotting scripts live under the corresponding analysis directory. The reported network experiments use fixed seed ranges, a documented load grid, finite first-in, first-out queues, a one millisecond delay grid from 0 to 150 milliseconds, and saved seed-level outputs so that figures and summary tables can be regenerated from the experiment logs.
+
+\section{Operational setting}
+
+Consider a source sending traffic to a destination over a path with unknown remaining capacity. The operator can introduce a controlled offered load for measurement, or can observe naturally increasing traffic, but the monitoring algorithm sees only the packet-delay samples that arrive at the receiver. At each load level \(r_i\), samples are collected until adaptive stopping declares the reconstructed delay distribution stable. The resulting estimate is denoted \(\widehat{P}_{r_i}\). The stopping decision uses only consecutive reconstructions at the same load level; it does not use the true distribution.
+
+After stopping, the current distribution is compared with the first low-load distribution in the evaluated experiments. The comparison uses total variation distance (TVD) as follows.
+\[
+d_{\mathrm{TV}}\left(\widehat{P}_{r_0},\widehat{P}_{r_i}\right)
+= \frac{1}{2}\sum_x
+\left|\widehat{P}_{r_0}(x)-\widehat{P}_{r_i}(x)\right|.
+\]
+If the distance is at most a chosen identity threshold \(\Delta\), the new load is treated as part of the same delay regime. If the distance exceeds \(\Delta\), the load is treated as the first evidence that the path has entered a different regime. This is a batch-level distribution comparison. It is not a test of whether an individual packet belongs to a distribution.
+
+The operational interpretation is conservative. A significant distributional change does not by itself prove that every packet is congested, nor does it identify a physical queue. It indicates that the delay process observed by the receiver no longer matches the low-load operating state. In the capacity use case, the later evaluation asks whether the response to added load accelerates enough to mark a capacity-relevant boundary.
+
+\section{Initial search design and response sweep}
+
+The first design used a two-phase search. The first phase was exponential. Starting from a small offered load \(r_0\), the monitor collected a stopped distribution and then tested \(2r_0,4r_0,8r_0\), and so on. Each new stopped distribution was compared with the low-load stopped distribution. This phase avoided spending many experiments far below the capacity boundary, where distributions were expected to remain similar. It ended once the first significant distributional change was detected, creating a bracket \([r_{\mathrm{safe}},r_{\mathrm{changed}}]\).
+
+The second phase refined the bracket by binary search. The midpoint load was tested, a stopped distribution was reconstructed, and the same distributional comparison was applied. If the midpoint remained similar to the low-load state, it became the new lower end of the bracket. If it was significantly different, it became the new upper end. The output was therefore not a single exact value. It was a capacity range defined by the final stable load and the final changed load. Reporting a range better reflects measurement uncertainty than reporting a point estimate because the boundary is inferred from noisy packet observations and a chosen threshold \(\Delta\).
+
+The evaluated experiments replace this bracketed search with an additive load sweep. The bracketed procedure was the initial deployment-oriented design, but it hides the response curve and would make it harder to see why first-change detection fails. The additive sweep is less efficient as a deployment procedure, but it is more revealing experimentally because it exposes the full response curve. Instead of treating any distributional change as capacity, the final evaluated procedure follows the rate at which TVD changes as load is increased. Delay distributions can move gradually under additional load before the path reaches a capacity-relevant boundary. The useful signal is the point where the distributional response accelerates, not the first point where it is non-zero.
+
+This use case depends directly on the earlier statistical sections. Sample-complexity analysis explains why enough samples are needed before a distribution comparison is meaningful. Adaptive stopping decides when those samples have accumulated at a particular load level. Distribution identity then turns the stopped estimate into an operational decision. Without stopping, the search could compare unstable distributions. Without identity testing, the search would have no principled way to decide whether a new load had changed the path.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{capacity_use_case_overview.png}
+\caption{Early design iteration for bracketed distribution search. The monitor increases offered load until a stopped delay distribution differs from the low-load state and then refines the bracket by binary search. The evaluated runs in Chapters 5 to 7 use additive TVD response tracking instead.}
+\label{fig:capacity-use-case-overview}
+\end{figure}
+
+\section{Illustrative example}
+
+Figure \ref{fig:capacity-use-case-overview} illustrates the initial bracketed logic using a simple one-link experiment. The configured simulation capacity is 10 megabits per second (Mbit/s), but the monitor does not use this value. It begins at 0.5 Mbit/s and compares stopped empirical distributions at 1, 2, 4, and 8 Mbit/s with the low-load reference. In the example trace, these comparisons remain below the identity threshold, so 8 Mbit/s becomes the highest stable load. The next exponential step, 16 Mbit/s, produces a large distributional change. The search has therefore bracketed the transition between 8 and 16 Mbit/s.
+
+Binary search then tests the interior of the bracket. Loads of 12 Mbit/s and 10 Mbit/s are changed relative to the low-load state, while 9 Mbit/s and 9.5 Mbit/s remain similar. A final test at 9.75 Mbit/s crosses the identity threshold. The resulting estimate is the interval from 9.5 to 9.75 Mbit/s. The configured 10 Mbit/s capacity is used only after this procedure to evaluate the estimate. The example is intentionally simple, but it captures the main point that the capacity boundary is inferred from where the delay distribution changes, not from direct access to the link rate.
+
+The right-hand side of Figure \ref{fig:capacity-use-case-overview} shows why a distributional view is useful. A low-load and a later stable distribution may have similar centres and tails. As the load approaches the limit, the distribution can widen or develop a heavier tail before a scalar threshold becomes decisive. Once the path is pushed beyond its stable regime, the distribution may shift sharply, become multi-modal, or place much more mass at high delays. These shape changes are precisely the information that a scalar mean or a single percentile can hide.
+
+\section{Relationship to active probing}
+
+The use case resembles active probing because the experiment changes offered load. Its interpretation is different. Traditional available-bandwidth tools transmit probe streams and infer a rate from how those probes are dispersed or delayed \cite{jainDovrolisPathload,dovrolisPacketDispersion}. Here, the object being tracked is the empirical delay distribution at each operating point. The monitor is passive with respect to its measurement object: it does not inject dedicated probes or use queue telemetry to make the distributional decision. The evaluation uses controlled load changes only to expose the response curve and score the decision against known simulation capacity.
+
+This framing also differs from fine-grained queue telemetry. ConQuest gives direct visibility into which flows contribute to queue occupancy when programmable data-plane support or link tapping is available \cite{chenConQuest}. The approach here assumes a weaker measurement interface. It does not require the monitor to inspect queue internals or identify the flow responsible for a backlog. It asks whether the end-to-end delay distribution has changed, which is a less detailed but more generally available signal.
+
+PIRATE is closer in spirit because it extracts latency information passively from packet timing under difficult visibility conditions \cite{shobhanaPirate}. The difference is the unit of inference. PIRATE estimates response latency from causal request pairs. The method studied here estimates a distribution over packet delays and asks whether that distribution has changed under load. Both approaches show the value of packet timing beyond simple counters, but they answer different operational questions.
+
+The use case provides the bridge between the statistical foundations and the later network experiments. A successful result would not mean that the exact physical capacity has been measured. It would mean that the monitoring system can identify the range of offered load over which the path leaves its previous delay regime. The following chapters make that test progressively harder: first a single link, then a longer one-route path, and finally a multi-path mixture in which several route behaviours appear in the same receiver-side distribution.

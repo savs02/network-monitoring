@@ -27,7 +27,8 @@
       "Bash(wait && cat /private/tmp/claude-501/-Users-savanisawaikar-network-monitoring/tasks/bdo020n1i.output 2>/dev/null || true)",
       "Bash(cd /Users/savanisawaikar/network-monitoring && bash delay-monitoring/scripts/run_cross_traffic_experiment.sh 2>&1)",
       "Bash(cd /Users/savanisawaikar/network-monitoring/delay-monitoring/analysis && python3 cross_traffic_experiment.py)",
-      "Bash(ls -lh /Users/savanisawaikar/network-monitoring/delay-monitoring/results/cross-traffic/*.png 2>/dev/null; ls /Users/savanisawaikar/network-monitoring/delay-monitoring/results/cross-traffic/)"
+      "Bash(ls -lh /Users/savanisawaikar/network-monitoring/delay-monitoring/results/cross-traffic/*.png 2>/dev/null; ls /Users/savanisawaikar/network-monitoring/delay-monitoring/results/cross-traffic/)",
+      "Bash(pdflatex -interaction=nonstopmode -halt-on-error main.tex)"
     ]
   }
 }

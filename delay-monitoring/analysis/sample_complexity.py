@@ -79,8 +79,8 @@ def tvd(p, q):
 
 
 def theoretical_bound(n):
-    """Upper bound on TVD: sqrt(k * log(1/epsilon) / n), clipped at 1."""
-    return min(1.0, np.sqrt(K * np.log(1.0 / EPSILON) / n))
+    """Upper bound on TVD: sqrt((k + log(1/epsilon)) / n), clipped at 1."""
+    return min(1.0, np.sqrt((K + np.log(1.0 / EPSILON)) / n))
 
 
 def param_label(dist_name, params):

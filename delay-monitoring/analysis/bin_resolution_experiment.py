@@ -6,7 +6,7 @@ affects the theoretical sample requirement n_theory, and how n_theory and
 the accuracy target delta are coupled.
 
 Discrete PMF bound:   n = ceil((k + log(1/epsilon)) / delta^2)
-Continuous KDE bound: n = ceil(K * log(1/epsilon) / delta^2)
+Continuous KDE bound: n = ceil((K + log(1/epsilon)) / delta^2)
 
 A finer bin size increases k linearly, which increases n_theory.
 Halving delta quadruples n_theory — the 1/delta^2 coupling.
@@ -65,7 +65,7 @@ def n_discrete(delta, bin_size):
 
 def n_continuous(delta, grid_res):
     K = int(GRID_MAX / grid_res)
-    return math.ceil(K * math.log(1.0 / EPSILON) / delta ** 2)
+    return math.ceil((K + math.log(1.0 / EPSILON)) / delta ** 2)
 
 
 # ============================================================
@@ -158,7 +158,7 @@ def plot_n_theory_vs_delta():
     cols = cmap(np.linspace(0.1, 0.9, len(GRID_RESOLUTIONS)))
     for gr, col in zip(GRID_RESOLUTIONS, cols):
         K  = int(GRID_MAX / gr)
-        ns = [K * math.log(1.0 / EPSILON) / d ** 2 for d in delta_fine]
+        ns = [(K + math.log(1.0 / EPSILON)) / d ** 2 for d in delta_fine]
         ax.plot(delta_fine, ns, color=col, linewidth=2,
                 label=f"{gr} ms grid  (K = {K})")
 
@@ -168,7 +168,7 @@ def plot_n_theory_vs_delta():
     ax.set_yscale("log")
     ax.set_xlabel("Accuracy target (δ)")
     ax.set_ylabel("Theoretical n required")
-    ax.set_title(r"Continuous KDE: $n = K\,\log(1/\varepsilon)\,/\,\delta^2$")
+    ax.set_title(r"Continuous KDE: $n = (K+\log(1/\varepsilon))\,/\,\delta^2$")
     ax.legend(fontsize=8, loc="upper right")
     ax.grid(True, alpha=0.3, which="both")
 
@@ -249,7 +249,7 @@ def print_tables():
         print(row)
 
     print("\n" + "=" * 80)
-    print(f"Continuous KDE bound — n = ceil(K · log(1/ε) / δ²),  ε = {EPSILON}")
+    print(f"Continuous KDE bound — n = ceil((K + log(1/ε)) / δ²),  ε = {EPSILON}")
     print("=" * 80)
     header = f"{'Grid res':>10}  {'K':>5}" + "".join(
         f"  {'δ='+str(d):>{w}}" for d in DELTAS

@@ -6,27 +6,72 @@
 //
 // Two experiment modes:
 //
-//   Theoretical / packet-loss:
+//   Direct sampling:
 //     Sender applies an artificial delay sampled from the chosen distribution.
 //     DelayMonitor attached to the sender records the sampled delay directly.
 //
-//   Cross-traffic (--crossTrafficRate > 0):
-//     No artificial delay. A second OnOff UDP sender injects background traffic
-//     at the specified fraction of link capacity. Probe packets carry a
-//     TimestampTag; DelayMonitor attached to the receiver measures real
-//     end-to-end delay (propagation + queuing).
+//   Offered-load / cross-traffic:
+//     The probe sender applies the chosen base delay distribution, then sends
+//     packets over the link. A second OnOff UDP sender can inject controlled
+//     background traffic either as an absolute data rate or as a fraction of
+//     link capacity. Probe packets carry a TimestampTag; DelayMonitor attached
+//     to the receiver measures real end-to-end delay. Endpoint-visible probe
+//     and cross-traffic delivery counters are exported for loss comparisons.
 
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
+#include "ns3/traffic-control-module.h"
 #include "ns3/applications-module.h"
 #include "variable-delay-application.h"
 #include "delay-monitor.h"
+#include <fstream>
+#include <sstream>
 
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE("SingleHop");
+
+static uint64_t g_queueTraceDrops = 0;
+static uint64_t g_macTxDrops = 0;
+static uint64_t g_phyTxDrops = 0;
+static uint64_t g_crossTrafficTxPackets = 0;
+static uint64_t g_crossTrafficTxBytes = 0;
+static uint64_t g_crossTrafficRxPackets = 0;
+static uint64_t g_crossTrafficRxBytes = 0;
+
+static void
+QueueDropTrace(Ptr<const Packet> packet)
+{
+    g_queueTraceDrops++;
+}
+
+static void
+MacTxDropTrace(Ptr<const Packet> packet)
+{
+    g_macTxDrops++;
+}
+
+static void
+PhyTxDropTrace(Ptr<const Packet> packet)
+{
+    g_phyTxDrops++;
+}
+
+static void
+CrossTrafficTxTrace(Ptr<const Packet> packet)
+{
+    g_crossTrafficTxPackets++;
+    g_crossTrafficTxBytes += packet->GetSize();
+}
+
+static void
+CrossTrafficRxTrace(Ptr<const Packet> packet, const Address& from)
+{
+    g_crossTrafficRxPackets++;
+    g_crossTrafficRxBytes += packet->GetSize();
+}
 
 int
 main(int argc, char* argv[])
@@ -48,13 +93,15 @@ main(int argc, char* argv[])
     double   binomial_prob   = 0.5; // mean delay = trials * prob ms
 
     uint32_t zipf_n     = 20;  // support {1, ..., N}
-    double   zipf_alpha = 1.5; // exponent — higher alpha concentrates more mass on small values
+    double   zipf_alpha = 1.5; // higher alpha concentrates more mass on small values
 
     // --- Traffic parameters ---
 
     uint32_t numPackets   = 100;
+    uint32_t packetSize   = 1024;
     double   lossRate     = 0.0; // fraction of packets dropped before reaching the monitor
     double   intervalMean = 1.0; // mean inter-packet time in ms (exponential)
+    double   simulationStopTime = 120.0;
 
     // --- Realistic mode parameters ---
 
@@ -64,15 +111,24 @@ main(int argc, char* argv[])
 
     bool   crossTrafficMode      = false;
     double crossTrafficRate      = 0.0; // fraction of link capacity
+    std::string crossTrafficDataRate = ""; // absolute offered load, e.g. 8Mbps
     double crossTrafficStartTime = 0.0; // seconds
+    double crossTrafficStopTime = -1.0; // seconds, negative means stop before simulation drain
+    std::string crossTrafficPattern = "constant";
+    std::string crossTrafficOnTime = "ns3::ConstantRandomVariable[Constant=1]";
+    std::string crossTrafficOffTime = "ns3::ConstantRandomVariable[Constant=0]";
 
     std::string linkDataRate = "10Mbps";
     std::string linkDelay    = "2ms";
     uint32_t    queueSize    = 50;  // DropTail queue depth in packets
+    std::string queueDiscType = "ns3::FifoQueueDisc";
+    bool        useQueueDisc = false;
 
     // --- Output ---
 
     std::string outputFile = "";
+    std::string dropStatsFile = "";
+    bool verbose = false;
 
     // --- Command-line interface ---
 
@@ -86,24 +142,38 @@ main(int argc, char* argv[])
     cmd.AddValue("normal_variance",       "Normal variance parameter", normal_variance);
     cmd.AddValue("binomial_trials",       "Binomial number of trials (N)", binomial_trials);
     cmd.AddValue("binomial_prob",         "Binomial success probability (p)", binomial_prob);
-    cmd.AddValue("zipf_n",                "Zipf upper bound N — support is {1, ..., N}", zipf_n);
+    cmd.AddValue("zipf_n",                "Zipf upper bound N. Support is {1, ..., N}", zipf_n);
     cmd.AddValue("zipf_alpha",            "Zipf exponent alpha", zipf_alpha);
     cmd.AddValue("numPackets",            "Number of packets to send", numPackets);
+    cmd.AddValue("packetSize",            "Probe packet size in bytes", packetSize);
     cmd.AddValue("lossRate",              "Fraction of packets dropped before reaching the monitor (0 = no loss)", lossRate);
     cmd.AddValue("intervalMean",          "Mean inter-packet interval in ms (exponential)", intervalMean);
+    cmd.AddValue("simulationStopTime",     "Simulation stop time in seconds", simulationStopTime);
     cmd.AddValue("realisticMode",         "Sampled delay is a floor; packet sent over wire; receiver records actual E2E delay", realisticMode);
-    cmd.AddValue("crossTrafficMode",      "Use receiver-side TimestampTag monitoring — cross-traffic experiment", crossTrafficMode);
+    cmd.AddValue("crossTrafficMode",      "Use receiver-side TimestampTag monitoring for cross-traffic experiments", crossTrafficMode);
     cmd.AddValue("crossTrafficRate",      "Fraction of link capacity used by cross-traffic (0 = theoretical)", crossTrafficRate);
+    cmd.AddValue("crossTrafficDataRate",  "Absolute cross-traffic data rate, e.g. 8Mbps. Overrides crossTrafficRate when set", crossTrafficDataRate);
     cmd.AddValue("crossTrafficStartTime", "Simulation time (s) at which the cross-traffic sender starts", crossTrafficStartTime);
+    cmd.AddValue("crossTrafficStopTime",  "Simulation time (s) at which the cross-traffic sender stops. Negative leaves drain time before simulation stop", crossTrafficStopTime);
+    cmd.AddValue("crossTrafficPattern",   "Cross-traffic pattern label: constant or bursty", crossTrafficPattern);
+    cmd.AddValue("crossTrafficOnTime",    "OnOffApplication OnTime random variable string", crossTrafficOnTime);
+    cmd.AddValue("crossTrafficOffTime",   "OnOffApplication OffTime random variable string", crossTrafficOffTime);
     cmd.AddValue("linkDataRate",          "Point-to-point link data rate", linkDataRate);
     cmd.AddValue("linkDelay",             "Point-to-point link propagation delay", linkDelay);
     cmd.AddValue("queueSize",             "DropTail queue depth in packets", queueSize);
+    cmd.AddValue("queueDiscType",         "Traffic-control queue disc type", queueDiscType);
+    cmd.AddValue("useQueueDisc",          "Install a traffic-control queue disc. Disabled for observable-loss experiments", useQueueDisc);
     cmd.AddValue("outputFile",            "Output CSV path for delay samples (default: results/delay_samples_{dist}.csv)", outputFile);
+    cmd.AddValue("dropStatsFile",         "Output CSV path for probe and queue drop statistics", dropStatsFile);
+    cmd.AddValue("verbose",               "Enable NS_LOG_INFO output for debugging", verbose);
     cmd.Parse(argc, argv);
 
     Time::SetResolution(Time::NS);
-    LogComponentEnable("SingleHop", LOG_LEVEL_INFO);
-    LogComponentEnable("VariableDelayApplication", LOG_LEVEL_INFO);
+    if (verbose)
+    {
+        LogComponentEnable("SingleHop", LOG_LEVEL_INFO);
+        LogComponentEnable("VariableDelayApplication", LOG_LEVEL_INFO);
+    }
 
     NS_LOG_INFO("=== Two-node network: " << delayDist << ", " << numPackets << " packets ===");
     NS_LOG_INFO("Inter-packet interval: Exponential with mean " << intervalMean << " ms");
@@ -122,6 +192,16 @@ main(int argc, char* argv[])
                  "MaxSize", QueueSizeValue(QueueSize(std::to_string(queueSize) + "p")));
 
     NetDeviceContainer devices = p2p.Install(nodes);
+    Ptr<PointToPointNetDevice> senderDevice = DynamicCast<PointToPointNetDevice>(devices.Get(0));
+    Ptr<Queue<Packet>> senderQueue;
+    if (senderDevice && senderDevice->GetQueue())
+    {
+        senderQueue = senderDevice->GetQueue();
+        senderQueue->TraceConnectWithoutContext("Drop", MakeCallback(&QueueDropTrace));
+        senderQueue->TraceConnectWithoutContext("DropBeforeEnqueue", MakeCallback(&QueueDropTrace));
+        senderDevice->TraceConnectWithoutContext("MacTxDrop", MakeCallback(&MacTxDropTrace));
+        senderDevice->TraceConnectWithoutContext("PhyTxDrop", MakeCallback(&PhyTxDropTrace));
+    }
 
     InternetStackHelper stack;
     stack.Install(nodes);
@@ -129,6 +209,19 @@ main(int argc, char* argv[])
     Ipv4AddressHelper address;
     address.SetBase("10.1.1.0", "255.255.255.0");
     Ipv4InterfaceContainer interfaces = address.Assign(devices);
+    Ptr<QueueDisc> rootQueueDisc;
+    if (useQueueDisc)
+    {
+        TrafficControlHelper trafficControlHelper;
+        trafficControlHelper.SetRootQueueDisc(
+            queueDiscType,
+            "MaxSize",
+            QueueSizeValue(QueueSize(std::to_string(queueSize) + "p")));
+        trafficControlHelper.Install(devices);
+        Ptr<TrafficControlLayer> trafficControl = nodes.Get(0)->GetObject<TrafficControlLayer>();
+        rootQueueDisc =
+            trafficControl ? trafficControl->GetRootQueueDiscOnDevice(devices.Get(0)) : nullptr;
+    }
 
     // --- Delay distribution ---
 
@@ -177,7 +270,7 @@ main(int argc, char* argv[])
     }
     else if (delayDist == "piecewise")
     {
-        // Irregular multi-modal PMF over {1,...,20} — peaks at 1, 5, 8, 10, 12.
+        // Irregular multi-modal PMF over {1,...,20}, with peaks at 1, 5, 8, 10, 12.
         // Probabilities: [0.12,0.02,0.08,0.01,0.10,0.03,0.07,0.12,0.02,0.09,
         //                 0.01,0.08,0.04,0.06,0.02,0.05,0.02,0.04,0.01,0.01]
         Ptr<EmpiricalRandomVariable> rv = CreateObject<EmpiricalRandomVariable>();
@@ -222,17 +315,19 @@ main(int argc, char* argv[])
     receiver->SetPort(port);
     nodes.Get(1)->AddApplication(receiver);
     receiver->SetStartTime(Seconds(0.0));
-    receiver->SetStopTime(Seconds(1000.0));
+    receiver->SetStopTime(Seconds(simulationStopTime));
 
     Ptr<VariableDelaySender> sender = CreateObject<VariableDelaySender>();
     sender->SetRemote(interfaces.GetAddress(1), port);
     sender->SetIntervalRandomVariable(intervalRv);
-    sender->SetPacketSize(1024);
+    sender->SetPacketSize(packetSize);
     sender->SetMaxPackets(numPackets);
     sender->SetLossRate(lossRate);
     nodes.Get(0)->AddApplication(sender);
     sender->SetStartTime(Seconds(0.01));
-    sender->SetStopTime(Seconds(1000.0));
+    sender->SetStopTime(Seconds(simulationStopTime));
+
+    Ptr<PacketSink> crossTrafficSink;
 
     if (realisticMode)
     {
@@ -254,41 +349,55 @@ main(int argc, char* argv[])
         sender->SetDelayRandomVariable(delayRv);
         receiver->SetDelayMonitor(&delayMonitor);
 
-        // Parse link rate string (e.g. "10Mbps") to compute the cross-traffic data rate.
-        double linkBps = 0.0;
-        if      (linkDataRate.find("Gbps") != std::string::npos)
-            linkBps = std::stod(linkDataRate.substr(0, linkDataRate.find("Gbps"))) * 1e9;
-        else if (linkDataRate.find("Mbps") != std::string::npos)
-            linkBps = std::stod(linkDataRate.substr(0, linkDataRate.find("Mbps"))) * 1e6;
-        else if (linkDataRate.find("Kbps") != std::string::npos)
-            linkBps = std::stod(linkDataRate.substr(0, linkDataRate.find("Kbps"))) * 1e3;
+        std::string ctRateString;
+        if (!crossTrafficDataRate.empty())
+        {
+            ctRateString = crossTrafficDataRate;
+        }
         else
-            linkBps = std::stod(linkDataRate); // assume bps
+        {
+            // Parse link rate string (e.g. "10Mbps") to compute the cross-traffic data rate.
+            double linkBps = 0.0;
+            if      (linkDataRate.find("Gbps") != std::string::npos)
+                linkBps = std::stod(linkDataRate.substr(0, linkDataRate.find("Gbps"))) * 1e9;
+            else if (linkDataRate.find("Mbps") != std::string::npos)
+                linkBps = std::stod(linkDataRate.substr(0, linkDataRate.find("Mbps"))) * 1e6;
+            else if (linkDataRate.find("Kbps") != std::string::npos)
+                linkBps = std::stod(linkDataRate.substr(0, linkDataRate.find("Kbps"))) * 1e3;
+            else
+                linkBps = std::stod(linkDataRate); // assume bps
 
-        std::ostringstream ctRateStr;
-        ctRateStr << static_cast<uint64_t>(crossTrafficRate * linkBps) << "bps";
+            std::ostringstream ctRateStr;
+            ctRateStr << static_cast<uint64_t>(crossTrafficRate * linkBps) << "bps";
+            ctRateString = ctRateStr.str();
+        }
 
-        NS_LOG_INFO("Cross-traffic: " << ctRateStr.str()
-                    << " (" << (crossTrafficRate * 100) << "% of " << linkDataRate << ")");
+        NS_LOG_INFO("Cross-traffic: " << ctRateString << " pattern=" << crossTrafficPattern);
 
-        if (crossTrafficRate > 0.0)
+        if (crossTrafficRate > 0.0 || !crossTrafficDataRate.empty())
         {
             uint16_t ctPort = 10;
+            double ctStopTime = crossTrafficStopTime >= 0.0
+                                    ? crossTrafficStopTime
+                                    : std::max(crossTrafficStartTime, simulationStopTime - 1.0);
 
             PacketSinkHelper sink("ns3::UdpSocketFactory",
                                   InetSocketAddress(Ipv4Address::GetAny(), ctPort));
             ApplicationContainer sinkApps = sink.Install(nodes.Get(1));
             sinkApps.Start(Seconds(0.0));
-            sinkApps.Stop(Seconds(1000.0));
+            sinkApps.Stop(Seconds(simulationStopTime));
+            crossTrafficSink = DynamicCast<PacketSink>(sinkApps.Get(0));
+            sinkApps.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&CrossTrafficRxTrace));
 
             OnOffHelper onoff("ns3::UdpSocketFactory",
                               InetSocketAddress(interfaces.GetAddress(1), ctPort));
-            onoff.SetConstantRate(DataRate(ctRateStr.str()), 1024);
-            onoff.SetAttribute("OnTime",  StringValue("ns3::ConstantRandomVariable[Constant=1]"));
-            onoff.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
+            onoff.SetConstantRate(DataRate(ctRateString), 1024);
+            onoff.SetAttribute("OnTime",  StringValue(crossTrafficOnTime));
+            onoff.SetAttribute("OffTime", StringValue(crossTrafficOffTime));
             ApplicationContainer ctApps = onoff.Install(nodes.Get(0));
+            ctApps.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&CrossTrafficTxTrace));
             ctApps.Start(Seconds(crossTrafficStartTime));
-            ctApps.Stop(Seconds(1000.0));
+            ctApps.Stop(Seconds(ctStopTime));
         }
     }
     else
@@ -302,7 +411,7 @@ main(int argc, char* argv[])
 
     // --- Run ---
 
-    Simulator::Stop(Seconds(1000.0));
+    Simulator::Stop(Seconds(simulationStopTime));
     Simulator::Run();
     NS_LOG_INFO("Simulation complete. Packets received: " << receiver->GetReceived());
 
@@ -310,6 +419,49 @@ main(int argc, char* argv[])
         outputFile = "../delay-monitoring/results/delay_samples_" + delayDist + ".csv";
 
     delayMonitor.ExportToCSV(outputFile);
+    if (!dropStatsFile.empty())
+    {
+        std::ofstream drops(dropStatsFile);
+        if (drops.is_open())
+        {
+            uint32_t receivedProbes = delayMonitor.GetSampleCount();
+            uint32_t lostProbes = receivedProbes >= numPackets ? 0 : numPackets - receivedProbes;
+            uint32_t queueDropsBeforeEnqueue = senderQueue ? senderQueue->GetTotalDroppedPacketsBeforeEnqueue() : 0;
+            uint32_t queueDropsTotal = senderQueue ? senderQueue->GetTotalDroppedPackets() : 0;
+            QueueDisc::Stats queueDiscStats;
+            if (rootQueueDisc)
+            {
+                queueDiscStats = rootQueueDisc->GetStats();
+            }
+            drops << "sent_probe_packets,received_probe_packets,probe_loss_count,"
+                  << "cross_traffic_tx_packets,cross_traffic_rx_packets,"
+                  << "cross_traffic_loss_count,cross_traffic_tx_bytes,"
+                  << "cross_traffic_rx_bytes,active_cross_traffic_flows,use_queue_disc,"
+                  << "queue_drop_count,queue_drop_total_count,queue_trace_drop_count,"
+                  << "mac_tx_drop_count,phy_tx_drop_count,"
+                  << "qdisc_drop_count,qdisc_drop_before_enqueue_count,"
+                  << "qdisc_drop_after_dequeue_count,qdisc_mark_count,"
+                  << "qdisc_received_packets,qdisc_sent_packets\n";
+            uint64_t crossTrafficLoss =
+                g_crossTrafficTxPackets >= g_crossTrafficRxPackets
+                    ? g_crossTrafficTxPackets - g_crossTrafficRxPackets
+                    : 0;
+            drops << numPackets << "," << receivedProbes << "," << lostProbes << ","
+                  << g_crossTrafficTxPackets << "," << g_crossTrafficRxPackets << ","
+                  << crossTrafficLoss << "," << g_crossTrafficTxBytes << ","
+                  << g_crossTrafficRxBytes << ","
+                  << (g_crossTrafficTxPackets > 0 ? 1 : 0) << ","
+                  << (useQueueDisc ? 1 : 0) << ","
+                  << queueDropsBeforeEnqueue << "," << queueDropsTotal << ","
+                  << g_queueTraceDrops << "," << g_macTxDrops << "," << g_phyTxDrops << ","
+                  << queueDiscStats.nTotalDroppedPackets << ","
+                  << queueDiscStats.nTotalDroppedPacketsBeforeEnqueue << ","
+                  << queueDiscStats.nTotalDroppedPacketsAfterDequeue << ","
+                  << queueDiscStats.nTotalMarkedPackets << ","
+                  << queueDiscStats.nTotalReceivedPackets << ","
+                  << queueDiscStats.nTotalSentPackets << "\n";
+        }
+    }
     Simulator::Destroy();
 
     return 0;

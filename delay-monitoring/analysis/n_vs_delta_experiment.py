@@ -4,7 +4,7 @@ n vs delta experiment — theoretical bound vs empirical sample requirement.
 Varies the TVD accuracy target delta and computes, for each value:
 
   Theoretical bound (PAC-style guarantee):
-    Continuous (KDE, 1ms grid): n_theory = ceil(K · log(1/ε) / δ²)
+    Continuous (KDE, 1ms grid): n_theory = ceil((K + log(1/ε)) / δ²)
     Discrete   (PMF, b ms):     n_theory = ceil((k + log(1/ε)) / δ²)
 
   Empirical requirement:
@@ -58,7 +58,7 @@ SEEDS        = list(range(1, 21))   # 20 independent draws per (distribution, n)
 # Fine grid for KDE evaluation (continuous case)
 BIN_WIDTH = 1.0
 GRID      = np.arange(BIN_WIDTH / 2, GRID_MAX, BIN_WIDTH)
-K         = len(GRID)   # 149 bins
+K         = len(GRID)   # 150 bin centres
 
 # Bin sizes tested for the discrete PMF
 BIN_SIZES = [1, 2, 5, 10]
@@ -91,8 +91,8 @@ DELTA_COLORS = ["#c0392b", "#e67e22", "#f39c12", "#27ae60", "#2980b9",
 # ============================================================
 
 def n_theory_continuous(delta):
-    """n = ceil(K · log(1/ε) / δ²)"""
-    return math.ceil(K * math.log(1.0 / EPSILON) / delta ** 2)
+    """n = ceil((K + log(1/ε)) / δ²)"""
+    return math.ceil((K + math.log(1.0 / EPSILON)) / delta ** 2)
 
 
 def n_theory_discrete(delta, bin_size):
@@ -102,8 +102,8 @@ def n_theory_discrete(delta, bin_size):
 
 
 def bound_curve_continuous(n_array):
-    """Theoretical TVD bound as a function of n: sqrt(K · log(1/ε) / n)"""
-    return np.minimum(1.0, np.sqrt(K * math.log(1.0 / EPSILON) / n_array))
+    """Theoretical TVD bound as a function of n: sqrt((K + log(1/ε)) / n)"""
+    return np.minimum(1.0, np.sqrt((K + math.log(1.0 / EPSILON)) / n_array))
 
 
 def bound_curve_discrete(n_array, bin_size):

@@ -34,10 +34,10 @@ $\Box$ \end{quotation}}
 \newcommand{\ints}{\mbox{\(\mathbb Z\)}}
 
 \title{Know Your Limits: Delay-Based Passive Estimation of Remaining Path Capacity}
-\date{May 2026}
+\date{18 May 2026}
 \author{Savani Sawaikar\\
 Master of Engineering Computer Science\\
-Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
+Supervised by Dr. Stefano Vissicchio}
 
 \begin{document}
 
@@ -49,14 +49,14 @@ Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley}
 \vspace*{2cm}
 {\Large\bfseries Know Your Limits: Delay-Based Passive Estimation of Remaining Path Capacity\par}
 \vspace{1.5cm}
-{\large Savani Sawaikar\par}
+{\large SBBP4\par}
 \vspace{0.5cm}
-{Master of Engineering (MEng) Computer Science\par}
-{University College London (UCL)\par}
+{Master of Engineering Computer Science\par}
+{University College London\par}
 \vspace{0.5cm}
-{Supervised by Dr. Stefano Vissicchio and Prof. Mark Handley\par}
+{Supervised by Dr. Stefano Vissicchio\par}
 \vspace{0.5cm}
-{May 2026\par}
+{18 May 2026\par}
 \vfill
 \begin{minipage}{0.9\textwidth}
 \small
@@ -67,7 +67,8 @@ The report may be freely copied and distributed provided the source is explicitl
 \end{titlepage}
 
 \begin{abstract}
-Knowing how much additional traffic a path can absorb before performance degrades is central to network management, yet current practice often answers this question by monitoring scalar delay metrics such as mean round-trip time or percentile latency and raising alerts when these cross predefined thresholds. These summaries discard distributional information that encodes how path conditions are changing. This report evaluates a passive monitoring system that treats the delay distribution itself as the object of interest. The evaluation first studies the statistical sample complexity behind distribution reconstruction, then evaluates an adaptive stopping rule that decides when enough samples have been collected without using ground truth at deployment time.
+\input{abstract.tex}
+
 \end{abstract}
 
 \clearpage
@@ -77,141 +78,51 @@ Knowing how much additional traffic a path can absorb before performance degrade
 
 \chapter{Introduction}
 
+\input{intro.tex}
+
 \chapter{Use Case}
 
-\chapter{Methodology}
+\input{use_case}
 
-The methodology treats passive delay monitoring as two linked statistical tasks: reconstruction and identification. Reconstruction estimates the full distribution of packet delays observed at the receiver, instead of reducing a path to a scalar delay statistic. Identification uses that reconstructed distribution to decide whether the path appears to be in a particular operating state, such as a safe capacity regime or a degraded regime. This chapter sets out the common method used across the evaluation. The first two evaluation sections focus on reconstruction and stopping, while the later use-case section uses identification to turn the reconstructed distribution into an operational decision.
-
-\section{Problem framing}
-\label{sec:method-problem-framing}
-
-The object of interest is the delay distribution induced by a network path over a measurement interval. Let \(X_1,\ldots,X_n\) denote independent delay observations drawn from an unknown distribution \(P\). In the simplest direct-sampling experiments, these observations are generated from a known distribution family in order to isolate the statistical question. In the network experiments, they are packet delays produced by Network Simulator 3 (NS-3). In both cases, the monitor receives only the samples. The distribution family and its parameters are not given to the reconstruction algorithm.
-
-This framing separates estimation from validation. The monitor constructs an estimate \(\widehat{P}_n\) from the observed samples alone. Ground truth is used only after reconstruction, in order to evaluate whether the estimate is accurate. This distinction is central to the project: the deployment setting is passive and distribution-agnostic, while the experimental setting uses known ground truth to measure performance.
-
-Identification enters after this reconstruction step. In the use-case setting, the question is no longer only whether \(\widehat{P}_n\) is close to the hidden ground truth. It is whether the observed delay distribution is consistent with a reference state, or sufficiently different from it to indicate that the path has moved into a different capacity regime. This is closer to identity testing or goodness-of-fit testing in the terminology of distribution testing. The statistical sample-complexity evaluation does not use that testing result directly, because it first has to establish that the reconstructed distribution is reliable enough to support later identification decisions.
-
-The methodology is deliberately staged. Direct sampling is used first because it removes packet scheduling, queueing, and simulator effects. This establishes whether the statistical reconstruction problem behaves as expected. The method is then applied to simulated packet delays, where the same reconstruction and stopping rules are tested under network conditions. The later use-case, multi-hop, and multi-path experiments are intended to increase network complexity without changing the monitoring interface.
-
-\section{Observation model}
-\label{sec:method-observation-model}
-
-The passive monitor observes packet delays at the receiver. In the non-binning setting used as the clean baseline, each packet contributes one delay sample. This is the least lossy version of the problem because the estimator can use the observed delays directly. Where a finite-domain comparison is required, the observed delays are mapped onto a delay grid. A bin is a fixed-width interval of delay values, and the number of bins determines the number of probabilities that must be estimated.
-
-The main continuous grid used in the evaluation has one millisecond bins from 0 milliseconds to 150 milliseconds, giving 150 cells. This range is wide enough for the configured normal, lognormal, and Weibull delay distributions used in the current experiments. Discrete experiments use their natural finite supports, so no additional delay grid is needed. The binning step is therefore not a claim that delay is intrinsically discrete. It is a measurement and evaluation device that allows continuous reconstructions to be compared using the same finite-domain distance.
-
-In the simple network case, the topology is a two-node, one-link path. Node A sends packets to Node B, and the link delay is sampled independently for each packet from the configured delay distribution. This setup gives direct control over the ground truth while still exercising the packet-level measurement pipeline. More complex topologies can be introduced later by changing how the path generates observed delays, rather than by changing the reconstruction objective.
-
-\section{Distribution reconstruction}
-\label{sec:method-distribution-reconstruction}
-
-The reconstruction method depends on whether the target distribution is being represented as a finite probability mass function or as a smoothed continuous estimate. For discrete data, the estimator is the empirical probability mass function (PMF). If \(\mathcal{X}\) is the support, the estimate assigns each value \(x \in \mathcal{X}\) its observed relative frequency:
-\[
-\widehat{P}_n(x)=\frac{1}{n}\sum_{i=1}^{n}\mathbf{1}\{X_i=x\}.
-\]
-This estimator is simple, distribution-agnostic, and directly aligned with the finite-domain learning theory used in the evaluation.
-
-For continuous delays, two reconstructions are considered. The first is a binned empirical PMF, obtained by counting how many samples fall into each delay bin. This gives a finite representation that can be compared directly with true bin probabilities. The second is a kernel density estimate (KDE). The KDE evaluates a smooth density from the samples, then converts that density back into probability mass on the same delay grid for comparison. This allows the evaluation to test whether smoothing improves sample efficiency without assuming that the monitor knows the generating family.
-
-The estimators are intentionally non-parametric. The monitor does not fit a normal, lognormal, Weibull, binomial, Zipfian, or piecewise model. Those families are used to generate controlled ground truth distributions, not to constrain the reconstruction. This is important because the eventual monitoring setting should not require the operator to know the delay distribution in advance.
-
-\section{Accuracy metrics}
-\label{sec:method-accuracy-metrics}
-
-The primary accuracy metric is total variation distance (TVD). For two distributions \(P\) and \(Q\) over the same finite domain \(\mathcal{X}\),
-\[
-d_{\mathrm{TV}}(P,Q)=\frac{1}{2}\sum_{x\in\mathcal{X}}|P(x)-Q(x)|.
-\]
-TVD is used because it has a direct interpretation as the largest probability difference that the two distributions assign to any event. It is also the distance used by the finite-domain learning bound that motivates the sample-complexity experiments.
-
-For continuous distributions, TVD is computed after both the true distribution and the estimate have been represented on the same finite grid. The true probability of a bin is computed from the known cumulative distribution function in direct-sampling experiments, or from the simulator's configured ground truth where available. The estimated probability is computed either from the empirical bin counts or from the grid-normalised KDE. This keeps the metric consistent across discrete and continuous cases.
-
-Kullback-Leibler divergence and Wasserstein distance are secondary diagnostics. They provide complementary views of reconstruction quality, but they are not the primary success criterion. Kullback-Leibler divergence is sensitive to small probabilities and can become unstable when an estimated bin has zero mass. Wasserstein distance captures geometric movement of probability mass across the delay axis, which is useful for delay distributions, but it is not the distance used in the sample-complexity theorem. The evaluation therefore reports and discusses TVD first.
-
-\section{Sample complexity and stopping}
-\label{sec:method-sample-complexity-stopping}
-
-The statistical part of the methodology uses finite-domain distribution learning as a reference point. For a distribution over \(k\) outcomes, the number of samples needed to learn the distribution within TVD \(\delta\) with failure probability at most \(\varepsilon\) scales as
-\[
-n=\Theta\left(\frac{k+\log(1/\varepsilon)}{\delta^2}\right).
-\]
-This bound is used as a conservative theoretical baseline. It explains why finer grids require more samples and why stricter accuracy targets become expensive quickly. It is not treated as a deployment rule, because it protects against arbitrary worst-case distributions and can be much larger than the empirical requirement for structured delay distributions.
-
-The adaptive stopping method addresses that gap. Samples are processed in batches. After each batch, the monitor compares the current reconstruction with the previous reconstruction using TVD. If the change between the two estimates is below a chosen stability threshold, the monitor stops. The stopping decision uses only observed samples and previous estimates. Ground truth is not used at stopping time.
-
-The stopping rule converts the offline sample-complexity question into an online monitoring question. The offline question asks how many samples would be sufficient if the ground truth were known for evaluation. The online question asks whether the monitor can detect that its estimate has stabilised before collecting a worst-case number of samples. The evaluation tests this by recording both the stopping time and the post-hoc TVD against the true distribution.
-
-This creates the iterative loop used in the dissertation. Theory gives a conservative reference point. Direct sampling checks whether the estimator behaves sensibly before any network effects are introduced. Adaptive stopping then asks how quickly the estimator can be trusted without ground truth. The use case will use that trusted estimate for identification. If a later network experiment fails, the loop makes the failure easier to diagnose: the cause is less likely to be basic distribution learning, and more likely to be the network mechanism, the stopping threshold, or the identification boundary.
-
-\section{Capacity use case setup}
-\label{sec:method-capacity-use-case}
-
-The motivating use case turns distribution reconstruction into a capacity-estimation procedure. The controlled network experiment introduces additional cross traffic on the same link as the monitored flow. This cross traffic is generated using probe packets so that the experiment can deliberately move the path from an uncongested state towards a congested state. The probes are part of the experimental workload used to create different capacity regimes. The monitoring method still observes packet delays and reconstructs their distribution rather than relying on per-packet path tracking or explicit queue measurements.
-
-The use case treats the delay distribution under a low-load or no-added-load condition as the reference distribution for the path. As more probe traffic is added, the observed delay distribution is reconstructed again using the same non-parametric estimator and stopping rule described above. The operational question is then whether the new distribution still has the same identity as the reference state, or whether it has changed enough to indicate that the added traffic is consuming the remaining capacity. In practice, this can be tested by comparing the stopped reconstruction with the reference distribution using TVD or a related distributional distance. A small distance indicates that the path still behaves like the reference state. A large distance indicates that the extra offered load has changed the delay regime.
-
-The capacity search is iterative. The experiment starts with a small number of probe packets per measurement interval and doubles that number until the distributional comparison first indicates congestion. This exponential phase quickly finds a bracket: one offered-load setting that still appears safe, and one higher setting that appears congested. The experiment then refines the bracket with a binary-search style procedure, testing the midpoint number of probes and updating the safe or congested endpoint according to the reconstructed delay distribution. The result is an estimate of the maximum added probe load that can be sent before the path leaves the reference delay regime.
-
-This design keeps the use case aligned with the earlier evaluations. The statistical section justifies that delay distributions can be reconstructed from samples. The adaptive stopping section decides when the reconstruction is trustworthy without ground truth. The capacity use case then uses distribution identity to turn a trusted reconstruction into an operational decision about remaining capacity.
-
-\section{Experimental workflow}
-\label{sec:method-experimental-workflow}
-
-Each experiment follows the same workflow. A ground truth distribution is selected, samples are generated, a reconstruction is built from those samples, and the reconstruction is compared with ground truth. Random seeds are used to repeat each configuration so that the reported behaviour reflects sampling variability rather than a single run. Median values and interquartile ranges are used in the plots because they show the central trend and the spread across seeds without being dominated by isolated runs.
-
-The first evaluation uses direct sampling from discrete and continuous distributions. The discrete cases are binomial, Zipfian, and piecewise distributions. The continuous cases are normal, lognormal, and Weibull distributions. This stage validates the statistical method independently of the network simulator. The second evaluation uses the same distribution families to test adaptive stopping. It asks whether stability between consecutive reconstructions is a reliable proxy for accuracy against ground truth.
-
-The later evaluations will use the same measurement and reconstruction pipeline in increasingly realistic network settings. The motivating use case will connect distribution reconstruction to the operational question of remaining path capacity using the cross-traffic search described above. The multi-hop and multi-path studies will test whether the method remains informative when the observed delay distribution is produced by multiple links or multiple path components. This structure keeps the dissertation aligned: each evaluation changes the source of the observed samples, while the central object of estimation remains the delay distribution.
-
-\section{Reproducibility}
-\label{sec:method-reproducibility}
-
-The implementation separates data generation, analysis, and report figures. Simulation and experiment launch scripts live under the project scripts directory, while analysis scripts live under the analysis directory. Generated data are kept under the results directory, and report-ready figures are copied into the report figure directory. This separation makes it possible to rerun an experiment, regenerate its summary data, and update the dissertation figures without changing the prose manually.
-
-The current methodology relies on fixed parameter choices for comparability across experiments. The main TVD target is 0.05, the main failure probability for the sample-complexity reference is 0.05, and the continuous delay grid uses one millisecond bins over 0 to 150 milliseconds. These choices are not inherent limits of the method. They provide a consistent baseline so that changes in performance can be attributed to the distribution shape, estimator, sample count, or stopping configuration rather than to changing evaluation definitions.
-
-\chapter{Evaluation}
-
-The evaluation has five parts: statistical sample complexity, adaptive stopping, the motivating use case, multi-hop topologies, and multi-path topologies.
-
-\section{Statistical sample complexity}
+\chapter{Statistical Sample Complexity}
 \label{sec:eval-statistical}
 
-The first evaluation establishes the statistical foundation for the rest of the project. The later use case aims to infer remaining path capacity from changes in the observed delay distribution. That objective is only meaningful if the monitor can first reconstruct the distribution accurately without being told its generating family. This section therefore removes the network simulator from the loop and draws samples directly from known distributions. The experiment is deliberately narrow, but useful because any failure here would be a failure of the statistical reconstruction method itself, not of Network Simulator 3 (NS-3), packet scheduling, or topology design.
+Sample-complexity analysis provides the statistical foundation for the rest of the project. Later use-case experiments aim to infer remaining path capacity from changes in the observed delay distribution, but that objective depends on a prior capability: the monitor must be able to reconstruct a distribution accurately without being told its generating family. To isolate that requirement, the network simulator is removed from the loop and samples are drawn directly from known distributions. The experiment is intentionally narrow. Its value is that any failure would point to the statistical reconstruction method itself, rather than to Network Simulator 3 (NS-3), packet scheduling, or topology design.
 
-The monitor receives only samples. It is not told whether they came from a binomial, Zipfian, piecewise, normal, lognormal, or Weibull distribution. The generating family is used only to create ground truth for evaluation. This separation matters because the eventual capacity use case also has to be distribution-agnostic. A path may move from a low-delay state to a congested state by changing its skew, tail, or modality rather than by following a named parametric family.
+Only samples are exposed to the monitor. It is not told whether they came from a binomial, Zipfian, piecewise, normal, lognormal, or Weibull distribution. The generating family creates ground truth for evaluation, but plays no role in reconstruction. Maintaining that separation is essential because the eventual capacity use case must also be distribution-agnostic. A path may move from a low-delay state to a congested state by changing its skew, tail, or modality rather than by following a named parametric family.
 
-The main accuracy metric is total variation distance (TVD). For a true distribution \(P\) and an estimate \(\widehat{P}\) over a finite domain \(\mathcal{X}\), this is
+Accuracy is measured primarily by total variation distance (TVD). For a true distribution \(P\) and an estimate \(\widehat{P}\) over a finite domain \(\mathcal{X}\), this is
 \[
 d_{\mathrm{TV}}(P,\widehat{P}) =
 \frac{1}{2}\sum_{x \in \mathcal{X}} |P(x)-\widehat{P}(x)|.
 \]
-A reconstruction is treated as successful when this distance is at most a target error \(\delta\), with failure probability at most \(\varepsilon\). Throughout this section, \(\delta=0.05\) and \(\varepsilon=0.05\), so the target is reconstruction within 5 percent TVD with probability at least 0.95.
+A reconstruction is treated as successful when this distance is at most a target error \(\delta\), with failure probability at most \(\varepsilon\). Throughout this section, \(\delta=0.05\) and \(\varepsilon=0.05\), so the target is TVD of at most 0.05 with probability at least 0.95.
 
-\subsection{The learning bound}
+The section answers three evaluation questions in order. First, it checks where the finite-sample reference bound comes from and how it should be interpreted. Second, it applies the bound to discrete distributions, where the support is already finite. Third, it applies the same comparison to continuous delay distributions after discretising them onto a common evaluation grid. The order follows the theory. The TVD learning bound is stated for a finite domain of \(k\) outcomes, so the first experiment uses native discrete supports where those outcomes are exactly defined. The continuous experiment then maps delay samples onto a 150-bin grid, which is the finite-domain form used by the later network evaluation.
 
-The theoretical reference point comes from finite-domain distribution learning. Canonne's monograph on distribution testing records this as the learning baseline for arbitrary distributions on a known finite domain, and uses it as the benchmark against which sublinear testing algorithms are compared \cite{canonneTopics}. Canonne writes the TVD tolerance as \(\varepsilon\) and the failure probability as \(\delta\). Using this report's notation, where \(\delta\) is the TVD target and \(\varepsilon\) is the failure probability, independent samples from an unknown distribution over \(k\) possible outcomes are sufficient for the plug-in histogram estimator to learn the distribution in TVD with sample complexity
+\section{The Learning Bound}
+
+Finite-domain distribution learning supplies the theoretical reference point. Canonne's monograph on distribution testing records this as the learning baseline for arbitrary distributions on a known finite domain, and uses it as the benchmark against which sublinear testing algorithms are compared \cite{canonneTopics}. Canonne writes the TVD tolerance as \(\varepsilon\) and the failure probability as \(\delta\). Using this report's notation, where \(\delta\) is the TVD target and \(\varepsilon\) is the failure probability, independent samples from an unknown distribution over \(k\) possible outcomes are sufficient for the plug-in histogram estimator to learn the distribution in TVD with sample complexity
 \[
 n = \Theta\left(\frac{k+\log(1/\varepsilon)}{\delta^2}\right).
 \]
-This is an information-theoretic finite-sample bound, tight up to universal constants for arbitrary distributions on \(k\) categories \cite{canonneShort,canonneTopics,devroyeLugosi}. The base of the logarithm affects only constants in the asymptotic theorem; the numerical calculations below use the natural logarithm. The \(k\) term is the number of probabilities that must be estimated. The \(1/\delta^2\) term comes from concentration: halving the desired error requires roughly four times as many samples. The \(\log(1/\varepsilon)\) term pays for high probability rather than only average-case accuracy.
+This information-theoretic finite-sample bound is tight up to universal constants for arbitrary distributions on \(k\) categories \cite{canonneShort,canonneTopics,devroyeLugosi}. The base of the logarithm affects only constants in the asymptotic theorem; the numerical calculations below use the natural logarithm. The \(k\) term counts how many probabilities must be estimated. The \(1/\delta^2\) term comes from concentration, so halving the desired error requires roughly four times as many samples. The \(\log(1/\varepsilon)\) term pays for high probability rather than only average-case accuracy.
 
-This baseline is appropriate for the first evaluation because it studies reconstruction rather than identification. It asks whether the empirical distribution itself has been learned. Identification still matters, but it belongs to the use-case stage. Once the use case has a reference operating state, the monitor can ask an identity-testing style question: whether the current delay distribution is consistent with that reference, or far enough away to indicate a capacity change \cite{canonneSurvey}. The reconstruction evaluation comes first because a distribution identity test is only meaningful if the estimated distribution feeding it is already stable.
+As a baseline, the bound suits this first evaluation because the question is reconstruction rather than capacity identification. Later sections use the reconstructed distribution to compare path states, but this section keeps that later decision out of scope and measures only TVD against the known generating distribution.
 
-The word finite is important. A discrete distribution already has a finite support. A continuous delay distribution has to be evaluated on a finite grid before TVD can be computed as a sum. A bin is one such grid cell. In the continuous experiments below, one bin corresponds to a one millisecond interval, and all bins from 0 milliseconds to 150 milliseconds are used. This gives \(k=150\) categories. Once the continuous distribution has been converted into bin probabilities, the same finite-domain comparison applies.
+Finiteness is also a methodological constraint. A discrete distribution already has a finite support. A continuous delay distribution must be evaluated on a finite grid before TVD can be computed as a sum. The grid is the discretisation used for evaluation, not a claim that observations are aggregated over time. A bin is one fixed interval on the delay axis. In the continuous experiments below, one bin corresponds to a one millisecond interval, and all bins from 0 milliseconds to 150 milliseconds are used. This gives \(k=150\) categories. Once the continuous distribution has been converted into bin probabilities, the same finite-domain comparison applies.
 
 The experiments use the explicit reference value
 \[
-n_{\mathrm{theory}} =
+n_{\mathrm{ref}} =
 \left\lceil \frac{k+\log(1/\varepsilon)}{\delta^2} \right\rceil .
 \]
-With \(\varepsilon=0.05\), \(\log(1/\varepsilon)=\log(20)=2.996\). The corresponding theory curve in the plots is the same relationship inverted as
+This reference drops the unknown asymptotic constant hidden by the \(\Theta(\cdot)\) notation, so it is an order-of-magnitude comparison scale rather than a formal sufficient-sample threshold. With \(\varepsilon=0.05\), \(\log(1/\varepsilon)=\log(20)=2.996\). The corresponding reference curve in the plots is the same relationship inverted as
 \[
-\delta_{\mathrm{theory}}(n)=
+\delta_{\mathrm{ref}}(n)=
 \sqrt{\frac{k+\log(1/\varepsilon)}{n}}.
 \]
-The curve should be read as a distribution-free reference, not as a prediction that every structured distribution will need exactly that many samples. The useful empirical questions are whether TVD falls with \(n\), whether harder shapes converge more slowly, and whether the target is reached no later than the calculated reference point. This is a methodological check as much as a numerical one. If direct sampling already failed this test, later network experiments would not be interpretable. Passing it means the later sections can focus on stopping, distribution identity, and topology effects rather than on whether the estimator is fundamentally mis-specified.
+The curve is a distribution-free reference, not a prediction that every structured distribution will need exactly that many samples. The empirical questions are whether TVD falls with \(n\), whether harder shapes converge more slowly, and how far below \(n_{\mathrm{ref}}\) the target is reached for each shape. Empirical failure probability is measured as the fraction of seeds whose reconstruction misses the TVD target, which is the empirical analogue of the \(\varepsilon\) parameter in the bound.
 
 \begin{figure}[htbp]
 \centering
@@ -220,9 +131,9 @@ The curve should be read as a distribution-free reference, not as a prediction t
 \label{fig:statistical-distribution-shapes}
 \end{figure}
 
-\subsection{Discrete sampling}
+\section{Discrete Sampling}
 
-The discrete experiment uses three finite distributions, shown in the top row of Figure \ref{fig:statistical-distribution-shapes}. These are not arbitrary examples. They separate the effect of support size from the effect of how probability mass is arranged on that support. The binomial distribution is smooth and concentrated. The Zipfian distribution is highly skewed and has a long finite tail of rare outcomes. The piecewise distribution is deliberately irregular and multi-modal, so it tests a case where there is no smooth ordering for the estimator to exploit.
+Three finite distributions are used in the discrete experiment, shown in the top row of Figure \ref{fig:statistical-distribution-shapes}. They are chosen so that support size and probability shape can be examined separately, with each shape standing in for a feature that can also appear in real delay distributions. A binomial distribution gives a smooth, concentrated peak, resembling a lightly loaded path with narrow delay variation. A Zipfian distribution gives strong skew and a long finite tail, matching the case where delays are usually small but occasionally much larger. A piecewise distribution gives irregular, multi-modal mass, as would be expected when delays arise from several disjoint regimes such as different service classes or route choices. The purpose of the discrete experiment is not to claim that delay is intrinsically discrete. It asks whether reconstruction can preserve these shape features before the added complication of continuous sampling.
 
 The binomial case uses
 \[
@@ -231,26 +142,26 @@ X \sim \mathrm{Binomial}(20,0.5),
 p(x)=\binom{20}{x}0.5^x0.5^{20-x},
 \qquad x \in \{0,\ldots,20\}.
 \]
-This gives \(k=21\) possible outcomes. The Zipfian case uses a truncated power law,
+The support has \(k=21\) possible outcomes. The Zipfian case uses a truncated power law,
 \[
 p(x)=\frac{x^{-1.5}}{\sum_{j=1}^{20}j^{-1.5}},
 \qquad x \in \{1,\ldots,20\},
 \]
-so \(k=20\). The piecewise case also uses support \(\{1,\ldots,20\}\), with probabilities indexed in support order as
+so \(k=20\). Finally, the piecewise case also uses support \(\{1,\ldots,20\}\), with probabilities indexed in support order as
 \[
 \begin{aligned}
 p = (&0.12,0.02,0.08,0.01,0.10,0.03,0.07,0.12,0.02,0.09,\\
      &0.01,0.08,0.04,0.06,0.02,0.05,0.02,0.04,0.01,0.01).
 \end{aligned}
 \]
-The values sum to one and create separated high-probability regions.
+These values sum to one and create separated high-probability regions.
 
-For each distribution, samples are drawn directly from the probability mass function (PMF). The estimator is the empirical PMF. Each point in Figure \ref{fig:statistical-discrete-tvd} is the median TVD over 100 random seeds, and the shaded band is the interquartile range. The tested sample sizes are centred around the calculated \(n_{\mathrm{theory}}\) value for each support size.
+For each distribution, samples are drawn directly from the probability mass function (PMF) and reconstructed using the empirical PMF. Each point in Figure \ref{fig:statistical-discrete-tvd} is the median TVD over 100 random seeds, while the shaded band shows the interquartile range. The median shows the typical reconstruction trajectory, while the interquartile band shows whether the conclusion is being driven by a narrow group of seeds or by consistent behaviour across runs. The adaptive stopping section therefore reports correctness across seeds explicitly, since an operational monitor should care about the probability of stopping with a bad reconstruction. Tested sample sizes are centred around the calculated \(n_{\mathrm{ref}}\) value for each support size.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{statistical_discrete_tvd_vs_n.png}
-\caption{Discrete reconstruction error as the sample count increases. The dotted horizontal line is the target \(\delta=0.05\), the red vertical line is the calculated \(n_{\mathrm{theory}}\), and the dashed black curve is \(\delta_{\mathrm{theory}}(n)\).}
+\caption{Discrete reconstruction error as the sample count increases. The dotted horizontal line is the target \(\delta=0.05\), the red vertical line is the calculated \(n_{\mathrm{ref}}\), and the dashed black curve is \(\delta_{\mathrm{ref}}(n)\).}
 \label{fig:statistical-discrete-tvd}
 \end{figure}
 
@@ -259,7 +170,7 @@ For each distribution, samples are drawn directly from the probability mass func
 \small
 \begin{tabular}{lrrrr}
 \toprule
-Distribution & \(k\) & \(n_{\mathrm{theory}}\) & Target \(n\) & TVD at \(n_{\mathrm{theory}}\) \\
+Distribution & \(k\) & \(n_{\mathrm{ref}}\) & Target \(n\) & TVD at \(n_{\mathrm{ref}}\) \\
 \midrule
 Binomial & 21 & 9,599 & 960 & 0.0123 \\
 Zipfian & 20 & 9,199 & 920 & 0.0132 \\
@@ -270,9 +181,9 @@ Piecewise & 20 & 9,199 & 2,300 & 0.0158 \\
 \label{tab:statistical-discrete-results}
 \end{table}
 
-The calculation for the binomial case is
+For the binomial case,
 \[
-n_{\mathrm{theory}} =
+n_{\mathrm{ref}} =
 \left\lceil \frac{21+\log(20)}{0.05^2} \right\rceil
 =
 \left\lceil \frac{23.996}{0.0025} \right\rceil
@@ -280,24 +191,24 @@ n_{\mathrm{theory}} =
 \]
 For the Zipfian and piecewise cases, \(k=20\), so
 \[
-n_{\mathrm{theory}} =
+n_{\mathrm{ref}} =
 \left\lceil \frac{20+\log(20)}{0.05^2} \right\rceil
 =
 \left\lceil \frac{22.996}{0.0025} \right\rceil
 = 9{,}199.
 \]
 
-Figure \ref{fig:statistical-discrete-tvd} shows the expected decrease in TVD as \(n\) grows. The empirical curves all fall below the target well before the calculated reference point, but the ranking across distributions is the important result. The binomial distribution is the easiest of the three. Although it has one more support point than the others, most of its mass is concentrated near the centre, so the low-probability tails contribute little to TVD. It first reaches the target at \(n=960\), and by \(n_{\mathrm{theory}}=9{,}599\) the median TVD is 0.0123.
+Figure \ref{fig:statistical-discrete-tvd} shows the expected decrease in TVD as \(n\) grows. Binomial and Zipfian estimates reach the 0.05 target with about ten times fewer samples than \(n_{\mathrm{ref}}\), while the piecewise estimate reaches it with about four times fewer. More important than the absolute gap to theory is the ranking across distributions. Binomial is easiest despite having one more support point than the other two cases, because most probability mass is concentrated near the centre and the low-probability tails contribute little to TVD. It first reaches the target at \(n=960\), and by \(n_{\mathrm{ref}}=9{,}599\) the median TVD is 0.0123.
 
-The Zipfian distribution reaches the target at \(n=920\) and has median TVD 0.0132 at its theory point. Its head is easy to estimate because the first few outcomes carry most of the mass. The rare tail outcomes are harder individually, but their combined probability is limited, so errors in the tail do not dominate TVD. This is why the Zipfian curve is close to the binomial curve despite having a more uneven shape.
+Zipfian reaches the target at \(n=920\) and has median TVD 0.0132 at its reference point. Its head is easy to estimate because the first few outcomes carry most of the mass. Rare tail outcomes are harder individually, but their combined probability is limited, so tail errors do not dominate TVD. That is why the Zipfian curve stays close to the binomial curve despite having a more uneven shape.
 
-The piecewise distribution is the hardest discrete case. It is still below the theoretical reference by a wide margin, but it needs \(n=2{,}300\) samples before the median TVD falls below 0.05. This behaviour matches the design of the distribution. Probability mass is spread across separated peaks and troughs, so the empirical PMF has to learn several non-neighbouring support points accurately. The result is useful because it shows that the theoretical bound is not only conservative for smooth distributions. Even an irregular finite distribution reaches the target before the calculated distribution-free sample count, but it does so later than the smoother and more skewed alternatives.
+Piecewise is the hardest discrete case. It needs \(n=2{,}300\) samples before median TVD falls below 0.05, roughly two and a half times the binomial requirement at a similar support size. Probability mass is spread across separated peaks and troughs, so the empirical PMF has to learn several non-neighbouring support points accurately. The result shows that the theoretical bound is conservative even outside the smooth cases. An irregular finite distribution still reaches the target before the calculated distribution-free sample count, but it does so later than the smoother and more skewed alternatives.
 
-This is the first point where the evaluation feeds back into the experimental design. The support size \(k\) alone does not determine the practical difficulty of reconstruction. The arrangement of mass across the support also matters. The piecewise distribution should therefore remain in the adaptive stopping and use-case experiments, because it is a better stress test for false stability than the binomial distribution. This matters for capacity estimation because a capacity change is unlikely to appear only as a uniform shift in every probability. It may create or remove modes, move mass into a tail, or change the relative weight of several delay regimes. The estimator has to preserve those shape changes if distribution identity is going to be useful later.
+Support size \(k\) alone does not determine practical reconstruction difficulty; the arrangement of mass across the support matters as well. Piecewise therefore remains in the adaptive stopping experiments as a stronger stress test for false stability than binomial. A rule that succeeds only on smooth or highly concentrated shapes has not yet shown that it can handle the irregular probability mass that appears in multi-regime delay behaviour.
 
-\subsection{Continuous sampling}
+\section{Continuous Sampling}
 
-The continuous experiment uses the normal, lognormal, and Weibull distributions shown in the bottom row of Figure \ref{fig:statistical-distribution-shapes}. These are the same families used elsewhere in the project because they cover three delay shapes that are relevant to passive monitoring. The normal distribution is symmetric and concentrated, representing a low-variability delay regime. The lognormal distribution is positive and right-skewed, which captures the idea that delay can be mostly small but occasionally much larger. The Weibull distribution is also positive but has a different asymmetric shape, with a sharp rise and a longer decaying tail. Together they test whether reconstruction works beyond a single benign, bell-shaped case.
+Continuous sampling uses the normal, lognormal, and Weibull distributions shown in the bottom row of Figure \ref{fig:statistical-distribution-shapes}. These families are not claimed to exhaustively model Internet delay. They provide controlled representatives of shape classes that matter for passive monitoring. Empirical work on network delay reports concentrated modes with right-skewed or heavy-tailed variation, and has fitted gamma, lognormal, and Weibull forms to one-way delay and round-trip time measurements \cite{karakasDelay}. Wider traffic-modelling studies also use lognormal and Weibull families for Internet metrics and packet-level behaviour \cite{downeyLognormal,arfeenWeibull}. Normal is included as a symmetric low-variance baseline. Lognormal captures a positive, right-skewed regime in which delay is usually small but occasionally much larger. Weibull gives a different positive asymmetric shape, with a sharp rise and a longer decaying tail. Together, the three families test whether reconstruction works beyond a single benign, bell-shaped case.
 
 The parameter choices are
 \[
@@ -307,17 +218,17 @@ X_{\mathrm{normal}} \sim \mathcal{N}(40,2^2),
 \qquad
 X_{\mathrm{weibull}} \sim \mathrm{Weibull}(\lambda=10,\alpha=2).
 \]
-All samples are evaluated on the same one millisecond grid from 0 milliseconds to 150 milliseconds. The true binned distribution is computed by integrating the known cumulative distribution function over each bin. The empirical PMF counts how many samples fall in each bin. The kernel density estimate (KDE) is computed from the same samples, evaluated at the bin centres, and normalised so that it can also be compared as a probability mass function on the grid. This matters because TVD compares probability mass, not raw continuous density values.
+All samples are evaluated on the same one millisecond grid from 0 milliseconds to 150 milliseconds. This grid is the finite representation used to compare continuous objects. True bin probabilities are computed by integrating the known cumulative distribution function over each bin. The empirical PMF counts sample frequencies on the same grid. The kernel density estimate (KDE) uses a Gaussian kernel with bandwidth chosen by Scott's rule, which is the default in the SciPy implementation used throughout the project. Scott's rule sets the bandwidth from the sample size and standard deviation alone, so it does not require knowledge of the generating family. The KDE is evaluated at the bin centres and normalised for comparison as a probability mass function on the same grid. TVD is then computed over probability mass on the grid, not over raw continuous density values.
 
-The finite-grid comparison has \(k=150\), so the calculated bound is
+The finite-grid comparison has \(k=150\), roughly an order of magnitude larger than the discrete supports above, so the calculated reference value is
 \[
-n_{\mathrm{theory}} =
+n_{\mathrm{ref}} =
 \left\lceil \frac{150+\log(20)}{0.05^2} \right\rceil
 =
 \left\lceil \frac{152.996}{0.0025} \right\rceil
 = 61{,}199.
 \]
-Each point in Figure \ref{fig:statistical-continuous-tvd} is the median across 30 random seeds, with interquartile shading.
+Each point in Figure \ref{fig:statistical-continuous-tvd} is the median across 30 random seeds, with interquartile shading. The main text keeps the combined view because it shows the ordering between the three continuous families. The individual normal and lognormal curves are reported in Appendix Figures \ref{fig:app-tvd-vs-n-normal} and \ref{fig:app-tvd-vs-n-lognormal}, while the Weibull curve is also retained in Appendix Figure \ref{fig:app-tvd-vs-n-weibull} as the hardest continuous reconstruction.
 
 \begin{figure}[htbp]
 \centering
@@ -331,72 +242,86 @@ Each point in Figure \ref{fig:statistical-continuous-tvd} is the median across 3
 \small
 \begin{tabular}{lrrrrr}
 \toprule
-Distribution & PMF target \(n\) & KDE target \(n\) & PMF at theory & KDE at theory & Gap \\
+Distribution & PMF target \(n\) & KDE target \(n\) & PMF at reference & KDE at reference & Gap \\
 \midrule
 Normal & 500 & 500 & 0.0047 & 0.0060 & 0.0031 \\
 Lognormal & 1,000 & 500 & 0.0052 & 0.0057 & 0.0030 \\
 Weibull & 2,000 & 500 & 0.0073 & 0.0058 & 0.0039 \\
 \bottomrule
 \end{tabular}
-\caption{Continuous sample-complexity results on the one millisecond grid. The first \(n\) columns report the smallest tested sample count for which the median TVD is below 0.05. The last three columns report median values at \(n_{\mathrm{theory}}=61{,}199\).}
+\caption{Continuous sample-complexity results on the one millisecond grid. The first \(n\) columns report the smallest tested sample count for which the median TVD is below 0.05. The last three columns report median values at \(n_{\mathrm{ref}}=61{,}199\).}
 \label{tab:statistical-continuous-results}
 \end{table}
 
-The continuous results in Figure \ref{fig:statistical-continuous-tvd} show the same broad pattern as the discrete results. TVD falls as the number of samples grows, and all three distributions are well below the target by the calculated \(n_{\mathrm{theory}}\). The empirical PMF reaches the target at 500 samples for the normal distribution, 1,000 samples for the lognormal distribution, and 2,000 samples for the Weibull distribution. The ordering is intuitive. The normal distribution places most mass in a narrow symmetric region, so the important bins are quickly populated. The lognormal distribution is skewed, which makes its right tail noisier. The Weibull distribution is the hardest for the binned PMF because its mass rises sharply near the lower end and then decays over a longer range, so the histogram has to estimate both a peak and a tail.
+Figure \ref{fig:statistical-continuous-tvd} shows the same broad pattern as the discrete results. TVD falls as sample count grows, and all three distributions are well below the target by the calculated \(n_{\mathrm{ref}}\). The empirical PMF reaches the target at 500 samples for normal, 1,000 samples for lognormal, and 2,000 samples for Weibull. Normal places most mass in a narrow symmetric region, so the important bins are quickly populated. Lognormal skew makes the right tail noisier. Weibull is hardest for the binned PMF because its mass rises sharply near the lower end and then decays over a longer range, requiring the histogram to estimate both a peak and a tail.
 
-KDE changes this picture in the low-sample regime. It reaches the 0.05 target at the first tested point, 500 samples, for all three continuous distributions. This does not mean KDE has been given the parametric family. It only uses the local smoothness of nearby delay values. The empirical PMF treats adjacent one millisecond bins as unrelated categories, while KDE shares information across neighbouring values. That smoothing is especially helpful for Weibull, where the PMF median TVD is 0.0875 at 500 samples but the KDE median TVD is 0.0421. This is a key design result. The monitor should use the smoothness of delay measurements when it is available, rather than forcing a continuous phenomenon into independent bins too early.
+KDE changes the low-sample regime. It reaches the 0.05 target at the first tested point, 500 samples, for all three continuous distributions. This does not mean KDE has been given the parametric family; it uses only the local smoothness of nearby delay values. Where the empirical PMF treats adjacent one millisecond bins as unrelated categories, KDE shares information across neighbouring values. Smoothing is especially helpful for Weibull: at 500 samples, the PMF median TVD is 0.0875, while the KDE median TVD is 0.0421. The later continuous experiments therefore use KDE as the primary estimator and retain the binned PMF as a finite-grid audit.
 
-At the theory point, both estimators are much more accurate than required. The binned PMF medians are 0.0047 for normal, 0.0052 for lognormal, and 0.0073 for Weibull. The KDE medians are 0.0060, 0.0057, and 0.0058. The small reversal for normal and lognormal, where the PMF is slightly closer than KDE at very large \(n\), is also expected. Once many samples have populated the bins, the empirical PMF has little variance left, while KDE still introduces a small amount of smoothing bias. The practical conclusion is therefore not that KDE always dominates PMF. It is that KDE is more sample efficient at the target accuracy used here, while PMF becomes competitive once the sample count is already large.
+The conservative reading is slightly more nuanced than the median alone. For the binned PMF, the first sample count whose median is below 0.05 is not always the first point whose upper quartile is also below 0.05. Normal and lognormal PMF estimates have median TVD below the target at 500 samples, but their upper quartiles remain above it; by 1,000 samples the interquartile band is safely below the target. For KDE, the upper quartile is already below 0.05 at 500 samples for all three continuous families. The later stopping analysis therefore uses correctness over seeds rather than only median stopping time.
 
-This comparison gives a concrete design choice for the next iteration. KDE is the right estimator to test for early continuous reconstruction because it buys sample efficiency without using a parametric assumption. The PMF remains useful as a finite-grid audit because it shows what can be learned without smoothing. The small large-\(n\) KDE bias also prevents an over-interpretation of the smoother curve. Smoothing helps early stopping, but it should not be treated as ground truth when the use case needs a conservative capacity decision.
+At the reference point, both estimators are much more accurate than required. Binned PMF medians are 0.0047 for normal, 0.0052 for lognormal, and 0.0073 for Weibull. KDE medians are 0.0060, 0.0057, and 0.0058. The small reversal for normal and lognormal, where PMF is slightly closer than KDE at very large \(n\), is expected. Once many samples have populated the bins, the empirical PMF has little variance left, while KDE still introduces a small amount of smoothing bias. KDE is more sample efficient at the target accuracy used here, while PMF becomes competitive once the sample count is already large.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.86\textwidth]{statistical_continuous_kde_pmf_gap.png}
-\caption{TVD between the binned empirical PMF and the KDE reconstruction on the one millisecond grid. The disagreement shrinks as \(n\) grows, with the largest small-sample gap in the Weibull case.}
-\label{fig:statistical-kde-pmf-gap}
-\end{figure}
+The comparison fixes the estimator choice for the next iteration. KDE is used for early continuous reconstruction because it buys sample efficiency without using a parametric assumption. PMF remains useful as a finite-grid audit because it shows what can be learned without smoothing. The small large-\(n\) KDE bias also prevents over-interpretation of the smoother curve. Smoothing helps early stopping, but it should not be treated as ground truth when the use case needs a conservative capacity decision.
 
-Figure \ref{fig:statistical-kde-pmf-gap} directly compares the two continuous reconstructions. The gap between the binned PMF and KDE falls with \(n\), from 0.0704 to 0.0039 in the Weibull case and from roughly 0.03 to 0.003 in the normal and lognormal cases. This shows that KDE is not reconstructing a fundamentally different object. It is a smoothed version of the same empirical information, and the two estimates agree once enough samples are available. That agreement is important for the use case. A capacity estimator based on distributional change should not depend on an arbitrary choice between two incompatible representations of the same samples.
+The supporting KDE-versus-PMF diagnostic in Appendix Figure \ref{fig:app-estimator-gap} checks that smoothing is not reconstructing a fundamentally different object. The gap between the binned PMF and KDE falls with \(n\), with the largest small-sample disagreement in the Weibull case and much smaller gaps for normal and lognormal. That agreement is important for the use case. A capacity estimator based on distributional change should not depend on an arbitrary choice between two incompatible representations of the same samples.
 
-The main implication for the monitor is that the theoretical bound is useful as a statistical backstop but too conservative as a stopping rule. It correctly identifies the dependence on support size, confidence, and error tolerance, and the empirical curves behave in the direction predicted by the theory. However, the direct-sampling distributions are far more structured than an arbitrary distribution over \(k\) unrelated cells. Their smoothness, concentration, skew, and modality all affect how quickly TVD falls. Treating \(n_{\mathrm{theory}}\) as the only answer would hide the fact that useful reconstructions are available much earlier.
+The finite-domain reference captures the dependence on support size, confidence, and error tolerance, and the empirical curves behave as the theory predicts. Structured distributions reach the 0.05 target with one to two orders of magnitude fewer samples than \(n_{\mathrm{ref}}\). Continuous KDE estimates reach it at 500 samples for all three families, against \(n_{\mathrm{ref}}=61{,}199\), a factor of about 122. Discrete PMF estimates reach it between \(n=920\) and \(n=2{,}300\), against \(n_{\mathrm{ref}}\) values near 9{,}200, a factor between 4 and 10. Smoothness, concentration, skew, and modality each shift this gap, with piecewise and Weibull the slowest of the six tested distributions. An online monitor that waited for \(n_{\mathrm{ref}}\) packets every time would therefore over-collect by roughly that factor, motivating the adaptive stopping rule in the next section.
 
-The stronger lesson is that the project needs an iterative evaluation loop rather than a single sample-complexity calculation. The bound defines the safe outer envelope. The direct-sampling experiments identify which distribution shapes are hard, which estimator is worth using early, and which cases should be carried forward as stress tests. The adaptive stopping section then asks whether the monitor can recognise this convergence online, without ground truth. The use case can then apply distribution identity to ask whether the trusted delay distribution still matches a reference capacity state, or whether it has changed enough to imply lower remaining capacity.
+Because this evaluation uses stationary distributions and direct sampling, it does not yet test how the same estimators behave on non-stationary delay traces or under network-induced effects such as missing or reordered observations. Those tests belong to the network experiments. The reading at this stage is that reconstruction itself is not the bottleneck. If a later network experiment fails, the likely cause is the stopping rule, the network mechanism, or the identification step rather than the empirical PMF or KDE estimator.
 
-The older delta-sweep, bin-resolution, KDE-disagreement, and Kolmogorov-Smirnov diagnostics are kept in Appendix \ref{app:statistical-diagnostics}. They support the same conclusion from a wider set of views: stricter TVD targets and finer grids increase the theoretical sample requirement, while the empirical structured distributions usually converge much earlier than the worst-case finite-domain reference.
+Appendix \ref{app:statistical-diagnostics} contains the delta-sweep, bin-resolution, KDE-disagreement, and Kolmogorov-Smirnov diagnostics. They support the same conclusion from a wider set of views. Stricter TVD targets and finer grids increase the theoretical sample requirement, while the structured distributions tested here usually converge much earlier than the worst-case finite-domain reference. The Kolmogorov-Smirnov diagnostics are secondary because the main reconstruction and identity decisions use TVD. Kolmogorov-Smirnov distance is sensitive to the maximum vertical gap between cumulative distributions, whereas TVD measures total probability-mass disagreement across the delay grid. The plots therefore check that convergence is not only a TVD-specific artefact; they do not choose the operating point. Wasserstein distance, also known as earth mover's distance, remains a useful future diagnostic because it measures how far probability mass moves along the delay axis.
 
 \clearpage
 
-\section{Adaptive stopping}
+\chapter{Adaptive Stopping}
 \label{sec:eval-adaptive}
 
-The second evaluation turns the offline reconstruction result into an online monitoring rule. The previous section shows that the tested delay distributions can be reconstructed long before the worst-case sample bound. A passive monitor, however, cannot look at ground truth during deployment and cannot know in advance where it is on the TVD curve. It needs a stopping rule that decides when the current estimate is stable enough to be passed to the next stage of the system. In the use case, that next stage is distribution identity: comparing the current delay distribution with a reference capacity state.
+Adaptive stopping moves the analysis from offline reconstruction to online decision making. The previous section shows that the tested delay distributions can be reconstructed long before the worst-case sample bound. A passive monitor, however, cannot look at ground truth during deployment and cannot know in advance where it sits on the TVD curve. It needs a stopping rule that decides when the current estimate is stable enough to be passed to the next stage of the system. In the use case, that next stage is distribution identity: comparing the current delay distribution with a reference capacity state.
 
-Samples are processed in groups of \(B\) packets, where \(B\) is the packets per batch parameter. After each new group of packets, the monitor computes the TVD between the current estimate and the previous estimate. If this inter-estimate TVD falls below a threshold \(\theta\), the monitor stops:
+\section{Stopping Rule and Metrics}
+
+At runtime, samples are processed in groups of \(B\) packets, where \(B\) is the packets per batch parameter. After each new group of packets, the monitor computes the TVD between the current estimate and the previous estimate. If this inter-estimate TVD falls below a threshold \(\theta\), the monitor stops:
 \[
 \tau = \inf\left\{mB : d_{\mathrm{TV}}\left(\widehat{F}_{mB}, \widehat{F}_{(m-1)B}\right) < \theta\right\}.
 \]
-The stopping rule does not use the true distribution. Ground truth is used only after a run has stopped to evaluate whether the stopped estimate satisfies \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq\delta\), where the target is \(\delta=0.05\).
+The true distribution is not used by the stopping rule. Ground truth appears only after a run has stopped, when the experiment checks whether the stopped estimate satisfies \(d_{\mathrm{TV}}(\widehat{F}_{\tau},F)\leq\delta\), where the target is \(\delta=0.05\).
 
-The estimates in this rule are cumulative. With \(B=100\), the first comparison is between the reconstruction from samples 1 to 100 and the reconstruction from samples 1 to 200. The next comparison is between samples 1 to 200 and samples 1 to 300. The rule is therefore not comparing disjoint batches. It asks whether adding another batch changes the accumulated reconstruction enough to justify continuing. The batch size controls the spacing of these decisions: small batches give more opportunities to stop, while larger batches make each stability check less noisy.
+The rule is simpler than classical sequential tests. Sequential probability ratio tests make likelihood-ratio decisions between specified hypotheses, while cumulative-sum methods accumulate evidence for a persistent change in process behaviour \cite{waldSequential,pageCusum,laiSequential}. The monitor here does neither. It has no parametric likelihood, no labelled pre-change and post-change models, and no ground-truth reference distribution at runtime. The stopping rule is therefore a low-cost stability check for an empirical distribution estimate, not a formal sequential change detector. That limitation bounds the claim: the rule is evaluated empirically under the tested distributions rather than given a finite-sample stopping guarantee.
 
-The adaptive stopping sweep tests eight choices for packets per batch, 
-\(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six stability thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 random seeds. The continuous group uses the same normal, lognormal, and Weibull distributions as the sample-complexity experiment, reconstructed with a kernel density estimate (KDE) on the 1 ms grid. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points, reconstructed with a probability mass function (PMF) estimator.
+Estimates in this rule are cumulative. With \(B=100\), the first comparison is between the reconstruction from samples 1 to 100 and the reconstruction from samples 1 to 200. The next comparison is between samples 1 to 200 and samples 1 to 300. The rule is therefore not comparing disjoint batches. It asks whether adding another batch changes the accumulated reconstruction enough to justify continuing. Batch size controls the spacing of these decisions: small batches give more opportunities to stop, while larger batches make each stability check less noisy.
 
-The evaluation tests whether stability between consecutive estimates is a reliable proxy for accuracy against the true distribution. This matters because the previous section uses ground truth only to measure when a reconstruction becomes accurate, while a deployed passive monitor sees only its own estimates. The stopping rule is useful only if it stops early and still meets the TVD target with high probability.
+The adaptive sweep tests eight choices for packets per batch,
+\(B \in \{100,200,300,500,750,1000,1500,2000\}\), and six stability thresholds, \(\theta \in \{\delta/6,\delta/5,\delta/4,\delta/3,\delta/2,\delta\}\). Each configuration is evaluated over 100 random seeds. The threshold \(\theta\) controls how much movement is tolerated between two consecutive cumulative estimates. Setting \(\theta=\delta\) means that the stopping rule accepts an inter-estimate change as large as the final reconstruction-error target itself. Setting \(\theta=\delta/6\) requires the local change to be six times smaller before stopping. This makes \(\theta\) a conservativeness parameter rather than a new accuracy target.
 
-The central trade-off is not simply speed against accuracy. It is the risk of mistaking local stability for global correctness. Small values of \(B\) give the monitor more opportunities to stop, but each decision is based on a small increment of new evidence. Loose thresholds amplify the same problem by accepting weak signs of stability. Continuous reconstruction and discrete reconstruction are separated because they fail for different reasons. The kernel density estimate can look stable while the smoothed peak or tail is still wrong. The probability mass function estimate can look stable before enough mass has reached separated support points. These are exactly the kinds of shape errors that would matter in a capacity use case, where the decision depends on whether the current delay distribution still matches a reference state.
+The continuous group uses the same normal, lognormal, and Weibull distributions as the sample-complexity experiment, reconstructed with a Gaussian kernel density estimate (KDE) on the 1 ms grid using Scott's rule for bandwidth selection. The discrete group uses a binomial distribution, a truncated Zipf distribution, and a hand-built multi-modal piecewise distribution over roughly 20 support points, reconstructed with a probability mass function (PMF) estimator. Both groups are retained because they answer different design questions. Continuous KDE reconstruction is the more natural choice for real-valued delays, while discrete PMF reconstruction tests the harder case where probability mass must be allocated to separate support points without smoothing. The final monitoring system may use one representation, but comparing both here shows how much of the stopping behaviour comes from the estimator rather than from the stopping rule alone.
 
-The primary adaptive metric is correctness, defined as the fraction of seeds where the stopped estimate is within TVD 0.05 of the true distribution. The secondary metric is efficiency, defined as the ratio between the relevant theoretical bound and the median number of packets collected before stopping. The figures are chosen to answer three questions. The correctness heatmaps show which operating points are reliable. The stopping-count plots show the packet cost of those choices. The stopped-distribution and continued-trace plots show what the decision means in distributional terms, including why some apparently efficient settings fail.
+The evaluation asks whether stability between consecutive estimates is a reliable proxy for accuracy against the true distribution. The previous section uses ground truth only to measure when a reconstruction becomes accurate, while a deployed passive monitor sees only its own estimates. A useful stopping rule must therefore stop early and still meet the TVD target with high probability. Since the bound in the previous section asks for failure probability at most \(\varepsilon=0.05\), the empirical analogue here is correctness of at least 0.95 across the seeds at a given stopping configuration.
 
-\begin{figure}[htbp]
+Small values of \(B\) give the monitor more opportunities to stop, but each decision rests on a small increment of new evidence. Loose thresholds amplify the same problem by accepting weak signs of stability. Continuous and discrete reconstruction are analysed separately because they fail for different reasons. A kernel density estimate can look stable while the smoothed peak or tail is still wrong. A probability mass function estimate can look stable before enough mass has reached separated support points. These are precisely the shape errors that would matter in a capacity use case, where the decision depends on whether the current delay distribution still matches a reference state.
+
+Correctness is the primary adaptive metric, defined as the fraction of seeds where the stopped estimate is within TVD 0.05 of the true distribution. Efficiency is secondary, defined as the ratio between the relevant theoretical bound and the median number of packets collected before stopping. Efficiency is only interpreted as useful when correctness is at least 0.95. Below that point, a high efficiency number means only that the rule stopped early, not that it stopped safely. The figures in the main text are introduced as they become needed. Correctness heatmaps first establish which operating points are reliable. Stopping-count plots then show the packet cost of those choices. The Weibull stopped-distribution and continued-trace plots show what the decision means in distributional terms. Normal and lognormal variants are retained in the appendix so that the section can make the argument without repeating the same visual pattern three times. In Table \ref{tab:packet-timing-reference}, Gbit/s denotes gigabits per second.
+
+\begin{table}[htbp]
 \centering
-\includegraphics[width=0.82\textwidth]{packet_timing_table.png}
-\caption{Back-to-back transmission time for representative packet counts. These times are only a scale reference, since the passive monitor does not inject traffic.}
-\label{fig:packet-timing-table}
-\end{figure}
+\small
+\begin{tabular}{rrrr}
+\toprule
+Packet count & Time at 100 Gbit/s & Time at 10 Gbit/s & Time at 1 Gbit/s \\
+\midrule
+200 & 24 microseconds & 240 microseconds & 2.4 milliseconds \\
+400 & 48 microseconds & 480 microseconds & 4.8 milliseconds \\
+800 & 96 microseconds & 960 microseconds & 9.6 milliseconds \\
+1,600 & 192 microseconds & 1.92 milliseconds & 19.2 milliseconds \\
+3,000 & 360 microseconds & 3.60 milliseconds & 36.0 milliseconds \\
+\bottomrule
+\end{tabular}
+\caption{Back-to-back transmission time for representative 1500-byte packet counts. These times are only a scale reference, since the passive monitor does not inject traffic.}
+\label{tab:packet-timing-reference}
+\end{table}
 
-The evaluation reports packet counts as the primary cost because the monitor is passive. The time needed to collect a given number of samples depends on the traffic that already traverses the path. Figure \ref{fig:packet-timing-table} is therefore only a scale conversion, not an assumption that the monitor sends probes. For 1500-byte packets sent back-to-back on a 100 gigabit per second link, 1,600 packets correspond to about 192 microseconds and 3,000 packets to about 360 microseconds. On a 1 gigabit per second link the same counts correspond to 19.2 milliseconds and 36.0 milliseconds. This makes the sample counts easier to interpret. In a high-rate setting, the successful stopping configurations are not waiting for a long measurement interval. They are waiting for enough naturally observed packets to make the distribution stable.
+Packet count is reported as the primary cost because the monitor is passive. The time needed to collect a given number of samples depends on the traffic already traversing the path. Table \ref{tab:packet-timing-reference} is therefore only a scale conversion, not an assumption that the monitor sends probes. For 1500-byte packets sent back-to-back on a 100 gigabit per second link, 1,600 packets correspond to about 192 microseconds and 3,000 packets to about 360 microseconds. On a 1 gigabit per second link the same counts correspond to 19.2 milliseconds and 36.0 milliseconds. This makes the sample counts easier to interpret. In a high-rate setting, successful stopping configurations are not waiting for a long measurement interval; they are waiting for enough naturally observed packets to make the distribution stable.
+
+\section{Continuous Stopping Behaviour}
 
 \begin{figure}[htbp]
 \centering
@@ -405,59 +330,11 @@ The evaluation reports packet counts as the primary cost because the monitor is 
 \label{fig:adaptive-cont-correctness}
 \end{figure}
 
-Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid, with larger batch sizes higher on the vertical axis. The unsafe region is concentrated in the lower-right corner, where the monitor checks too often and accepts too much change between estimates. With \(B=100\) and \(\theta=\delta\), correctness is 0.53 for normal, 0.42 for lognormal, and 0.49 for Weibull. This is not a marginal loss. It means the rule accepts inaccurate estimates in roughly half of the trials while appearing highly efficient. Tightening the threshold to \(\theta=\delta/6\) at the same value of \(B\) raises correctness to 0.98, 0.95, and 0.97. Increasing \(B\) has a similar stabilising effect because each comparison is made after a larger cumulative sample. At \(B=200\) and \(\theta=\delta/6\), correctness is 1.00 for normal, 1.00 for lognormal, and 0.99 for Weibull. The deduction from the heatmap is therefore not that smaller batches are always bad. It is that the monitor needs enough evidence between decisions for stability to mean something.
+Figure \ref{fig:adaptive-cont-correctness} shows the continuous correctness grid, with larger batch sizes higher on the vertical axis. Unsafe settings concentrate in the lower-right corner, where the monitor checks too often and accepts too much change between estimates. With \(B=100\) and \(\theta=\delta\), correctness is 0.53 for normal, 0.42 for lognormal, and 0.49 for Weibull. The rule accepts inaccurate estimates in roughly half of the trials while appearing highly efficient. Since \(\theta=\delta\) allows consecutive estimates to differ by the full final-error target, the rule can stop even when both estimates are still wrong in the same direction. Tightening the threshold to \(\theta=\delta/6\) at the same value of \(B\) raises correctness to 0.98, 0.95, and 0.97. Increasing \(B\) has a similar stabilising effect because each comparison is made after a larger cumulative sample. At \(B=200\) and \(\theta=\delta/6\), correctness is 1.00 for normal, 1.00 for lognormal, and 0.99 for Weibull. The heatmap therefore does not imply that smaller batches are always bad. It shows that the monitor needs enough evidence between decisions for stability to be meaningful.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{heatmap_cont_normal.png}
-\caption{Correctness and efficiency for the normal distribution. Efficiency is the ratio between the theoretical bound and the median stopping sample size.}
-\label{fig:adaptive-normal-efficiency}
-\end{figure}
+The Weibull case is retained as the continuous stress case because it was the hardest continuous distribution for the binned PMF in the sample-complexity evaluation. Its sharp rise and longer right tail make it a useful check on whether KDE stability is hiding a shape error. The most aggressive setting, \(B=100\) and \(\theta=\delta\), stops after a median of 200 packets but is correct in only 49 percent of seeds. Tightening the threshold to \(\theta=\delta/6\) at the same batch size raises correctness to 97 percent, while \(B=200,\theta=\delta/6\) reaches 99 percent correctness with a median stopping time of 1,400 packets. Appendix Figures \ref{fig:adaptive-weibull-efficiency}, \ref{fig:app-adaptive-normal-efficiency}, and \ref{fig:app-adaptive-lognormal-efficiency} give the corresponding heatmaps.
 
-Figure \ref{fig:adaptive-normal-efficiency} shows why the stopping problem is a trade-off rather than a single optimum. For the normal distribution, the most aggressive configuration, \(B=100\) and \(\theta=\delta\), has very high apparent efficiency because the median stopping time is only 200 samples. However, it is correct in only 53 percent of seeds, so it is not usable. The configuration \(B=100\) and \(\theta=\delta/6\) is much better: it reaches 98 percent correctness with median stopping time 900 and an efficiency of roughly 200 times relative to the 179,744-sample theoretical bound. The more conservative \(B=200\) and \(\theta=\delta/6\) reaches 100 percent correctness with median stopping time 1,600 and efficiency about 112 times. Since the use case will make an operational capacity decision from the stopped distribution, the safer point is preferable to the most efficient point.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{heatmap_cont_lognormal.png}
-\vspace{0.5em}
-\includegraphics[width=\textwidth]{heatmap_cont_weibull.png}
-\caption{Correctness and efficiency for the lognormal and Weibull distributions. Both distributions show the same basic trade-off as the normal case, but the unsafe region is larger for loose thresholds and small batches.}
-\label{fig:adaptive-lognormal-weibull-efficiency}
-\end{figure}
-
-Figure \ref{fig:adaptive-lognormal-weibull-efficiency} adds the two continuous distributions that are hidden inside the aggregate correctness grid. Lognormal behaves similarly to normal in the safe region, but the loose \(B=100,\theta=\delta\) configuration is correct in only 42 percent of seeds. Weibull is slightly more robust under tight thresholds, with 97 percent correctness at \(B=100,\theta=\delta/6\), but it also fails under loose thresholds because the early KDE can stabilise around an oversmoothed peak before the tail is well estimated. The important point is that the failure mode is not tied to one distributional shape. Normal, lognormal, and Weibull have different geometry, but all can produce early apparent stability when the rule is too permissive. The common safe pattern is \(B=200,\theta=\delta/6\), which reaches 1.00 correctness for normal, 1.00 for lognormal, and 0.99 for Weibull. That consistency is what makes the setting suitable for the next stage: it is not tuned to one convenient distribution.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{n_stop_summary_cont_all.png}
-\caption{Median total packets collected before stopping for the continuous distributions. Shading shows the interquartile range across seeds, and the dotted line shows the theoretical sample bound used in the adaptive sweep.}
-\label{fig:n-stop-summary-cont-all}
-\end{figure}
-
-Figure \ref{fig:n-stop-summary-cont-all} separates packet cost from correctness. Larger values of \(B\) usually increase the median number of packets collected before stopping, because the monitor has fewer opportunities to stop and each decision is made after a larger increment. Tighter thresholds also increase the stopping time. The three distributions have similar stopping-count curves, which is useful because the operating point does not need to be tuned separately for every smooth continuous family. The difference between settings is not mainly how long the safe settings take. It is how often the unsafe settings stop before the estimate is accurate.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{n_stop_b200_continuous.png}
-\caption{Median total packets collected before stopping at \(B=200\) for the continuous distributions. Error bars show the interquartile range across seeds, and the number above each point is the correctness over 100 seeds.}
-\label{fig:n-stop-b200-continuous}
-\end{figure}
-
-Figure \ref{fig:n-stop-b200-continuous} isolates \(B=200\), the first clearly conservative continuous batch size suggested by the heatmap. The batch size alone is not enough: at \(\theta=\delta\), the median stopping count is only 400 packets and correctness remains between 0.74 and 0.79. With \(\theta=\delta/6\), the median stopping count rises to 1,600 packets for normal and lognormal, and 1,400 packets for Weibull. The corresponding correctness values are 1.00, 1.00, and 0.99. This is the stronger operating point because it pays a moderate sample cost for a large reduction in false stability, while still stopping far below the theoretical bound. It also gives the use case a cleaner input: a distribution estimate that has been held to a stricter stability standard before any capacity interpretation is made.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.92\textwidth]{stopped_distribution_normal_b200.png}
-\caption{Zoomed stopped KDE reconstruction for the normal distribution at \(B=200\) and \(\theta=\delta/6\). The stopped estimate is overlaid with the true binned distribution for the same 1 ms grid.}
-\label{fig:stopped-distribution-normal-b200}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.92\textwidth]{stopped_distribution_lognormal_b200.png}
-\caption{Zoomed stopped KDE reconstruction for the lognormal distribution at \(B=200\) and \(\theta=\delta/6\). The plot shows whether the skewed peak and right tail are preserved at the stopping time.}
-\label{fig:stopped-distribution-lognormal-b200}
-\end{figure}
+Packet-count diagnostics are kept in Appendix Figures \ref{fig:n-stop-summary-cont-all} and \ref{fig:n-stop-b200-continuous}. The main point is that larger values of \(B\) and tighter thresholds increase stopping time, but the conservative operating point remains far below the finite-domain reference. At \(B=200,\theta=\delta/6\), median stopping counts are 1,600 packets for normal and lognormal, and 1,400 packets for Weibull, with correctness values of 1.00, 1.00, and 0.99. This gives the use case a cleaner input: a distribution estimate held to a stricter stability standard before any capacity interpretation is made.
 
 \begin{figure}[htbp]
 \centering
@@ -466,7 +343,7 @@ Figure \ref{fig:n-stop-b200-continuous} isolates \(B=200\), the first clearly co
 \label{fig:stopped-distribution-weibull-b200}
 \end{figure}
 
-Figures \ref{fig:stopped-distribution-normal-b200}, \ref{fig:stopped-distribution-lognormal-b200}, and \ref{fig:stopped-distribution-weibull-b200} show what the conservative \(B=200,\theta=\delta/6\) decision means in distributional terms. The normal and lognormal estimates stop after 1,200 packets for the illustrative seed, while the Weibull estimate stops after 1,400 packets. In all three cases the TVD is comfortably below 0.05, but the plots are more informative than the scalar value alone. The normal case shows that the centre and shoulders are aligned. The lognormal case shows that the skew and right tail are not erased by smoothing. The Weibull case shows the hardest visual feature: the estimate must capture both a steep left rise and a longer right tail. These figures make the heatmap conclusion concrete. \(B=200,\theta=\delta/6\) is not merely slower than \(B=100\). It produces a stopped reconstruction that preserves the distributional shape that the capacity use case will later compare against a reference state.
+Figure \ref{fig:stopped-distribution-weibull-b200} shows what the conservative \(B=200,\theta=\delta/6\) decision means in distributional terms for the hardest continuous shape. The illustrative Weibull run stops after 1,400 packets, and TVD against truth at the stopping point is well inside the 0.05 target. The plot is more informative than the scalar value alone. It shows that the estimate preserves the steep left rise, the peak, and the longer right tail, which are exactly the features that would matter if a later capacity decision were based on distribution identity. The normal and lognormal stopped reconstructions in Appendix Figures \ref{fig:app-stopped-distribution-normal-b200} and \ref{fig:app-stopped-distribution-lognormal-b200} show the easier cases. Their centres and tails are also aligned, but they add less to the argument once the Weibull reconstruction has been inspected directly.
 
 \begin{figure}[htbp]
 \centering
@@ -475,7 +352,7 @@ Figures \ref{fig:stopped-distribution-normal-b200}, \ref{fig:stopped-distributio
 \label{fig:early-stop-trace-cont-all}
 \end{figure}
 
-Figure \ref{fig:early-stop-trace-cont-all} explains why the loose \(B=100,\theta=\delta\) rule fails. In the examples shown, the observed TVD to the previous estimate falls below the stopping threshold at 200 packets, so the rule stops. The upper row shows that the true TVD is still above 0.05 at that point. Continuing the same run beyond the stopping decision shows the TVD against truth falling below the target after later batches. This is the key diagnosis. The estimator is not fundamentally unable to learn the distribution, and the batch mechanism is not wrong because it compares cumulative estimates. The problem is premature trust: the first two cumulative reconstructions can be close to one another because both are under-sampled, not because both are correct. In a capacity-estimation setting, this would be a serious error because the system could classify a path state using a distribution that had not yet learned the relevant tail or peak. Tightening \(\theta\) or increasing \(B\) reduces this false-stability event by requiring a stronger sign of convergence before stopping.
+Figure \ref{fig:early-stop-trace-cont-all} explains why the loose \(B=100,\theta=\delta\) rule fails. In the examples shown, the observed TVD to the previous estimate falls below the stopping threshold at 200 packets, so the rule stops. The upper row shows that true TVD is still above 0.05 at that point. Continuing the same run beyond the stopping decision shows TVD against truth falling below the target after later batches. The failure is premature conclusion: the first two cumulative reconstructions can be close to one another because both are under-sampled, not because both are correct. In a capacity-estimation setting, this would be a serious error because the system could classify a path state using a distribution that had not yet learned the relevant tail or peak. In this design, tightening \(\theta\) or increasing \(B\) reduces this false-stability event by requiring a stronger sign of convergence before stopping.
 
 \begin{table}[htbp]
 \centering
@@ -496,6 +373,8 @@ Discrete & \(B=300,\theta=\delta/5\) & 1.00 & 1.00 & 1.00 & 2,250 to 3,000 \\
 \label{tab:adaptive-operating-points}
 \end{table}
 
+\section{Discrete Stopping Behaviour}
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{correctness_grid_disc.png}
@@ -503,21 +382,454 @@ Discrete & \(B=300,\theta=\delta/5\) & 1.00 & 1.00 & 1.00 & 2,250 to 3,000 \\
 \label{fig:adaptive-disc-correctness}
 \end{figure}
 
-Figure \ref{fig:adaptive-disc-correctness} shows that the discrete distributions are more demanding. At \(B=100\) and \(\theta=\delta\), correctness is only 0.13 for binomial, 0.12 for Zipf, and 0.02 for the piecewise distribution. The reason is that the PMF estimate can appear stable before enough mass has been allocated to each support point, especially when the distribution has several separated modes. Tightening the threshold helps, but the safest region is reached later than in the continuous case. With \(B=300\) and \(\theta=\delta/5\), all three discrete distributions reach 100 percent correctness, with median stopping times between 2,250 and 3,000 samples. This is still far below the corresponding worst-case learning bounds, but the efficiency gains are naturally smaller than in the continuous KDE case because the theoretical bounds for these 20-point discrete distributions are already much lower. The discrete result reinforces the main lesson from the statistical evaluation: irregular shape, not just support size, controls how conservative the stopping rule needs to be.
+Figure \ref{fig:adaptive-disc-correctness} shows that the discrete distributions are more demanding. At \(B=100\) and \(\theta=\delta\), correctness is only 0.13 for binomial, 0.12 for Zipf, and 0.02 for the piecewise distribution. The PMF estimate can appear stable before enough mass has been allocated to each support point, especially when the distribution has several separated modes. Tightening the threshold helps, but the safest region is reached later than in the continuous case. With \(B=300\) and \(\theta=\delta/5\), all three discrete distributions reach 100 percent correctness, with median stopping times between 2,250 and 3,000 samples. Those counts remain far below the corresponding worst-case learning bounds, although the efficiency gains are naturally smaller than in the continuous KDE case because the theoretical bounds for these 20-point discrete distributions are already much lower. The discrete result reinforces the main lesson from the statistical evaluation: irregular shape, not just support size, controls how conservative the stopping rule needs to be.
 
 Appendix \ref{app:adaptive-diagnostics} includes the corresponding total-packets plot and stopping-time TVD plot for the piecewise distribution. Those diagnostics show that the piecewise case is hard because loose thresholds and small values of \(B\) leave many stopped estimates near or above the target line. With tighter thresholds or larger values of \(B\), the stopped TVD moves safely below 0.05, often around 0.02 to 0.03, leaving useful safety margin.
 
-The adaptive stopping evaluation gives a clear deployment message. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures at a small sample cost compared with the theoretical bound. For continuous KDE reconstruction, the main operating point should be \(B=200,\theta=\delta/6\). The \(B=100\) setting is useful as an aggressive comparison and as a failure diagnostic under loose thresholds, but the heatmap shows that \(B=200\) gives a cleaner reliability story across normal, lognormal, and Weibull delays. Discrete PMF reconstruction should use a larger value of \(B\), with \(B=300\) and \(\theta=\delta/5\) giving a clean setting across the three tested distributions.
+\section{Implications for the use case}
 
-This sets up the use-case evaluation directly. The stopping rule is not the final operational decision. It decides when the distribution estimate is stable enough to be trusted. The use case can then perform the identification step: comparing that stable estimate with a reference delay distribution associated with a capacity state. Keeping these stages separate is important. Early stopping error is the risk of trusting an unstable estimate. Identification error is the risk of drawing the wrong capacity conclusion from a stable estimate. The first two evaluations reduce the first risk, which makes the later capacity experiment a fairer test of whether distributional change is an informative signal for remaining path capacity.
+The adaptive stopping evaluation gives a clear message for the stationary direct-sampling tasks tested here. A loose stability threshold is unsafe because the estimate can look locally stable before it is globally accurate. A stricter threshold, especially \(\theta=\delta/6\) or \(\theta=\delta/5\), removes most early stopping failures at a small sample cost compared with the theoretical bound. For continuous KDE reconstruction, \(B=200,\theta=\delta/6\) is the conservative operating point used to carry the method forward. For discrete PMF reconstruction, \(B=300,\theta=\delta/5\) plays the same role. These should not be read as universal recommendations. They show that the approach is feasible, but that feasibility depends on choosing a point in the correctness-efficiency trade-off that gives enough safety margin. The \(B=100\) setting remains useful as an aggressive comparison and as a failure diagnostic under loose thresholds, but the heatmaps show that the larger batch gives a cleaner reliability story across normal, lognormal, and Weibull delays.
 
-\chapter{Conclusion and Future Work}
+These operating points are scoped to the experimental conditions of this section. Samples are independent and identically distributed within each run, the underlying distribution does not change during a run, and the input stream is complete and ordered. Each assumption is relaxed in the network experiments. A drifting distribution can defeat the stability check by producing small batch-to-batch changes that never accumulate, and a sudden change can defeat it by producing one large jump that reads as continued instability. The stopping rule used here is also a simple two-step comparison and does not enforce a minimum sample count. It provides no formal finite-sample guarantee beyond the empirical correctness measured in this section. A more conservative variant could require stability over several consecutive batches, or could require a minimum \(B\) before the first comparison is allowed. The stationary case does not require these extensions, although the use-case experiments keep them in view. Computational cost is dominated by per-batch reconstruction. The PMF estimator costs one increment per sample. The KDE estimator with Scott's rule costs work proportional to the number of samples times the number of grid points at evaluation time, which is the source of most per-batch cost on the 1 ms grid.
 
-The evaluation supports the core premise of the project. Passive delay samples contain enough information to reconstruct the delay distribution, and the number of samples needed in the tested cases is much smaller than the distribution-free worst-case bound. The statistical theory explains the scaling with resolution and accuracy, while the adaptive stopping experiments show how to turn that theory into a practical online rule. This sets up the remaining evaluations. The immediate use case is to test whether a trusted reconstructed distribution can reveal a capacity change through distribution identity. The later multi-hop and multi-path experiments then test whether the same monitoring interface remains useful when several network components shape the observed delay distribution.
+Stopping is not the final operational decision; it decides when the distribution estimate is stable enough to be trusted. The use case can then perform the identification step, comparing that stable estimate with an empirical low-load operating state rather than with a ground-truth reference distribution. Early stopping error is the risk of trusting an unstable estimate. Identification error is the risk of drawing the wrong capacity conclusion from a stable estimate. By reducing the first risk, the first two evaluations make the later capacity experiment a fairer test of whether distributional change is an informative signal for remaining path capacity.
+
+\chapter{Single Link Capacity Response}
+\label{sec:eval-capacity-use-case}
+
+The single-link chapter is the first full use-case iteration. The previous two chapters establish the statistical machinery in isolation. Delay distributions can be reconstructed from samples, and adaptive stopping can decide when an estimate is stable without access to ground truth. The remaining question is whether a sequence of stopped distributions can support an operational judgement about remaining capacity.
+
+The single-link experiment is a pressure test for the project logic. The initial hypothesis was that the first significant distributional change would mark the point where added traffic had consumed the useful capacity headroom. That hypothesis is plausible from a distribution-testing perspective, but it is too blunt operationally because traffic can perturb delay gradually before the path reaches a capacity-relevant boundary. The refined hypothesis is stronger: the boundary should appear as an acceleration in the distributional response, rather than as the first detectable difference.
+
+\section{Experimental design}
+
+The topology contains one 10 Mbit/s point-to-point link. A monitored probe flow crosses the link while a controlled User Datagram Protocol cross-traffic flow is increased additively. The configured link rate is used by the simulator to create the experimental condition, but it is not used by the monitoring decision. The monitor observes received probe delays, reconstructs a stopped delay distribution at each offered-load level, and compares distributions across load levels.
+
+The experiment uses one hop to isolate the capacity mechanism from path composition, routing, and multi-queue effects. If the method cannot produce a meaningful signal in a single controlled link, there is little reason to expect it to work in a larger topology. If it does work, the single-hop result becomes the baseline against which the multi-hop chapter can be judged.
+
+The final experiment uses an additive load sweep rather than the earlier bracket-refinement design described in the use case. The load ratio starts at 0.050 and increases in steps of 0.025 until 1.300 of the configured link rate. This common grid makes the TVD response visible across all seeds and delay families. It also bounds the precision of the result. A reported boundary of 0.925 means that 0.925 is the first load-grid point satisfying the criterion, not that the physical capacity boundary has been measured to three decimal places.
+
+The delay process is drawn from the same three continuous families used earlier: normal, lognormal, and Weibull. The monitor is not told which family generated the samples. This preserves the distribution-agnostic constraint from the sample-complexity chapter and ensures that success is not due to fitting a known parametric model.
+
+At each offered-load level \(r_i\), samples are collected until the adaptive stopping rule returns a stable estimate \(\widehat{P}_{r_i}\). The continuous stopping configuration is retained, with \(B=200\), \(\theta=\delta/6\), and \(\delta=0.05\). This choice is conservative because the capacity decision depends on comparing distributions. An unstable estimate would create a misleading capacity signal even if the later comparison rule were well chosen.
+
+The score at load \(r_i\) is measured against the first low-load estimate \(\widehat{P}_{r_0}\):
+\[
+S_i =
+d_{\mathrm{TV}}\left(\widehat{P}_{r_i},\widehat{P}_{r_0}\right).
+\]
+The low-load estimate is not treated as a known ground-truth reference distribution. It is the first empirical operating state observed by the monitor. The purpose of \(S_i\) is to measure how far the path has moved from that starting state as load increases.
+
+Two distributional criteria are compared because each tests a different interpretation of the use case. The first is ordinary distribution change, defined as the first load for which \(S_i \geq 0.05\). This tests the initial hypothesis that any significant identity failure marks the capacity boundary. The second is TVD rate change, which detects the first sharp acceleration in \(S_i\) as load increases. Let
+\[
+\Delta S_i = S_i-S_{i-1}, \qquad
+g_i = \max\left(0,\frac{\Delta S_i}{r_i-r_{i-1}}\right).
+\]
+Locally decreasing TVD is treated as zero slope so that sampling noise does not reduce the low-load baseline. Once at least two previous finite slopes are available, the baseline is
+\[
+m_i = \mathrm{median}\{g_j: 1 \leq j < i,\ g_j\ \mathrm{finite}\}.
+\]
+A load is marked as accelerated when
+\[
+\Delta S_i \geq 0.05
+\qquad \mathrm{and} \qquad
+g_i \geq 5 \cdot \max(m_i,10^{-4}).
+\]
+The \(10^{-4}\) lower bound prevents the median baseline from degenerating to zero when early TVD increments are numerically flat on the 0.025 load grid. These constants are empirical operating choices used to test whether the response curve has changed character, not a universal theory of congestion.
+
+The response-rate criterion is not intended to estimate a universal congestion threshold. It is a diagnostic rule for detecting a change in the shape of the TVD response curve. The minimum jump is tied to the reconstruction target \(\delta=0.05\), so a boundary requires a distributional movement at least as large as the tolerated reconstruction error. The slope multiplier is then ablated in the results to check whether the selected boundary depends on one arbitrary acceleration constant.
+
+The run uses 100 seeds for each delay family, giving 300 independent single-hop runs. Results are reported as a ratio of the configured link rate, which is used only for post-hoc evaluation. The simulation uses finite first-in, first-out queues, and the analysis records endpoint delivery loss as a sanity check, but loss is not used as the capacity criterion.
+
+\section{Results}
+
+Table \ref{tab:observable-single-methods} shows that the initial hypothesis does not survive the single-link experiment. The ordinary distribution-change rule fires in every run, but its median detection point is only 0.625 of the configured link capacity. A median of 0.625 is too early to be a defensible capacity estimate. The distribution-specific medians explain the failure: lognormal detects at 0.575, normal at 0.600, and Weibull at 0.925. The same TVD threshold is therefore measuring ordinary shape sensitivity for some delay families and a capacity-near transition for others. Appendix Figure \ref{fig:observable-single-methods} retains the corresponding summary plot.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Criterion & Detected runs & Median ratio & Interquartile range \\
+\midrule
+First distribution change & 300 of 300 & 0.625 & 0.575 to 0.925 \\
+TVD rate change & 300 of 300 & 0.925 & 0.925 to 0.925 \\
+\bottomrule
+\end{tabular}
+\caption{Distributional capacity criteria in the single-hop 10 Mbit/s experiment. Ratios are relative to the configured link rate.}
+\label{tab:observable-single-methods}
+\end{table}
+
+The TVD rate-change rule supports the refined hypothesis. It detects at 0.925 of configured capacity in all 300 single-hop runs, with an interquartile range of 0.925 to 0.925. The number must be read as a grid point from the 0.025 load sweep. The evidence lies in the same grid point being selected across the three tested normal, lognormal, and Weibull delay families, rather than in decimal precision. The response-rate criterion removes the dependence on where each distribution first crosses a fixed TVD threshold and instead detects the point where the curve changes character.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_single_tvd_by_distribution.png}
+\caption{Single-hop TVD response by delay family. Each curve shows the median TVD from the first low-load state, with interquartile ranges across 100 seeds.}
+\label{fig:observable-single-tvd-by-dist}
+\end{figure}
+
+Figure \ref{fig:observable-single-tvd-by-dist} explains the result mechanistically. Normal and lognormal delays cross the 0.05 first-change threshold gradually, long before the configured capacity. Weibull remains below the threshold for longer, which is why the first-change rule appears to work for that family in isolation. Across families, the same first-change rule reports medians of 0.575, 0.600, and 0.925. That spread indicates sensitivity to ordinary distributional drift rather than a stable capacity boundary.
+
+The response-rate criterion instead detects the point where the TVD curve stops increasing slowly and begins increasing sharply. In Figure \ref{fig:observable-single-tvd-by-dist}, that bend occurs at 0.925 for all three delay families. The criterion uses the change in the rate of distributional movement, not the first non-zero distance from the starting state.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{response_rate_parameter_sensitivity.png}
+\caption{Sensitivity of the response-rate criterion on the saved single-link and multi-hop outputs. The median boundary remains at the 0.925 grid point for slope multipliers from 2 to 10. The minimum score jump is more consequential: values below 0.05 admit early outliers, while larger values increasingly delay some runs beyond 0.925.}
+\label{fig:response-rate-sensitivity}
+\end{figure}
+
+Figure \ref{fig:response-rate-sensitivity} addresses the main free-parameter risk in the refined criterion. The five-times slope multiplier is not uniquely responsible for the 0.925 result, since multipliers from 2 to 10 give the same median and interquartile range on the saved outputs. The minimum score jump matters more. A jump threshold of 0.025 admits early detections below 0.900 in 8 of the 300 single-link runs, while 0.075 and 0.100 increasingly shift some detections to 0.950. The chosen value of 0.05 is therefore best described as a conservative empirical operating point aligned with the reconstruction TVD target. It is not a theorem, and it should be ablated again if the load grid, queue size, or traffic model changes.
+
+A simple scalar comparator was also run on the same stopped samples. Mean, median, 95th percentile, and 99th percentile delay were each compared with their first low-load value, and the first load with at least a 5 percent relative change was recorded. Table \ref{tab:single-scalar-baselines} includes the TVD response-rate row on the same reporting scale. Scalar thresholds match the 0.925 median in this controlled setting, yet introduce early and late outliers that the TVD response-rate criterion does not. The 99th percentile baseline fires as early as 0.075 in some runs, while median delay fires as early as 0.550. The measured advantage here is the absence of early and late detections under one fixed rule, not a different median boundary.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Signal & Detected runs & Median ratio & Early rate below 0.900 & Late rate above 0.925 \\
+\midrule
+TVD response rate & 300 & 0.925 & 0.000 & 0.000 \\
+Mean delay & 300 & 0.925 & 0.003 & 0.077 \\
+Median delay & 300 & 0.925 & 0.023 & 0.073 \\
+95th percentile delay & 300 & 0.925 & 0.013 & 0.063 \\
+99th percentile delay & 300 & 0.925 & 0.020 & 0.070 \\
+\bottomrule
+\end{tabular}
+\caption{Distributional and scalar baselines on the single-link outputs. Scalar delay rows use a 5 percent relative first-change threshold against the first low-load value.}
+\label{tab:single-scalar-baselines}
+\end{table}
+
+Endpoint delivery loss provides a useful sanity check on the interpretation, although it is not the proposed detection method. In the same single-link outputs, the TVD response-rate boundary appears at 0.925 in all 300 runs, while endpoint cross-traffic loss first appears at 0.950 and the sparse probe stream does not show loss. Since the load grid has 0.025 spacing, this is the smallest non-zero gap the experiment can resolve. The comparison is therefore a resolution-limited timing result, not a broad claim that distributional monitoring always dominates loss counting.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{0.26\textwidth}p{0.24\textwidth}p{0.39\textwidth}}
+\toprule
+Signal & First observed load ratio & Interpretation \\
+\midrule
+TVD response rate & 0.925 in all 300 runs & Distributional boundary under the tested criterion \\
+Endpoint cross-traffic loss & 0.950 & First delivery-failure signal, one grid step later \\
+Probe packet loss & Not observed & Too sparse to act as the trigger in these runs \\
+\bottomrule
+\end{tabular}
+\caption{Single-link sanity check comparing the distributional boundary with endpoint delivery loss. Loss is reported only to contextualise the timing of the proposed signal.}
+\label{tab:single-loss-sanity}
+\end{table}
+
+\section{Bursty cross traffic}
+
+The constant-rate experiment gives a clean first test, but it is also a favourable traffic model. A second single-link stress test replaces the constant cross-traffic source with Pareto on-off User Datagram Protocol traffic. The on and off periods both use a bounded Pareto random variable with scale 0.02, shape 1.5, and bound 0.5 seconds. During on periods, the sender transmits at twice the swept average rate, so an average offered load near 0.5 already contains on-period bursts close to the nominal link rate. The same adaptive stopping rule and response-rate criterion are used without re-tuning.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+Signal & Detected runs & Median ratio & Interquartile range \\
+\midrule
+First distribution change & 300 of 300 & 0.475 & 0.475 to 0.475 \\
+TVD rate change & 290 of 300 & 0.475 & 0.475 to 0.500 \\
+Endpoint cross-traffic loss & 300 of 300 & 0.575 & 0.550 to 0.600 \\
+Probe packet loss & 0 of 300 & Not observed & Not observed \\
+\bottomrule
+\end{tabular}
+\caption{Bursty single-link stress test over normal, lognormal, and Weibull delay families with 100 seeds each. Loss remains a sanity check rather than a capacity criterion.}
+\label{tab:observable-bursty-methods}
+\end{table}
+
+Table \ref{tab:observable-bursty-methods} changes the interpretation of the boundary. The median TVD rate-change point is 0.475 of the average offered load, not 0.925. At a swept average load of 0.475, the on-period traffic rate is 0.950 of the link rate. The shift is therefore a consequence of the traffic construction rather than a contradiction of the constant-rate result. The distributional response is tracking burst pressure on the queue, not only the long-run average sending rate. Appendix Figure \ref{fig:observable-bursty-methods} keeps the summary plot for the bursty comparison, while the main text retains the Weibull response curve because it shows the incomplete 90 of 100 detection case directly.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_bursty_tvd_loss_weibull.png}
+\caption{Weibull bursty cross-traffic response. The TVD bend appears before endpoint cross-traffic loss, but the response is less complete than in the constant-rate experiment.}
+\label{fig:observable-bursty-weibull}
+\end{figure}
+
+The Weibull case in Figure \ref{fig:observable-bursty-weibull} is the harder bursty setting. TVD rate change fires in 90 of 100 Weibull runs, compared with 100 of 100 normal and lognormal runs. Endpoint cross-traffic loss appears later, at a median average load of 0.575, and probe loss is still absent. The 90 percent Weibull detection rate shows that the signal is not tied to constant-rate traffic, although it is weaker than the 100 percent detection rate in the constant-rate experiment. The detected boundary should therefore be reported in terms of the offered traffic process, not only as a fraction of nominal link rate.
+
+\section{Interpretation}
+
+Under constant-rate traffic, defining the capacity signal as first distributional change gives a family-dependent answer. Defining it as slope acceleration gives a consistent grid point under the three tested delay families. Under bursty traffic, the same criterion moves to a lower average offered load because the queue is stressed by on-period bursts rather than by the average alone. These results revise the original operational criterion rather than proving exact physical capacity. The monitor should not ask only whether the path differs from the first state, because some difference is expected as load grows. It should ask whether the rate of difference has changed enough to indicate a new operating regime.
+
+The single-link result carries TVD response rate forward as the main capacity signal. The claim is bounded to this controlled topology and load grid: 0.925 is the first satisfying load-grid point under constant-rate traffic, not a universal constant or an exact measurement of the physical link rate. The bursty stress test adds a second constraint on the interpretation: the detected boundary depends on the traffic process used to increase pressure. The multi-hop chapter tests whether the same criterion remains useful when the receiver observes a longer path-level delay distribution.
+
+The repeated 0.925 value should therefore be interpreted as consistency under a shared experimental mechanism, not as evidence of a universal 92.5 percent capacity threshold. The grid, queue model, traffic pattern, and fixed decision rule all shape the reported number.
+
+\chapter{Multi Hop Capacity Response}
+\label{sec:eval-multi-hop}
+
+The multi-hop experiment tests whether the single-link conclusion is robust or merely a clean-topology artefact. A path-level monitor does not see where along the path a delay contribution was introduced. It only sees the final packet-delay samples at the receiver. As the path grows, several links can contribute propagation, transmission, queueing, and scheduling effects to the same observed distribution.
+
+The hypothesis at this stage is more specific than in the single-link chapter. If the signal is only absolute distributional change, then longer paths should make the method worse because more components can perturb the end-to-end delay distribution. If the signal is response acceleration, then the method should be more stable: ordinary drift may begin earlier, but the capacity-relevant bend should remain identifiable relative to the curve's own low-load trend.
+
+\section{Experimental design}
+
+The topology is extended to paths of two to ten point-to-point links. Each link has the same 10 Mbit/s configured rate. Cross traffic is path-wide: it enters at the first node and exits at the final node, so every link on the monitored route carries the increased load. The experiment does not try to locate a single bottleneck link. It tests whether a path-level distributional signal remains useful when traffic pressure is increased throughout the monitored path. The result is therefore a depth-invariance test under uniform load, not a heterogeneous multi-bottleneck experiment. If the response-rate criterion drifted even under uniform pressure, it would be unlikely to remain useful in less controlled topologies.
+
+The monitoring procedure is unchanged from the single-hop chapter. At each offered-load level, the monitor collects received probe delays until adaptive stopping returns \(\widehat{P}_{r_i}\). It then computes \(S_i=d_{\mathrm{TV}}(\widehat{P}_{r_i},\widehat{P}_{r_0})\) and applies the same first-change and TVD rate-change criteria. No threshold is re-tuned for hop count. A result that required a new threshold for every path length would be much weaker operationally. The sweep uses 0.05 load-ratio spacing over most of the range, with additional 0.025-spaced points around 0.900 to 1.050. The reported multi-hop boundary is therefore also a grid point. The experiment repeats the normal, lognormal, and Weibull delay families over 100 seeds for each hop count, giving 2,700 multi-hop runs.
+
+\section{Results}
+
+Figure \ref{fig:observable-multi-methods} shows that the first part of the hypothesis is correct. The naive distribution-change rule becomes less useful as the path grows. Its median detection ratio is 0.25 for two hops, 0.15 for three hops, and 0.10 from four hops onwards. This behaviour is not a capacity estimate. It is the accumulation of ordinary end-to-end distributional movement across a longer path.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_multi_methods.png}
+\caption{Multi-hop detection load for the two distributional capacity criteria over path-wide cross traffic.}
+\label{fig:observable-multi-methods}
+\end{figure}
+
+The TVD rate-change rule remains stable across the deeper path setting. For every hop count from two to ten, and across all 2,700 multi-hop runs, the median detection ratio is 0.925 with an interquartile range of 0.925 to 0.925. As in the single-link chapter, this is a statement about the first satisfying load-grid point. Appendix Figure \ref{fig:app-observable-multi-tvd-response} shows the ten-hop response curve: TVD from the low-load baseline drifts upward well before capacity, then accelerates sharply near 0.925.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_multi_tvd_heatmap.png}
+\caption{Multi-hop TVD response surface over offered load and hop count. The vertical line at 0.925 marks the response-rate boundary found without re-tuning by hop count.}
+\label{fig:observable-multi-tvd-heatmap}
+\end{figure}
+
+Figure \ref{fig:observable-multi-tvd-heatmap} shows why the multi-hop experiment is a useful extension of the single-link experiment, while also showing its scope. As the path length grows, the end-to-end distribution is already far from the low-load state at relatively small offered-load ratios. This makes first-change detection easier in the wrong sense: the monitor can detect that the path has changed, but that fact no longer carries a useful capacity interpretation. Across hop counts, the strongest change in the TVD surface appears near the same load ratio, producing the stable response-rate boundary at 0.925.
+
+The mechanism is visible in the heatmap. Under uniform load on identical links, each hop contributes a similar delay component, so increasing the hop count raises the absolute TVD from the low-load state. This explains why first-change detection moves earlier with path length. The response-rate rule normalises against the previous low-load slope, so gradual depth-related drift contributes to the baseline \(m_i\), while the saturation region appears as a sharp increase in \(g_i/m_i\). Since all links have the same rate and carry the same offered load, the bend occurs at approximately the same load ratio for every tested hop count.
+
+\section{Heterogeneous slow link}
+
+The uniform-depth experiment does not test whether the response-rate boundary survives a slow link in different path positions. A follow-up stress test therefore uses a five-hop path with one 10 Mbit/s link and four 20 Mbit/s links. The slow link is placed at the first, middle, and final hop in separate runs. Cross traffic remains path-wide, so the experiment still increases pressure across the monitored route rather than injecting traffic at one isolated link. The monitor is unchanged and does not receive the slow-link position.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Slow-link position & First-change median & First-change range & TVD rate median & Loss median \\
+\midrule
+First hop & 0.150 & 0.125 to 0.225 & 0.925 & 0.950 \\
+Middle hop & 0.150 & 0.125 to 0.225 & 0.925 & 0.950 \\
+Final hop & 0.150 & 0.125 to 0.200 & 0.925 & 0.950 \\
+\bottomrule
+\end{tabular}
+\caption{Heterogeneous five-hop results over normal, lognormal, and Weibull delay families with 100 seeds each per slow-link position. The range column reports the interquartile range. The TVD rate-change criterion detects in all 900 runs, with interquartile range 0.925 to 0.925 in every position.}
+\label{tab:observable-heterogeneous-methods}
+\end{table}
+
+Table \ref{tab:observable-heterogeneous-methods} gives a stronger multi-hop check than the uniform-depth run. First-change detection again fires early, with median 0.150 in all three slow-link positions. TVD rate change selects the 0.925 grid point in all 900 heterogeneous runs, and endpoint cross-traffic loss appears at 0.950. The slow-link position therefore does not change the response-rate boundary in this controlled path-wide setup. The experiment does not cover multiple bottlenecks or cross traffic entering and leaving at intermediate nodes. It removes the narrower concern that the previous multi-hop result only held because all links had identical configured rates. Appendix Figure \ref{fig:observable-heterogeneous-methods} contains the equivalent summary plot.
+
+\section{Interpretation}
+
+In longer paths, detecting any change becomes too easy and therefore uninformative. Detecting when the response changes character is more stable: TVD rate change selects the 0.925 load-grid point while using the same decision rule across all tested path lengths. The heterogeneous slow-link check extends this conclusion to a controlled non-uniform path, where the same response appears whether the slow link is first, middle, or final.
+
+The boundary is best described as a distributional capacity boundary, not an exact physical link-rate measurement. It is the offered load at which the observed delay distribution stops changing gradually and begins changing rapidly relative to the low-load trend. This avoids claiming access to queue internals or exact physical capacity, while still capturing the operational value of finding a repeatable transition using only received delay samples.
+
+The main depth experiment keeps every link at the same rate, and the heterogeneous stress test changes only one link at a time while preserving path-wide cross traffic. The chapter therefore does not prove robustness to intermediate cross-traffic entry and exit points, several independent bottlenecks, or route changes. The heatmap shows that longer homogeneous paths accumulate distributional distance even when they are far below the response-rate boundary. A deployment would need to distinguish ordinary path-length sensitivity from harmful capacity pressure. The response-rate rule is a first answer to that problem because it compares the curve with its own low-load trend. It is not yet a complete operational policy. A real system would still need safeguards for non-stationary traffic, route changes, and measurement gaps. Within the controlled experiment, however, the same refinement that fixed the single-link failure survives both the multi-hop depth extension and the slow-link position check.
+
+The multi-hop path still has one end-to-end route, so the observed distribution is a lengthened version of a single path response. A multi-path setting is harder because the receiver may observe a mixture of route behaviours. The evidence here justifies carrying forward the response-rate criterion, but it also narrows the question for the next stage. The issue is no longer whether the first change is useful. It is whether a response-rate boundary remains interpretable when several path components can shape the same empirical distribution.
+
+\chapter{Modal Analysis of Constructed Multi Path Mixtures}
+\label{sec:eval-multi-path}
+
+The multi-hop chapter keeps one route between source and destination. A multi-path setting is different. The receiver may observe packets that have crossed several route components, each with its own delay profile. The resulting empirical distribution is not simply a longer version of a single path distribution. It can become a mixture, and if the path components are sufficiently separated in delay, that mixture can become bimodal or multi-modal.
+
+This chapter does not evaluate routed equal-cost multi-path forwarding. It isolates a narrower statistical question: if receiver-side delay samples are already a separable mixture of route behaviours, can the capacity response be associated with the changing component rather than the whole mixture? That framing keeps the experiment honest. The chapter is a modal decomposition test, not a full network-routing study.
+
+This changes the capacity question. Applying the single-path TVD score to the whole mixture can hide which component has changed. A lightly used longer path may contribute only a small share of packets, so its capacity response can be diluted by a stable shorter path. Conversely, if most packets take the stressed path, the whole-mixture score can move early because the mixture composition dominates the comparison. The hypothesis in this chapter is therefore that multi-path capacity association should first identify modal components in the receiver-side distribution and then apply the response-rate criterion to the component that changes.
+
+\section{Statistical basis}
+
+Multimodality is a standard statistical signal that a sample may contain more than one generating regime. Hartigan and Hartigan's dip test formalises unimodality testing by measuring how far the empirical distribution function is from the closest unimodal distribution \cite{hartiganDip}. Silverman's test uses kernel density estimates to investigate the number of modes in a population \cite{silvermanModes}. These tests are relevant because the multi-path problem concerns both path change and the presence of several path behaviours in the same receiver-side sample.
+
+Networking work gives the same intuition from a measurement perspective. Passive delay measurements have been used to detect multipath routing through hypothesis tests on delay observations, motivated by the fact that different paths can induce distinct delay behaviour \cite{panMultipathDelay}. Capacity-measurement work has also noted that packet-dispersion estimates can follow complicated multi-modal distributions under heavy load, and that local modes can contain useful capacity information \cite{linLmsa}. This chapter follows that line of reasoning, but does not use a formal dip-test or Silverman-test decision. The experiment uses a simpler operational decomposition: estimate the low-load mixture with the same KDE grid as earlier chapters, identify local maxima above 1 percent of the maximum density with at least eight bins of separation, take the two highest peaks, split at the lowest valley between them, and require the valley height to be no more than 80 percent of the smaller peak. Components that fail this validity check are not used for component-level capacity detection.
+
+Let \(\widehat{P}_{r_0}^{(L)}\) denote the low-load distribution of the lower-delay path and \(\widehat{P}_{r}^{(U)}\) denote the distribution of the upper-delay path at load \(r\). The observed mixture is constructed as
+\[
+\widehat{M}_{r,\alpha}(x)
+= (1-\alpha)\widehat{P}_{r_0}^{(L)}(x)
++ \alpha \widehat{P}_{r}^{(U)}(x-\tau),
+\]
+where \(\alpha\) is the traffic share on the upper-delay path and \(\tau\) is the path-delay offset. If the low-load mixture has two modes at \(m_1\) and \(m_2\), the split point is
+\[
+v = \arg\min_{x \in [m_1,m_2]}\widehat{M}_{r_0,\alpha}(x).
+\]
+The component distributions are then obtained by conditioning on \(x \leq v\) and \(x>v\). The same TVD response-rate criterion from Chapters 5 and 6 is applied to the whole mixture, the lower component, and the upper component. This non-parametric version of modal analysis avoids assuming a Gaussian mixture model, but it only works cleanly when the modes are sufficiently separated.
+
+\section{Experimental design}
+
+The experiment reuses the stopped NS-3 distributions from the single-link capacity runs. It is an explicit modal-mixture experiment rather than a full routed equal-cost multi-path simulation. One component remains at the first low-load distribution. The second component is shifted by 30 milliseconds to represent a higher-delay route and is swept through the same offered-load grid as the single-link experiment. The receiver sees only the weighted mixture, not the component labels. By construction, the upper component carries the single-link capacity response; the evaluation question is whether the modal decomposition can recover and associate that response after the two components have been mixed.
+
+Four traffic splits are tested: \(\alpha=0.10,0.25,0.50,0.75\). The smallest split tests whether a stressed path can still be found when it contributes only 10 percent of observed packets. The largest split tests whether the whole mixture becomes too sensitive when most packets take the stressed component. Normal, lognormal, and Weibull delay families are each evaluated over 100 seeds, giving 1,200 multi-path mixture cases before expanding across the load grid. The link capacity used to generate the upper component is still hidden from the monitor and used only for scoring.
+
+The design follows directly from the previous chapters. The statistical and adaptive-stopping blocks are unchanged. The new difficulty is mixture interpretation. If the whole-mixture response remains reliable across traffic splits, then modal decomposition is unnecessary. If it fails at low or high shares, then the receiver-side distribution must be interpreted as a composition of path behaviours before a capacity boundary can be associated with one route component.
+
+\section{Results}
+
+Figure \ref{fig:multipath-bimodal-example} shows the basic mixture structure for the Weibull case at an even traffic split. At low load, the receiver distribution has two clear modes. The dashed vertical line marks the valley used to separate the lower-delay and upper-delay components. As the upper path approaches and then exceeds the capacity boundary, the upper mode moves and broadens while the lower mode remains fixed. Whole-distribution comparison records that the receiver distribution has changed, but the modal split records which part of it changed.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{multipath_bimodal_example.png}
+\caption{Example bimodal receiver distribution for a two-component path mixture. The dashed line is the valley split used to separate the lower-delay and upper-delay modes.}
+\label{fig:multipath-bimodal-example}
+\end{figure}
+
+The modal split is stable under the constructed experiment. Across all traffic shares and all three delay families, the low-load mixture is detected as bimodal in all 1,200 cases. The median split is 29.5 milliseconds for the lognormal and Weibull mixtures, and 57.5 milliseconds for the normal mixtures. The difference is a consequence of the underlying single-link delay shape and the 30 millisecond path offset, rather than a change in the decision rule.
+
+Figure \ref{fig:multipath-component-response} shows the component response for the Weibull case at \(\alpha=0.50\). The whole mixture has a visible TVD jump near the same region as the single-path boundary, but it is smaller because only half the probability mass belongs to the changing component. The lower mode remains close to zero TVD across the sweep. The upper mode shows the sharp response, and its rate-change boundary is the same 0.925 load-grid point selected in the single-link and multi-hop chapters.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{multipath_component_response_weibull_share50.png}
+\caption{Median TVD response in the bimodal Weibull mixture with a 50 percent upper-path share. The upper component carries the capacity response while the lower component remains stable.}
+\label{fig:multipath-component-response}
+\end{figure}
+
+Table \ref{tab:multipath-methods} summarises the detection results across traffic shares. The whole-mixture criteria are not reliable across the full range. At \(\alpha=0.10\), the mixture rate-change rule detects a boundary in only 69.7 percent of runs, and its median detected ratio among successful detections is 0.950. The stressed path is present, but its contribution to the whole distribution is too small to produce a consistent mixture-level acceleration. At \(\alpha=0.75\), the mixture first-change rule detects too early, with a median of 0.800 and 66.3 percent of runs below 0.900. The mixture is then dominated by the stressed path, so ordinary pre-boundary movement is mistaken for capacity.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{0.18\textwidth}p{0.26\textwidth}rrp{0.19\textwidth}}
+\toprule
+Traffic share on upper path & Criterion & Detection rate & Median ratio & Interquartile range \\
+\midrule
+0.10 & Mixture first change & 1.000 & 0.950 & 0.925 to 0.950 \\
+0.10 & Mixture TVD rate & 0.697 & 0.950 & 0.925 to 0.950 \\
+0.10 & Upper-mode TVD rate & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.25 & Mixture first change & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.25 & Mixture TVD rate & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.25 & Upper-mode TVD rate & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.50 & Mixture first change & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.50 & Mixture TVD rate & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.50 & Upper-mode TVD rate & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.75 & Mixture first change & 1.000 & 0.800 & 0.750 to 0.925 \\
+0.75 & Mixture TVD rate & 1.000 & 0.925 & 0.925 to 0.925 \\
+0.75 & Upper-mode TVD rate & 1.000 & 0.925 & 0.925 to 0.925 \\
+\bottomrule
+\end{tabular}
+\caption{Multi-path mixture detection results over normal, lognormal, and Weibull families with 100 seeds each. The lower-mode TVD rate did not fire in any run, so it is omitted from the table body.}
+\label{tab:multipath-methods}
+\end{table}
+
+For every traffic share, the upper-mode response detects in all 300 runs associated with that share, with median 0.925 and interquartile range 0.925 to 0.925. These are not 1,200 independent confirmations of the capacity boundary, because the upper component is constructed from the single-link response. The result shows instead that the valley split recovers the embedded upper-path response cleanly across shares from 10 percent to 75 percent. The lower-mode response never fires, which is a sanity check on the construction: the unchanged component is not falsely assigned the capacity response.
+
+Appendix Figure \ref{fig:multipath-methods} provides the corresponding summary plot. The table is kept as the main evidence because the detection rates and early detections are more important than the visual alignment of the bars.
+
+The 30 millisecond offset is also tested directly because modal separation is the chapter's main free parameter. Figure \ref{fig:multipath-offset-sensitivity} and Table \ref{tab:multipath-offset-sensitivity} sweep the offset from 10 to 50 milliseconds. At 10 milliseconds, only 66.7 percent of cases pass the bimodal-split validity check. At 20 milliseconds this rises to 97.7 percent, and from 30 milliseconds onwards all tested cases have valid splits. Conditional on a valid split, the upper-mode median remains at 0.925 throughout the sweep. The offset plot is part of the evidence rather than a summary chart because it shows the failure boundary for the modal decomposition. The sweep supports the 30 millisecond setting as a separable proof-of-concept point, but it also shows where the approach begins to fail: insufficient delay separation prevents reliable component recovery.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{multipath_offset_sensitivity.png}
+\caption{Sensitivity of modal capacity association to the delay separation between path components. Small offsets reduce the probability of a valid bimodal split, even though successful splits still recover the embedded upper-path response.}
+\label{fig:multipath-offset-sensitivity}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{rrrrr}
+\toprule
+Offset in ms & Valid split rate & Upper detection rate & Median ratio & Late rate above 0.925 \\
+\midrule
+10 & 0.667 & 0.667 & 0.925 & 0.003 \\
+20 & 0.977 & 0.977 & 0.925 & 0.016 \\
+30 & 1.000 & 1.000 & 0.925 & 0.013 \\
+40 & 1.000 & 1.000 & 0.925 & 0.013 \\
+50 & 1.000 & 1.000 & 0.925 & 0.013 \\
+\bottomrule
+\end{tabular}
+\caption{Offset sensitivity for the multi-path modal split over all tested shares, distributions, and seeds.}
+\label{tab:multipath-offset-sensitivity}
+\end{table}
+
+\section{Interpretation}
+
+The multi-path experiment shows that the response-rate criterion can be attached to a modal component when the receiver distribution is a separable mixture. It also identifies a separate failure mode from the previous chapters. In the single-link chapter, first-change detection is too sensitive to delay family. In the multi-hop chapter, first-change detection collapses as path length increases. In the multi-path chapter, whole-mixture TVD is diluted at low stressed-path share and too sensitive at high stressed-path share. Modal decomposition preserves the distributional signal without collapsing different path behaviours into one score.
+
+The experiment does not yet prove a deployable multi-path monitor. It is constructed from saved stopped distributions rather than from a routed NS-3 equal-cost multi-path topology, and the 30 millisecond offset makes the two modes separable by design. The result demonstrates the statistical decision without making an operational claim about arbitrary multi-path networks. It tests the statistical decision of identifying which mode carries capacity pressure in an already-mixed receiver distribution. It does not test load balancing, path selection, per-flow hashing, packet reordering, or shared-queue interactions, which would require a routed NS-3 multi-path topology. If the path-delay modes overlap strongly, a valley split may be unstable and a formal unimodality test, a bootstrap mode-count test, or a mixture model would be needed before assigning capacity responses to components.
+
+In this restricted setting, the modal split separates the receiver-side distribution into interpretable components, identifies which component is changing, and associates the capacity response with that component. The offset sweep makes the limitation explicit: the method is reliable when the route components are sufficiently separated, and unreliable when the modes overlap enough that the split cannot be recovered consistently.
+
+\chapter{Scope and Limitations}
+\label{sec:scope-limitations}
+
+The evaluation is intentionally controlled, and the claims are bounded by that scope. All network experiments use Network Simulator 3 rather than a hardware testbed or production trace. This makes the hidden link rate, traffic load, and delay family available for post-hoc scoring. The results do not yet include clock noise, operating-system timestamp artefacts, real traffic mixes, routing churn, or device-specific queue behaviour.
+
+The main single-link and multi-hop capacity experiments use stationary constant-bit-rate cross traffic and finite first-in, first-out queues. A bursty Pareto on-off stress test is added for the single link, but it remains synthetic User Datagram Protocol traffic rather than Transmission Control Protocol feedback, application traffic, or adversarial background traffic. The comparison with packet loss is also limited by the 0.025 load grid: in the constant-rate experiments, the distributional boundary appears one grid step before endpoint cross-traffic loss, which is the smallest non-zero timing gap the experiment can resolve.
+
+The multi-hop experiment is primarily a depth-invariance test under uniform load. Every link in the main run has the same 10 Mbit/s configured rate, and the cross traffic enters at the first node and exits at the last node. The heterogeneous five-hop stress test adds one slow link at the first, middle, or final position, but it still uses one end-to-end traffic source and one controlled slow link. A real topology could have intermediate cross-traffic entry and exit points, several independent queues changing at different rates, or several bottlenecks that appear and disappear over time.
+
+The distributional assumptions are also bounded. The main network experiments use three continuous delay families: normal, lognormal, and Weibull. These are useful representatives of symmetric, skewed, and asymmetric positive delays, but they do not establish invariance across all delay processes. The multi-path chapter adds a constructed two-component mixture, not a routed equal-cost multi-path simulation with flow hashing, reordering, or shared bottlenecks. Its result is therefore evidence that modal decomposition can recover an embedded capacity response when the modes are separable, not proof that arbitrary multi-path routing can be inferred from passive delay alone.
+
+Finally, several implementation choices remain fixed throughout the evaluation. Continuous distributions are compared on a 1 millisecond grid from 0 milliseconds to 150 milliseconds, KDE uses Scott's rule for bandwidth selection, and the capacity boundary is reported on a 0.025 load grid. The parameter sensitivity plots show that the response-rate multiplier is not solely responsible for the 0.925 boundary, the bursty experiment shows that the detected average-load boundary depends on the traffic process, the heterogeneous stress test checks one slow-link position at a time, and the multi-path offset sweep characterises one modal-separation parameter. Broader robustness still requires bin-resolution sensitivity, richer traffic traces, multiple simultaneous bottlenecks, and routed multi-path experiments.
+
+The response-rate criterion also has identifiable failure modes. It should fail when the low-load TVD baseline is already unstable, when traffic changes non-monotonically during the sweep, when routing changes while the monitor is collecting a load point, or when several bottlenecks produce multiple smaller bends rather than one sharp acceleration. These cases are not defects in the implementation; they define the boundary between a controlled capacity-pressure experiment and a deployable monitoring policy.
+
+\chapter{Future Work}
+
+The experiments in this report stop at controlled capacity-boundary problems. That makes the contribution easier to evaluate and positions the method as a foundation rather than a complete monitoring system. The reusable part is the pipeline: reconstruct a receiver-visible delay distribution, stop when that reconstruction is stable, compare it with an empirical operating state, and interpret the rate of distributional change. The multi-path chapter adds a fourth step when needed, which is to decompose the receiver distribution into modal components before associating a boundary with one path behaviour. The same pipeline can be applied to several related monitoring problems where the key signal is how the full delay distribution changes over time, across paths, or under intervention.
+
+\section{Path Profiling and Rerouting}
+
+The most direct extension is path profiling. In a network with several possible routes between a source and destination, each path can be associated with a characteristic delay distribution. If a failure or routing update moves a flow onto another path, the receiver may observe a shift in the distribution even when no explicit failure alarm is raised. This connects naturally to data-centre and wide-area traffic engineering, where systems such as Hedera, B4, SWAN, and CONGA already exploit path diversity and load balancing to improve utilisation or respond to congestion \cite{alFaresHedera,jainB4,hongSwan,alizadehConga}.
+
+The method in this report could support a passive version of that reasoning. Instead of requiring the monitor to know the selected route, it could compare the current stopped distribution with a library of previously learnt path profiles. A post-failure distribution that matches one profile more closely than another would give evidence about where the flow has moved. Routing telemetry would still be more direct, but the distributional comparison could provide an independent receiver-side check that rebalancing has actually changed the observed path behaviour. The multi-hop and multi-path results are the relevant starting point because they show that a path-level distribution can remain interpretable when several links contribute to delay, and that separable route components can be analysed through their modes. A full routed equal-cost multi-path or unequal-cost multi-path implementation remains future work because the experiment here constructs mixtures from stopped path components rather than simulating router-level path splitting.
+
+\section{Failure Recovery and Healing}
+
+Another extension is to use distributional profiles to distinguish between different recovery mechanisms after a failure. A path may improve because Transmission Control Protocol flows slow down, because traffic is rebalanced across paths, or because a failed component has been repaired. These cases can have different distributional signatures. A pure throughput counter or scalar alarm may report improvement in all three cases, while the delay distribution could reveal whether the path has returned to its earlier shape or has settled into a different operating state.
+
+Such a monitor would complement systems such as Pingmesh, Everflow, NetSight, and Fathom, which make failures and performance regressions more observable through active measurements, packet tracing, or application-level latency decomposition \cite{guoPingmesh,zhuEverflow,handigolNetSight,qureshiFathom}. The future-work question is whether the stopped delay distribution can act as a compact behavioural fingerprint for healing. The method would need a stronger identity step than the one used here, because the task would not only be to detect change. It would also be to decide whether the post-event distribution has returned to the pre-event state or converged to a new stable state.
+
+\section{Short Events and Transient Change}
+
+Short events are a harder use case because adaptive stopping waits for evidence that a distribution is stable. Micro-bursts, sub-second congestion, and transient queue build-up may disappear before enough samples have been collected for the conservative stopping rule used in this report. Existing work such as Trumpet, \(\mu\)Mon, Packet Doppler, and DRILL shows that short-timescale behaviour matters in data-centre networks and that microsecond or millisecond events can affect performance before slower counters react \cite{moshrefTrumpet,zhengMuMon,qiuPacketDoppler,ghorbaniDrill}.
+
+A distributional extension would therefore need to change the stopping model. Instead of asking for one stable distribution over a long interval, the monitor could maintain rolling or hierarchical distributions at several time scales. A short event would then be detected as a temporary movement of mass into a higher-delay region, a temporary tail expansion, or a short-lived second mode. The statistical challenge is to avoid treating ordinary sampling noise as an event. The failed \(B=100,\theta=\delta\) stopping cases in the adaptive-stopping chapter are relevant here because they show exactly how under-sampled distributions can look deceptively stable. Any short-event version of this work would need explicit false-alarm control.
+
+\section{Capacity Aware Backup Path Testing}
+
+The capacity-boundary method can also be applied to backup-path testing. Operators often need to know whether a standby path can absorb traffic during a failure or grey failure without immediately degrading delay. Active available-bandwidth tools such as Pathload, PathChirp, and Spruce estimate path capacity or available bandwidth using probe traffic \cite{jainDovrolisPathload,ribeiroPathchirp,straussSpruce}. The approach in this report suggests a complementary experiment: increase offered load on a candidate backup path, reconstruct stopped delay distributions at each load, and detect the point where the response accelerates.
+
+That extension would turn the current single-path experiment into a path-comparison tool. Two paths might have the same nominal link rate but different delay response curves, tail behaviour, or sensitivity to added traffic. A distributional capacity boundary could therefore help choose whether a backup path has enough capacity and which backup path preserves the most stable delay behaviour under load. The method would need careful guardrails because the test traffic itself can consume headroom. The additive-increase result in this report is relevant because it approaches the boundary more gently than a binary search and keeps the response curve visible.
+
+\section{Induced Change and Configuration Testing}
+
+The use case also extends to planned interventions. Introducing a new load balancer, changing a routing policy, or modifying traffic classes may change the shape of the delay distribution even when no immediate failure occurs. Systems such as B4 and SWAN show that traffic-engineering systems can intentionally push networks towards high utilisation, while relying on control logic to avoid harmful transients \cite{jainB4,hongSwan}. A distributional monitor could provide a before-and-after test for whether such an intervention changes the operating regime seen by end hosts.
+
+The current pipeline supplies the first part of this design. It shows how to compare stopped distributions and why a first-change rule can be too sensitive. Future work should separate benign induced change from harmful induced change. A load-balancer update may intentionally move traffic onto a different path, so a distributional difference is not automatically bad. The richer question is whether the new distribution has a heavier tail, a sharper response-rate boundary, or less headroom before delay behaviour deteriorates. Distributional profiling would then help judge the quality of a change, rather than only detecting that a change occurred.
+
+\section{Telemetry Assisted Validation}
+
+The final extension is to combine passive distributional monitoring with richer telemetry when it is available. In-band network telemetry, PINT, Marple, ConQuest, and UnivMon demonstrate that programmable or sketch-based measurement can expose queue state, hop latency, flow contributions, and network-wide summaries more directly than receiver-side delay alone \cite{p4IntSpec,benBasatPint,narayanaMarple,chenConQuest,liuUnivMon}. The method in this report is weaker by design because it does not assume that instrumentation. That weakness can become useful in a validation setting.
+
+Telemetry could provide ground truth for why a distributional boundary appears. If the delay distribution accelerates at a particular load, switch-local queue or hop-latency measurements could show whether the cause was one congested link, several lightly stressed links, or a routing change. Conversely, if telemetry reports queue pressure but the receiver-side distribution does not change, that would reveal a limit of the passive method. This pairing would make the work more deployable: passive distributional monitoring could run continuously at low overhead, while richer telemetry could be triggered when the distributional signal indicates that a path has entered a new regime.
+
+\chapter{Conclusion}
+
+This report has evaluated whether passive delay distributions can support a capacity-boundary decision. The motivation was that network operators often have to reason about remaining path capacity from limited observations, while scalar metrics such as mean delay, percentile latency, or link utilisation can hide important changes in distributional shape. The central question was therefore whether a monitor that only sees receiver-side packet delays can reconstruct the delay distribution, decide when that reconstruction is stable, and use distributional change to infer when a path leaves its previous operating regime.
+
+The statistical evaluation establishes the foundation. Finite-domain distribution learning gives a conservative reference bound for reconstructing arbitrary distributions in total variation distance. The empirical results show that the tested delay distributions are substantially easier than the worst case. In the discrete setting, binomial and Zipfian distributions reach the 0.05 TVD target with about ten times fewer samples than the theoretical reference, while the irregular piecewise distribution is harder but still reaches the target well before the bound. In the continuous setting, kernel density estimation is more sample-efficient than a binned empirical probability mass function because it exploits smoothness across neighbouring delay values.
+
+The adaptive stopping evaluation then converts offline reconstruction into an online decision. The monitor cannot observe ground truth at deployment time, so it needs a rule based only on consecutive estimates. The experiments show that loose stopping thresholds can stop too early, because two under-sampled estimates can be close to one another without either being accurate. The conservative continuous configuration \(B=200,\theta=\delta/6\) avoids that failure across the tested normal, lognormal, and Weibull distributions while keeping the median stopping cost far below the theoretical sample count.
+
+The capacity experiments reject the initial intuition that first distributional change should mark the capacity boundary. In the single-link experiment, first-change detection fires at a median of 0.625 of configured capacity because some delay families move gradually under load. The stronger criterion is the rate at which TVD changes. It detects at the 0.925 load-grid point across all 300 constant-rate single-link runs, while endpoint cross-traffic loss appears later at 0.950, one load-grid step afterwards. Under Pareto on-off bursty traffic, the detected average-load boundary moves to 0.475 because the on-period sending rate is twice the swept average, and endpoint cross-traffic loss appears at a median of 0.575. The multi-hop experiment confirms that the constant-rate result is not only a clean one-link artefact under the tested path-wide load model. Across paths of two to ten hops and 2,700 runs, first-change detection becomes less meaningful as path length grows, while TVD rate change remains fixed at the same grid point. A heterogeneous five-hop stress test with one 10 Mbit/s slow link and four 20 Mbit/s links also recovers the 0.925 grid point when the slow link is first, middle, or final.
+
+The constructed multi-path experiment adds a final qualification. When the receiver distribution is a separable mixture of route behaviours, whole-mixture TVD can either dilute the stressed component or react too early to ordinary movement in the dominant component. A modal split of the receiver distribution gives a cleaner association: the lower-delay mode remains stable, while the upper-delay mode recovers the embedded 0.925 load-grid response across all tested traffic shares. The offset sweep shows the boundary of this result: valid modal splits occur in only 66.7 percent of cases at a 10 millisecond path offset, but in all cases from 30 milliseconds onwards.
+
+The project is best understood as a staged research argument. Theory first establishes what it means to learn a distribution. Direct sampling then shows that the tested delay shapes are learnable well below the worst-case bound. Adaptive stopping shows how to trust a reconstruction without ground truth. The first network use case then exposes a flaw in the naive identity interpretation and motivates the response-rate criterion. The multi-hop experiment tests that refined criterion under a harder path-level setting, and the multi-path experiment shows how the same idea must be attached to modal components when several route behaviours appear together.
+
+This mirrors the system design introduced in Chapter 2. The pipeline stays fixed, but each evaluation stage tests one block more severely. The contribution is a bounded demonstration that a passive distributional monitor can be built from reconstruction, stopping, and comparison, and that the operational decision rule can be revised when an early hypothesis fails. The method does not measure exact physical link capacity, identify the responsible flow, or replace switch-local telemetry. The reported 0.925 boundary is an empirical result for the tested load grid, constant-rate traffic, finite queues, Scott's-rule kernel density estimates, separable modal mixtures, and the three continuous delay families evaluated here. The bursty stress test shows that the boundary should be interpreted through the offered traffic process, because average load and burst load can diverge.
+
+The strongest conclusion is therefore foundational rather than final. The work establishes the components needed for a distribution-first passive monitor: finite-domain reconstruction, empirical stopping without ground truth, identity comparison against an observed operating state, response-rate detection after first-change failed, and modal association when receiver samples contain separable route behaviours. The future-work chapter follows directly from that foundation. Path profiling, rerouting checks, transient-event detection, configuration validation, and telemetry-assisted diagnosis all ask whether the same pipeline can be made practical beyond the controlled simulations evaluated here.
 
 \appendix
 
 \chapter{Supporting evaluation plots}
+
+The appendix contains diagnostic plots used to check robustness of the main claims. Figures are grouped by the evaluation stage they support rather than by generation order.
 
 \section{Statistical diagnostics}
 \label{app:statistical-diagnostics}
@@ -534,6 +846,20 @@ The evaluation supports the core premise of the project. Passive delay samples c
 \includegraphics[width=\textwidth]{n_theory_heatmap.png}
 \caption{Theoretical PMF sample requirement over bin size and TVD target. Very fine bins and tight error tolerances both drive the bound upwards.}
 \label{fig:app-n-theory-heatmap}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tvd_vs_n_normal.png}
+\caption{Median TVD against sample count for the normal distribution. This supporting view separates the normal curve from the combined continuous plot in the main text.}
+\label{fig:app-tvd-vs-n-normal}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tvd_vs_n_lognormal.png}
+\caption{Median TVD against sample count for the lognormal distribution. The right-skewed case remains easier than Weibull at the target accuracy.}
+\label{fig:app-tvd-vs-n-lognormal}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -578,6 +904,41 @@ The evaluation supports the core premise of the project. Passive delay samples c
 
 \begin{figure}[htbp]
 \centering
+\includegraphics[width=\textwidth]{heatmap_cont_weibull.png}
+\caption{Correctness and efficiency for the Weibull distribution. Efficiency is the ratio between the theoretical bound and the median stopping sample size.}
+\label{fig:adaptive-weibull-efficiency}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{heatmap_cont_normal.png}
+\caption{Correctness and efficiency for the normal distribution. The supporting heatmap shows that the conservative continuous operating point is not specific to Weibull.}
+\label{fig:app-adaptive-normal-efficiency}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{heatmap_cont_lognormal.png}
+\caption{Correctness and efficiency for the lognormal distribution. Loose thresholds still stop too early, while \(B=200,\theta=\delta/6\) gives a reliable estimate.}
+\label{fig:app-adaptive-lognormal-efficiency}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{n_stop_summary_cont_all.png}
+\caption{Median total packets collected before stopping for the continuous distributions. Shading shows the interquartile range across seeds, and the dotted line shows the theoretical sample bound used in the adaptive sweep.}
+\label{fig:n-stop-summary-cont-all}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{n_stop_b200_continuous.png}
+\caption{Median total packets collected before stopping at \(B=200\) for the continuous distributions. Error bars show the interquartile range across seeds, and the number above each point is the correctness over 100 seeds.}
+\label{fig:n-stop-b200-continuous}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
 \includegraphics[width=\textwidth]{scatter_cont.png}
 \caption{Continuous correctness against efficiency. Each point is one stopping configuration.}
 \label{fig:app-scatter-cont}
@@ -595,6 +956,20 @@ The evaluation supports the core premise of the project. Passive delay samples c
 \includegraphics[width=0.92\textwidth]{n_stop_summary_disc_piecewise.png}
 \caption{Median total packets collected before stopping for the piecewise distribution.}
 \label{fig:app-n-stop-piecewise}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{stopped_distribution_normal_b200.png}
+\caption{Stopped KDE reconstruction for the normal distribution at \(B=200\) and \(\theta=\delta/6\). The centre and tails are already close to the true distribution at the stopping point.}
+\label{fig:app-stopped-distribution-normal-b200}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{stopped_distribution_lognormal_b200.png}
+\caption{Stopped KDE reconstruction for the lognormal distribution at \(B=200\) and \(\theta=\delta/6\). The estimate preserves the right-skewed shape used by the later distributional comparison.}
+\label{fig:app-stopped-distribution-lognormal-b200}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -625,7 +1000,101 @@ The evaluation supports the core premise of the project. Passive delay samples c
 \label{fig:app-tvd-stop-piecewise}
 \end{figure}
 
-\begin{thebibliography}{9}
+\clearpage
+
+\section{Capacity use-case diagnostics}
+\label{app:capacity-use-case-diagnostics}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_single_methods.png}
+\caption{Single-hop detection load for the two distributional capacity criteria. The configured capacity is used only for post-hoc evaluation.}
+\label{fig:observable-single-methods}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_bursty_methods.png}
+\caption{Single-link detection load under Pareto on-off bursty cross traffic. The reported load ratio is the swept average rate, while the on-period sending rate is twice that value.}
+\label{fig:observable-bursty-methods}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_multi_tvd_response.png}
+\caption{TVD response for the ten-hop path-wide cross-traffic experiment. The response-rate boundary appears where the curve leaves its gradual low-load trend.}
+\label{fig:app-observable-multi-tvd-response}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{observable_capacity_heterogeneous_methods.png}
+\caption{Detection load in the heterogeneous five-hop stress test. One link is 10 Mbit/s, the other four are 20 Mbit/s, and the slow link is moved across the path.}
+\label{fig:observable-heterogeneous-methods}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{multipath_detection_by_method.png}
+\caption{Detected capacity boundary in the multi-path mixture experiment. Whole-mixture rules depend on traffic share, while the upper-mode response remains aligned with the single-path grid point.}
+\label{fig:multipath-methods}
+\end{figure}
+
+\begin{thebibliography}{99}
+
+\bibitem{alFaresFatTree}
+Mohammad Al-Fares, Alexander Loukissas, and Amin Vahdat.
+\newblock A scalable, commodity data center network architecture.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 63 to 74, 2008.
+\newblock \url{https://doi.org/10.1145/1402958.1402967}.
+
+\bibitem{alFaresHedera}
+Mohammad Al-Fares, Sivasankar Radhakrishnan, Barath Raghavan, Nelson Huang, and Amin Vahdat.
+\newblock Hedera: Dynamic flow scheduling for data center networks.
+\newblock In Proceedings of the USENIX Symposium on Networked Systems Design and Implementation, pages 281 to 296, 2010.
+\newblock \url{https://www.usenix.org/conference/nsdi10/hedera-dynamic-flow-scheduling-data-center-networks}.
+
+\bibitem{alizadehConga}
+Mohammad Alizadeh, Tom Edsall, Sarang Dharmapurikar, Ramanan Vaidyanathan, Kevin Chu, Andy Fingerhut, Vinh The Lam, Francis Matus, Rong Pan, Navindra Yadav, and George Varghese.
+\newblock CONGA: Distributed congestion-aware load balancing for datacenters.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 503 to 514, 2014.
+\newblock \url{https://doi.org/10.1145/2619239.2626316}.
+
+\bibitem{alizadehDctcp}
+Mohammad Alizadeh, Albert Greenberg, David A. Maltz, Jitendra Padhye, Parveen Patel, Balaji Prabhakar, Sudipta Sengupta, and Murari Sridharan.
+\newblock Data Center TCP (DCTCP).
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 63 to 74, 2010.
+\newblock \url{https://doi.org/10.1145/1851182.1851192}.
+
+\bibitem{arfeenWeibull}
+Asad Arfeen, Krzysztof Pawlikowski, Don McNickle, and Andreas Willig.
+\newblock The role of the Weibull distribution in modelling traffic in Internet access and backbone core networks.
+\newblock Journal of Network and Computer Applications, volume 141, pages 1 to 22, 2019.
+\newblock \url{https://doi.org/10.1016/j.jnca.2019.05.002}.
+
+\bibitem{barfordSignalAnalysis}
+Paul Barford, Jeffery Kline, David Plonka, and Amos Ron.
+\newblock A signal analysis of network traffic anomalies.
+\newblock In Proceedings of the ACM SIGCOMM Internet Measurement Workshop, pages 71 to 82, 2002.
+\newblock \url{https://doi.org/10.1145/637201.637210}.
+
+\bibitem{chenConQuest}
+Xiaoqi Chen, Shir Landau Feibish, Yaron Koral, Jennifer Rexford, Ori Rottenstreich, Steven A. Monetti, and Tzuu-Yi Wang.
+\newblock Fine-grained queue measurement in the data plane.
+\newblock In Proceedings of the ACM International Conference on emerging Networking EXperiments and Technologies, pages 15 to 29, 2019.
+\newblock \url{https://doi.org/10.1145/3359989.3365408}.
+
+\bibitem{benBasatPint}
+Ran Ben Basat, Sivaramakrishnan Ramanathan, Yuliang Li, Gianni Antichi, Minlan Yu, and Michael Mitzenmacher.
+\newblock PINT: Probabilistic in-band network telemetry.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 662 to 680, 2020.
+\newblock \url{https://doi.org/10.1145/3387514.3405894}.
+
+\bibitem{brutlagAberrant}
+Jake D. Brutlag.
+\newblock Aberrant behavior detection in time series for network monitoring.
+\newblock In Proceedings of the 14th USENIX Conference on System Administration, pages 139 to 146, 2000.
+\newblock \url{https://www.usenix.org/publications/library/proceedings/lisa2000/brutlag.html}.
 
 \bibitem{canonneShort}
 Clement L. Canonne.
@@ -649,6 +1118,234 @@ Clement L. Canonne.
 Luc Devroye and Gabor Lugosi.
 \newblock Combinatorial Methods in Density Estimation.
 \newblock Springer, 2001.
+
+\bibitem{claiseNetflow}
+Benoit Claise.
+\newblock Cisco Systems NetFlow Services Export Version 9.
+\newblock RFC 3954, 2004.
+\newblock \url{https://www.rfc-editor.org/rfc/rfc3954}.
+
+\bibitem{dingRdProbe}
+Rui Ding, Xunpeng Liu, Shibo Yang, Qun Huang, Baoshu Xie, Ronghua Sun, Zhi Zhang, and Bolong Cui.
+\newblock RD-Probe: Scalable monitoring with sufficient coverage in complex datacenter networks.
+\newblock In Proceedings of the ACM SIGCOMM Conference, 2024.
+\newblock \url{https://doi.org/10.1145/3651890.3672256}.
+
+\bibitem{dovrolisPacketDispersion}
+Constantinos Dovrolis, Parameswaran Ramanathan, and David Moore.
+\newblock Packet-dispersion techniques and a capacity-estimation methodology.
+\newblock IEEE/ACM Transactions on Networking, volume 12, number 6, pages 963 to 977, 2004.
+\newblock \url{https://doi.org/10.1109/TNET.2004.838606}.
+
+\bibitem{downeyLognormal}
+Allen B. Downey.
+\newblock Lognormal and Pareto distributions in the Internet.
+\newblock Computer Communications, volume 28, number 7, pages 790 to 801, 2005.
+\newblock \url{https://doi.org/10.1016/j.comcom.2004.11.001}.
+
+\bibitem{guoPingmesh}
+Chuanxiong Guo, Lihua Yuan, Dong Xiang, Yingnong Dang, Ray Huang, Dave Maltz, Zhaoyi Liu, Vin Wang, Bin Pang, Hua Chen, Zhi-Wei Lin, and Varugis Kurien.
+\newblock Pingmesh: A large-scale system for data center network latency measurement and analysis.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 139 to 152, 2015.
+\newblock \url{https://doi.org/10.1145/2785956.2787496}.
+
+\bibitem{greenbergVl2}
+Albert Greenberg, James R. Hamilton, Navendu Jain, Srikanth Kandula, Changhoon Kim, Parantap Lahiri, David A. Maltz, Parveen Patel, and Sudipta Sengupta.
+\newblock VL2: A scalable and flexible data center network.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 51 to 62, 2009.
+\newblock \url{https://doi.org/10.1145/1592568.1592576}.
+
+\bibitem{ghorbaniDrill}
+Soudeh Ghorbani, Zibin Yang, P. Brighten Godfrey, Yashar Ganjali, and Amin Firoozshahian.
+\newblock DRILL: Micro load balancing for low-latency data center networks.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 225 to 238, 2017.
+\newblock \url{https://doi.org/10.1145/3098822.3098839}.
+
+\bibitem{handigolNetSight}
+Nikhil Handigol, Brandon Heller, Vimalkumar Jeyakumar, David Mazieres, and Nick McKeown.
+\newblock I Know What Your Packet Did Last Hop: Using packet histories to troubleshoot networks.
+\newblock In Proceedings of the USENIX Symposium on Networked Systems Design and Implementation, pages 71 to 85, 2014.
+\newblock \url{https://www.usenix.org/conference/nsdi14/technical-sessions/presentation/handigol}.
+
+\bibitem{hongSwan}
+Chi-Yao Hong, Srikanth Kandula, Ratul Mahajan, Ming Zhang, Vijay Gill, Mohan Nanduri, and Roger Wattenhofer.
+\newblock Achieving high utilization with software-driven WAN.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 15 to 26, 2013.
+\newblock \url{https://doi.org/10.1145/2486001.2486012}.
+
+\bibitem{harringtonSnmp}
+David Harrington, Randy Presuhn, and Bert Wijnen.
+\newblock An Architecture for Describing Simple Network Management Protocol (SNMP) Management Frameworks.
+\newblock RFC 3411, 2002.
+\newblock \url{https://doi.org/10.17487/RFC3411}.
+
+\bibitem{hartiganDip}
+John A. Hartigan and Pamela M. Hartigan.
+\newblock The dip test of unimodality.
+\newblock The Annals of Statistics, volume 13, number 1, pages 70 to 84, 1985.
+\newblock \url{https://doi.org/10.1214/aos/1176346577}.
+
+\bibitem{jainDovrolisPathload}
+Manish Jain and Constantinos Dovrolis.
+\newblock End-to-end available bandwidth: measurement methodology, dynamics, and relation with TCP throughput.
+\newblock IEEE/ACM Transactions on Networking, volume 11, number 4, pages 537 to 549, 2003.
+\newblock \url{https://doi.org/10.1109/TNET.2003.815304}.
+
+\bibitem{jainB4}
+Sushant Jain, Alok Kumar, Subhasree Mandal, Joon Ong, Leon Poutievski, Arjun Singh, Subbaiah Venkata, Jim Wanderer, Junlan Zhou, Min Zhu, Jonathan Zolla, Urs Holzle, Stephen Stuart, and Amin Vahdat.
+\newblock B4: Experience with a globally-deployed software defined WAN.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 3 to 14, 2013.
+\newblock \url{https://doi.org/10.1145/2486001.2486019}.
+
+\bibitem{karakasDelay}
+Mehmet Karakas.
+\newblock Determination of network delay distribution over the internet.
+\newblock M.S. thesis, Middle East Technical University, 2003.
+\newblock \url{https://hdl.handle.net/11511/13840}.
+
+\bibitem{lakhinaDistributions}
+Anukool Lakhina, Mark Crovella, and Christophe Diot.
+\newblock Mining anomalies using traffic feature distributions.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 217 to 228, 2005.
+\newblock \url{https://doi.org/10.1145/1080091.1080118}.
+
+\bibitem{lakhinaDiagnosing}
+Anukool Lakhina, Mark Crovella, and Christophe Diot.
+\newblock Diagnosing network-wide traffic anomalies.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 219 to 230, 2004.
+\newblock \url{https://doi.org/10.1145/1015467.1015492}.
+
+\bibitem{laiSequential}
+Tze Leung Lai.
+\newblock Sequential analysis: Some classical problems and new challenges.
+\newblock Statistica Sinica, volume 11, number 2, pages 303 to 408, 2001.
+\newblock \url{https://www3.stat.sinica.edu.tw/statistica/j11n2/j11n21/j11n21.htm}.
+
+\bibitem{linLmsa}
+Yu Lin, Shiduan Cheng, Chonggang Wang, Haitao Wu, Keping Long, and Shihong Zou.
+\newblock A new approach for path capacity measurement in Internet.
+\newblock High Speed Networks, volume 13, number 3, pages 183 to 206, 2004.
+\newblock \url{https://doi.org/10.3233/HSN-2004-243}.
+
+\bibitem{liuUnivMon}
+Zaoxing Liu, Antonis Manousis, Gregory Vorsanger, Vyas Sekar, and Vladimir Braverman.
+\newblock One sketch to rule them all: Rethinking network flow monitoring with UnivMon.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 101 to 114, 2016.
+\newblock \url{https://doi.org/10.1145/2934872.2934906}.
+
+\bibitem{moshrefTrumpet}
+Masoud Moshref, Minlan Yu, Ramesh Govindan, and Amin Vahdat.
+\newblock Trumpet: Timely and precise triggers in data centers.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 129 to 143, 2016.
+\newblock \url{https://doi.org/10.1145/2934872.2934879}.
+
+\bibitem{narayanaMarple}
+Srinivas Narayana, Anirudh Sivaraman, Vikram Nathan, Prateesh Goyal, Venkat Arun, Mohammad Alizadeh, Vimalkumar Jeyakumar, and Changhoon Kim.
+\newblock Language-directed hardware design for network performance monitoring.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 85 to 98, 2017.
+\newblock \url{https://doi.org/10.1145/3098822.3098829}.
+
+\bibitem{nychisEntropy}
+George Nychis, Vyas Sekar, David G. Andersen, Hyong Kim, and Hui Zhang.
+\newblock An empirical evaluation of entropy-based traffic anomaly detection.
+\newblock In Proceedings of the ACM Internet Measurement Conference, pages 151 to 156, 2008.
+\newblock \url{https://doi.org/10.1145/1452520.1452539}.
+
+\bibitem{p4IntSpec}
+P4 Applications Working Group.
+\newblock In-band Network Telemetry (INT) Dataplane Specification, version 2.1.
+\newblock 2020.
+\newblock \url{https://p4.org/p4-spec/docs/INT_v2_1.pdf}.
+
+\bibitem{pageCusum}
+E. S. Page.
+\newblock Continuous inspection schemes.
+\newblock Biometrika, volume 41, number 1, pages 100 to 115, 1954.
+\newblock \url{https://doi.org/10.1093/biomet/41.1-2.100}.
+
+\bibitem{panMultipathDelay}
+Sheng Pan, Yong Wang, Min Xiong, Li Gu, and Guo Min Hu.
+\newblock Detection of multipath routing with passive delay measurements.
+\newblock In Proceedings of the IEEE Conference on Computer Communications Workshops, pages 127 to 132, 2019.
+\newblock \url{https://doi.org/10.1109/INFCOMW.2019.8845038}.
+
+\bibitem{phaalSflow}
+Peter Phaal, Sonia Panchen, and Neil McKee.
+\newblock InMon Corporation's sFlow: A Method for Monitoring Traffic in Switched and Routed Networks.
+\newblock RFC 3176, 2001.
+\newblock \url{https://doi.org/10.17487/RFC3176}.
+
+\bibitem{qiuPacketDoppler}
+Tongqing Qiu, N. Hua, Jian Ni, Y. Richard Yang, and Hong Wang.
+\newblock Packet Doppler: network monitoring using packet shift detection.
+\newblock In Proceedings of the ACM CoNEXT Conference, pages 1 to 12, 2008.
+\newblock \url{https://doi.org/10.1145/1544012.1544015}.
+
+\bibitem{qureshiFathom}
+Mubashir Adnan Qureshi, Junhua Yan, Yuchung Cheng, Soheil Hassas Yeganeh, Neal Cardwell, Yousuk Seung, Willem de Bruijn, Van Jacobson, Amin Vahdat, and David Wetherall.
+\newblock Fathom: Understanding datacenter application network performance.
+\newblock In Proceedings of the ACM SIGCOMM Conference, 2023.
+\newblock \url{https://doi.org/10.1145/3603269.3604815}.
+
+\bibitem{ribeiroPathchirp}
+Vinay J. Ribeiro, Rudolf H. Riedi, Jiri Navratil, Les Cottrell, and Richard G. Baraniuk.
+\newblock pathChirp: Efficient available bandwidth estimation for network paths.
+\newblock SLAC Technical Report SLAC-PUB-9732, 2003.
+\newblock \url{https://doi.org/10.2172/813038}.
+
+\bibitem{shobhanaPirate}
+Bhavana Vannarth Shobhana, Yen-lin Chien, Jonathan Diamant, Badri Nath, Shir Landau Feibish, and Srinivas Narayana.
+\newblock Measuring round-trip response latencies under asymmetric routing.
+\newblock arXiv:2505.14358, 2025.
+\newblock \url{https://arxiv.org/abs/2505.14358}.
+
+\bibitem{singhJupiter}
+Arjun Singh, Joon Ong, Amit Agarwal, Glen Anderson, Ashby Armistead, Roy Bannon, Seb Boving, Gaurav Desai, Bob Felderman, Paulie Germano, Anand Kanagala, Hong Liu, Jeff Provost, Jason Simmons, Eiichi Tanda, Jim Wanderer, Urs Holzle, Stephen Stuart, and Amin Vahdat.
+\newblock Jupiter Rising: A decade of Clos topologies and centralized control in Google's datacenter network.
+\newblock ACM SIGCOMM Computer Communication Review, volume 45, number 4, pages 183 to 197, 2015.
+\newblock \url{https://doi.org/10.1145/2829988.2787508}.
+
+\bibitem{silvermanModes}
+Bernard W. Silverman.
+\newblock Using kernel density estimates to investigate multimodality.
+\newblock Journal of the Royal Statistical Society: Series B, volume 43, number 1, pages 97 to 99, 1981.
+\newblock \url{https://doi.org/10.1111/j.2517-6161.1981.tb01155.x}.
+
+\bibitem{sommersSla}
+Joel Sommers, Paul Barford, Nick Duffield, and Amos Ron.
+\newblock Accurate and efficient SLA compliance monitoring.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 109 to 120, 2007.
+\newblock \url{https://doi.org/10.1145/1282427.1282394}.
+
+\bibitem{straussSpruce}
+Jacob Strauss, Dina Katabi, and Frans Kaashoek.
+\newblock A measurement study of available bandwidth estimation tools.
+\newblock In Proceedings of the ACM SIGCOMM Internet Measurement Conference, pages 39 to 44, 2003.
+\newblock \url{https://doi.org/10.1145/948205.948211}.
+
+\bibitem{tsangDelayTomography}
+Yolanda Tsang, Mark Coates, and Robert D. Nowak.
+\newblock Network delay tomography.
+\newblock IEEE Transactions on Signal Processing, volume 51, number 8, pages 2125 to 2136, 2003.
+\newblock \url{https://doi.org/10.1109/TSP.2003.814520}.
+
+\bibitem{waldSequential}
+Abraham Wald.
+\newblock Sequential tests of statistical hypotheses.
+\newblock The Annals of Mathematical Statistics, volume 16, number 2, pages 117 to 186, 1945.
+\newblock \url{https://doi.org/10.1214/aoms/1177731118}.
+
+\bibitem{zhengMuMon}
+Hao Zheng, Chengyuan Huang, Xiangyu Han, Jiaqi Zheng, Xiaoliang Wang, Chen Tian, Wanchun Dou, and Guihai Chen.
+\newblock \(\mu\)Mon: Empowering microsecond-level network monitoring with wavelets.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 274 to 290, 2024.
+\newblock \url{https://doi.org/10.1145/3651890.3672236}.
+
+\bibitem{zhuEverflow}
+Yibo Zhu, Nanxi Kang, Jiaxin Cao, Albert Greenberg, Guohan Lu, Ratul Mahajan, Dave Maltz, Lihua Yuan, Ming Zhang, Ben Y. Zhao, and Haitao Zheng.
+\newblock Packet-level telemetry in large datacenter networks.
+\newblock In Proceedings of the ACM SIGCOMM Conference, pages 479 to 491, 2015.
+\newblock \url{https://doi.org/10.1145/2785956.2787483}.
 
 \end{thebibliography}
 

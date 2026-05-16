@@ -25,11 +25,11 @@ Reports:
   - Efficiency : n_theory / median(n_stop)
   - Summary CSV and a set of heatmap + box-plot figures
 
-Continuous distributions use a KDE on a 1ms grid (K=149 bins, matching
+Continuous distributions use a KDE on a 1ms grid (K=150 bins, matching
 sample_complexity_theoretical.py).  Discrete distributions use the empirical PMF.
 
 Theoretical sample requirements (delta=0.05, epsilon=0.05):
-  Continuous (KDE, K=149): n_theory = ceil(K * ln(1/eps) / delta^2) = 178 702
+  Continuous (KDE, K=150): n_theory = ceil((K + ln(1/eps)) / delta^2) = 61 199
   Binomial  (k=21):        n_theory = ceil((k + ln(1/eps)) / delta^2) = 9 599
   Zipf      (k=20):        n_theory = ceil((k + ln(1/eps)) / delta^2) = 9 199
   Piecewise (k=20):        n_theory = 9 199
@@ -63,10 +63,10 @@ MAX_SAMPLES_DISCRETE   = 30_000
 
 GRID_MAX  = 150.0
 BIN_WIDTH = 1.0
-GRID      = np.arange(BIN_WIDTH / 2, GRID_MAX, BIN_WIDTH)   # 149 bin centres
+GRID      = np.arange(BIN_WIDTH / 2, GRID_MAX, BIN_WIDTH)   # 150 bin centres
 K         = len(GRID)
 
-N_THEORY_CONTINUOUS = math.ceil(K * math.log(1.0 / EPSILON) / DELTA ** 2)
+N_THEORY_CONTINUOUS = math.ceil((K + math.log(1.0 / EPSILON)) / DELTA ** 2)
 
 CONTINUOUS_DISTRIBUTIONS = {
     "normal": {

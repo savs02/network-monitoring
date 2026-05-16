@@ -51,7 +51,7 @@ BIN_WIDTH = 1.0
 GRID      = np.arange(BIN_WIDTH / 2, GRID_MAX, BIN_WIDTH)
 K         = len(GRID)
 
-N_THEORY_CONT = math.ceil(K * math.log(1.0 / EPSILON) / DELTA ** 2)
+N_THEORY_CONT = math.ceil((K + math.log(1.0 / EPSILON)) / DELTA ** 2)
 
 CONTINUOUS_DISTS = {
     "normal":    {"label": "Normal(40, 4)",        "params": {"mean": 40.0, "variance": 4.0}, "color": "#3498db"},

@@ -90,7 +90,7 @@ def tvd(p, q):
 
 
 def theoretical_bound(n):
-    return min(1.0, np.sqrt(K * np.log(1.0 / EPSILON) / n))
+    return min(1.0, np.sqrt((K + np.log(1.0 / EPSILON)) / n))
 
 
 def param_label(dist_name, params):
