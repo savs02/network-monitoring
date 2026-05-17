@@ -11,6 +11,9 @@ import csv
 import math
 import os
 
+import matplotlib
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
@@ -23,6 +26,12 @@ RESULTS_DIR = os.path.join(
 
 EPSILON = 0.05
 DELTA = 0.05
+DISCRETE_N_THEORY = {
+    "binomial": 8920,
+    "zipf": 8520,
+    "piecewise": 8520,
+}
+CONTINUOUS_N_THEORY = 60520
 GRID_MAX = 150.0
 BIN_WIDTH = 1.0
 BIN_EDGES = np.arange(0.0, GRID_MAX + BIN_WIDTH, BIN_WIDTH)
@@ -110,17 +119,19 @@ def bound_curve(k, ns):
     return np.minimum(1.0, np.sqrt((k + math.log(1.0 / EPSILON)) / ns))
 
 
+def reference_bound_curve(n_theory, ns):
+    ns = np.asarray(ns, dtype=float)
+    return np.minimum(1.0, DELTA * np.sqrt(n_theory / ns))
+
+
 def tvd(p, q):
     return 0.5 * float(np.sum(np.abs(p - q)))
 
 
 def empirical_discrete_pmf(samples, support):
-    counts = np.zeros(len(support), dtype=float)
     offset = int(support[0])
-    for value in samples:
-        idx = int(value) - offset
-        if 0 <= idx < len(counts):
-            counts[idx] += 1.0
+    indices = np.asarray(samples, dtype=int) - offset
+    counts = np.bincount(indices, minlength=len(support))[: len(support)].astype(float)
     return counts / counts.sum()
 
 
@@ -215,7 +226,7 @@ def run_discrete():
             "ns": ns_by_dist[name],
             "values": values_by_n,
             "k": len(support),
-            "n_theory": finite_bound(len(support)),
+            "n_theory": DISCRETE_N_THEORY[name],
         }
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.8), sharey=True)
@@ -228,7 +239,13 @@ def run_discrete():
 
         ax.fill_between(ns, q25, q75, color=cfg["color"], alpha=0.18)
         ax.plot(ns, med, marker="o", color=cfg["color"], linewidth=2, label="Median TVD")
-        ax.plot(curve_x, bound_curve(k, curve_x), "k--", linewidth=1.3, label="Theory curve")
+        ax.plot(
+            curve_x,
+            reference_bound_curve(n_theory, curve_x),
+            "k--",
+            linewidth=1.3,
+            label="Theory curve",
+        )
         ax.axhline(DELTA, color="#555555", linestyle=":", linewidth=1.2, label="Target")
         ax.axvline(n_theory, color="#922b21", linestyle=":", linewidth=1.2)
         ax.set_xscale("log")
@@ -250,7 +267,106 @@ def run_discrete():
     out = os.path.join(RESULTS_DIR, "statistical_discrete_tvd_vs_n.png")
     plt.savefig(out, dpi=180, bbox_inches="tight")
     plt.close()
-    return results, out
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4.8), sharey=True)
+    for ax, (name, cfg) in zip(axes, DISCRETE_DISTS.items()):
+        ns = results[name]["ns"]
+        worst = np.array([np.max(results[name]["values"][n]) for n in ns])
+        best = np.array([np.min(results[name]["values"][n]) for n in ns])
+        k = results[name]["k"]
+        n_theory = results[name]["n_theory"]
+        curve_x = np.logspace(math.log10(min(ns)), math.log10(max(ns)), 250)
+
+        ax.fill_between(ns, best, worst, color=cfg["color"], alpha=0.14)
+        ax.plot(
+            ns,
+            worst,
+            marker="o",
+            color=cfg["color"],
+            linewidth=2,
+            label="Worst-case TVD",
+        )
+        ax.plot(
+            curve_x,
+            reference_bound_curve(n_theory, curve_x),
+            "k--",
+            linewidth=1.3,
+            label="Theory curve",
+        )
+        ax.axhline(DELTA, color="#555555", linestyle=":", linewidth=1.2, label="Target")
+        ax.axvline(n_theory, color="#922b21", linestyle=":", linewidth=1.2)
+        ax.set_xscale("log")
+        ax.set_title(f"{cfg['label']}, k={k}")
+        ax.set_xlabel("Samples n")
+        ax.grid(True, alpha=0.25, which="both")
+        ax.text(
+            0.03,
+            0.92,
+            f"$n_{{theory}}$ = {n_theory:,}",
+            transform=ax.transAxes,
+            fontsize=9,
+            bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
+        )
+    axes[0].set_ylabel("Total variation distance")
+    axes[0].legend(fontsize=8, loc="upper right")
+    fig.suptitle("Discrete distributions: worst-case TVD against true PMF as samples increase")
+    plt.tight_layout()
+    worst_out = os.path.join(RESULTS_DIR, "statistical_discrete_worst_tvd_vs_n.png")
+    plt.savefig(worst_out, dpi=180, bbox_inches="tight")
+    plt.close()
+
+    separate_worst_outs = []
+    for name, cfg in DISCRETE_DISTS.items():
+        ns = results[name]["ns"]
+        worst = np.array([np.max(results[name]["values"][n]) for n in ns])
+        best = np.array([np.min(results[name]["values"][n]) for n in ns])
+        k = results[name]["k"]
+        n_theory = results[name]["n_theory"]
+        curve_x = np.logspace(math.log10(min(ns)), math.log10(max(ns)), 250)
+
+        fig, ax = plt.subplots(figsize=(6.2, 4.6))
+        ax.fill_between(ns, best, worst, color=cfg["color"], alpha=0.14)
+        ax.plot(
+            ns,
+            worst,
+            marker="o",
+            color=cfg["color"],
+            linewidth=2,
+            label="Worst-case TVD",
+        )
+        ax.plot(
+            curve_x,
+            reference_bound_curve(n_theory, curve_x),
+            "k--",
+            linewidth=1.3,
+            label="Theory curve",
+        )
+        ax.axhline(DELTA, color="#555555", linestyle=":", linewidth=1.2, label="Target")
+        ax.axvline(n_theory, color="#922b21", linestyle=":", linewidth=1.2)
+        ax.set_xscale("log")
+        ax.set_title(f"{cfg['label']}, k={k}")
+        ax.set_xlabel("Samples n")
+        ax.set_ylabel("Total variation distance")
+        ax.grid(True, alpha=0.25, which="both")
+        ax.text(
+            0.03,
+            0.92,
+            f"$n_{{theory}}$ = {n_theory:,}",
+            transform=ax.transAxes,
+            fontsize=9,
+            bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
+        )
+        ax.legend(fontsize=8, loc="upper right")
+        plt.tight_layout()
+        separate_out = os.path.join(
+            RESULTS_DIR,
+            f"statistical_discrete_worst_tvd_vs_n_{name}.png",
+        )
+        plt.savefig(separate_out, dpi=180, bbox_inches="tight")
+        plt.close()
+        separate_worst_outs.append(separate_out)
+
+    return results, out, worst_out, separate_worst_outs
 
 
 def run_continuous():
@@ -279,7 +395,7 @@ def run_continuous():
             "kde": kde_by_n,
             "gap": gap_by_n,
             "k": K_CONT,
-            "n_theory": finite_bound(K_CONT),
+            "n_theory": CONTINUOUS_N_THEORY,
         }
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.8), sharey=True)
@@ -293,7 +409,13 @@ def run_continuous():
         ax.plot(ns, med_pmf, marker="s", color="#566573", linewidth=1.8, label="PMF")
         ax.fill_between(ns, q25_kde, q75_kde, color=cfg["color"], alpha=0.16)
         ax.plot(ns, med_kde, marker="o", color=cfg["color"], linewidth=2, label="KDE")
-        ax.plot(curve_x, bound_curve(K_CONT, curve_x), "k--", linewidth=1.3, label="PMF theory")
+        ax.plot(
+            curve_x,
+            reference_bound_curve(res["n_theory"], curve_x),
+            "k--",
+            linewidth=1.3,
+            label="PMF theory",
+        )
         ax.axhline(DELTA, color="#555555", linestyle=":", linewidth=1.2, label="Target")
         ax.axvline(res["n_theory"], color="#922b21", linestyle=":", linewidth=1.2)
         ax.set_xscale("log")
@@ -316,6 +438,107 @@ def run_continuous():
     plt.savefig(out_accuracy, dpi=180, bbox_inches="tight")
     plt.close()
 
+    separate_accuracy_outs = []
+    separate_worst_outs = []
+    for name, cfg in CONTINUOUS_DISTS.items():
+        res = results[name]
+        med_pmf, q25_pmf, q75_pmf = median_iqr(res["pmf"], ns)
+        med_kde, q25_kde, q75_kde = median_iqr(res["kde"], ns)
+        curve_x = np.logspace(math.log10(min(ns)), math.log10(max(ns)), 250)
+
+        fig, ax = plt.subplots(figsize=(6.2, 4.6))
+        ax.fill_between(ns, q25_pmf, q75_pmf, color="#7f8c8d", alpha=0.16)
+        ax.plot(ns, med_pmf, marker="s", color="#566573", linewidth=1.8, label="PMF")
+        ax.fill_between(ns, q25_kde, q75_kde, color=cfg["color"], alpha=0.16)
+        ax.plot(ns, med_kde, marker="o", color=cfg["color"], linewidth=2, label="KDE")
+        ax.plot(
+            curve_x,
+            reference_bound_curve(res["n_theory"], curve_x),
+            "k--",
+            linewidth=1.3,
+            label="PMF theory",
+        )
+        ax.axhline(DELTA, color="#555555", linestyle=":", linewidth=1.2, label="Target")
+        ax.axvline(res["n_theory"], color="#922b21", linestyle=":", linewidth=1.2)
+        ax.set_xscale("log")
+        ax.set_title(cfg["label"])
+        ax.set_xlabel("Samples n")
+        ax.set_ylabel("Total variation distance")
+        ax.grid(True, alpha=0.25, which="both")
+        ax.text(
+            0.03,
+            0.92,
+            f"$n_{{theory}}$ = {res['n_theory']:,}",
+            transform=ax.transAxes,
+            fontsize=9,
+            bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
+        )
+        ax.legend(fontsize=8, loc="upper right")
+        plt.tight_layout()
+        separate_out = os.path.join(
+            RESULTS_DIR,
+            f"statistical_continuous_tvd_vs_n_{name}_60520.png",
+        )
+        plt.savefig(separate_out, dpi=180, bbox_inches="tight")
+        plt.close()
+        separate_accuracy_outs.append(separate_out)
+
+        worst_pmf = np.array([np.max(res["pmf"][n]) for n in ns])
+        best_pmf = np.array([np.min(res["pmf"][n]) for n in ns])
+        worst_kde = np.array([np.max(res["kde"][n]) for n in ns])
+        best_kde = np.array([np.min(res["kde"][n]) for n in ns])
+
+        fig, ax = plt.subplots(figsize=(6.2, 4.6))
+        ax.fill_between(ns, best_pmf, worst_pmf, color="#7f8c8d", alpha=0.14)
+        ax.plot(
+            ns,
+            worst_pmf,
+            marker="s",
+            color="#566573",
+            linewidth=1.8,
+            label="Worst-case PMF",
+        )
+        ax.fill_between(ns, best_kde, worst_kde, color=cfg["color"], alpha=0.14)
+        ax.plot(
+            ns,
+            worst_kde,
+            marker="o",
+            color=cfg["color"],
+            linewidth=2,
+            label="Worst-case KDE",
+        )
+        ax.plot(
+            curve_x,
+            reference_bound_curve(res["n_theory"], curve_x),
+            "k--",
+            linewidth=1.3,
+            label="PMF theory",
+        )
+        ax.axhline(DELTA, color="#555555", linestyle=":", linewidth=1.2, label="Target")
+        ax.axvline(res["n_theory"], color="#922b21", linestyle=":", linewidth=1.2)
+        ax.set_xscale("log")
+        ax.set_title(cfg["label"])
+        ax.set_xlabel("Samples n")
+        ax.set_ylabel("Total variation distance")
+        ax.grid(True, alpha=0.25, which="both")
+        ax.text(
+            0.03,
+            0.92,
+            f"$n_{{theory}}$ = {res['n_theory']:,}",
+            transform=ax.transAxes,
+            fontsize=9,
+            bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
+        )
+        ax.legend(fontsize=8, loc="upper right")
+        plt.tight_layout()
+        worst_out = os.path.join(
+            RESULTS_DIR,
+            f"statistical_continuous_worst_tvd_vs_n_{name}_60520.png",
+        )
+        plt.savefig(worst_out, dpi=180, bbox_inches="tight")
+        plt.close()
+        separate_worst_outs.append(worst_out)
+
     fig, ax = plt.subplots(figsize=(8.2, 5.2))
     for name, cfg in CONTINUOUS_DISTS.items():
         med, q25, q75 = median_iqr(results[name]["gap"], ns)
@@ -331,7 +554,7 @@ def run_continuous():
     out_gap = os.path.join(RESULTS_DIR, "statistical_continuous_kde_pmf_gap.png")
     plt.savefig(out_gap, dpi=180, bbox_inches="tight")
     plt.close()
-    return results, out_accuracy, out_gap
+    return results, out_accuracy, out_gap, separate_accuracy_outs, separate_worst_outs
 
 
 def write_summary(discrete_results, continuous_results):
@@ -414,13 +637,29 @@ def print_key_numbers(discrete_results, continuous_results):
 def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
     shape_plot = plot_true_shapes()
-    discrete_results, discrete_plot = run_discrete()
-    continuous_results, continuous_plot, gap_plot = run_continuous()
+    discrete_results, discrete_plot, discrete_worst_plot, discrete_worst_separate = run_discrete()
+    (
+        continuous_results,
+        continuous_plot,
+        gap_plot,
+        continuous_separate,
+        continuous_worst_separate,
+    ) = run_continuous()
     summary = write_summary(discrete_results, continuous_results)
 
     print_key_numbers(discrete_results, continuous_results)
     print("\nSaved figures")
-    for path in (shape_plot, discrete_plot, continuous_plot, gap_plot, summary):
+    for path in (
+        shape_plot,
+        discrete_plot,
+        discrete_worst_plot,
+        *discrete_worst_separate,
+        continuous_plot,
+        *continuous_separate,
+        *continuous_worst_separate,
+        gap_plot,
+        summary,
+    ):
         print(f"  {path}")
 
 
