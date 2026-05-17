@@ -7,9 +7,12 @@ the dissertation checks the statistical reconstruction question before any
 topology-specific effects are introduced.
 """
 
+import argparse
 import csv
 import math
 import os
+
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/profiler-matplotlib")
 
 import matplotlib
 
@@ -27,9 +30,9 @@ RESULTS_DIR = os.path.join(
 EPSILON = 0.05
 DELTA = 0.05
 DISCRETE_N_THEORY = {
-    "binomial": 8920,
-    "zipf": 8520,
-    "piecewise": 8520,
+    "binomial": 9599,
+    "zipf": 9199,
+    "piecewise": 9199,
 }
 CONTINUOUS_N_THEORY = 60520
 GRID_MAX = 150.0
@@ -370,7 +373,7 @@ def run_discrete():
 
 
 def run_continuous():
-    ns = [500, 1000, 2000, 5000, 10000, 20000, 50000, 61199]
+    ns = sorted({500, 1000, 2000, 5000, 10000, 20000, 50000, CONTINUOUS_N_THEORY, 61199})
     results = {}
 
     for name, cfg in CONTINUOUS_DISTS.items():
@@ -635,6 +638,19 @@ def print_key_numbers(discrete_results, continuous_results):
 
 
 def main():
+    global RESULTS_DIR
+
+    parser = argparse.ArgumentParser(
+        description="Generate the statistical sample-complexity report figures."
+    )
+    parser.add_argument(
+        "--results-dir",
+        default=RESULTS_DIR,
+        help="Directory for generated figures and the summary CSV.",
+    )
+    args = parser.parse_args()
+
+    RESULTS_DIR = args.results_dir
     os.makedirs(RESULTS_DIR, exist_ok=True)
     shape_plot = plot_true_shapes()
     discrete_results, discrete_plot, discrete_worst_plot, discrete_worst_separate = run_discrete()

@@ -3,7 +3,7 @@ Plot empirical delay distributions from NS-3 simulation samples.
 
 One subplot per distribution (normal, lognormal, weibull), each showing:
   - histogram of sampled delays
-  - KDE estimate (what the monitor produces — no knowledge of underlying family)
+  - KDE estimate (what the monitor produces, with no knowledge of underlying family)
   - theoretical PDF (ground truth, for comparison only)
 """
 
@@ -15,7 +15,7 @@ import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results"
+RESULTS_DIR = os.path.join(SCRIPT_DIR, "../results")
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, "../results/delay_distributions.png")
 
 # distribution configurations matching the NS-3 simulation defaults
@@ -101,11 +101,11 @@ def plot_all(distributions):
             label=f"Samples (n={len(samples)})",
         )
 
-        # KDE estimate — distribution-agnostic, bandwidth chosen by Scott's rule
+        # KDE estimate, distribution-agnostic with bandwidth chosen by Scott's rule
         kde = stats.gaussian_kde(samples, bw_method="scott")
         ax.plot(x, kde(x), color=color, linewidth=2.0, label="KDE estimate")
 
-        # theoretical PDF — ground truth for comparison only, not available to the monitor
+        # theoretical PDF, ground truth for comparison only and not available to the monitor
         pdf = theoretical_pdf(dist_config, x)
         ax.plot(x, pdf, color="black", linewidth=1.8, linestyle="--", label="Theoretical PDF")
 
