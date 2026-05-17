@@ -1,91 +1,50 @@
 # Profiler
 
-Profiler is the implementation used for my MEng Computer Science final year project at UCL. The project studies passive network monitoring through delay distribution analysis. Given packet delay observations at the endpoint, Profiler reconstructs the path delay distribution and evaluates when the distributional response indicates a capacity boundary.
+Profiler is a passive network monitoring pipeline for detecting when a path approaches a capacity boundary from endpoint delay observations. It reconstructs non-parametric delay distributions from received packet samples, stops when the reconstruction is stable, and compares stopped distributions across offered-load conditions using total variation distance.
 
-The repository contains the NS-3 simulations, Python analysis code, and dissertation figures used for the evaluation. It is intended to be readable by a dissertation reviewer as well as runnable by someone who wants to reproduce the main experiments.
-
-## Project Context
-
-Profiler is evaluated through a staged set of controlled experiments. A sender transmits packets to a receiver over one or more point-to-point links. The simulator samples per-packet delay from a chosen distribution, while the monitoring code only sees observed delays. The monitor does not receive the name or parameters of the distribution. This makes the reconstruction distribution agnostic.
-
-The current experiments focus on lognormal, Weibull, and normal continuous delay distributions, plus finite-support binomial, Zipfian, and piecewise distributions for the statistical reconstruction checks. Accuracy is mainly measured with total variation distance, with related scripts for other distance measures and diagnostic plots.
-
-## Report Alignment
-
-The README follows the submitted dissertation PDF dated 17 May 2026. The main numbers used by the code paths below are:
-
-```text
-Total variation distance target: 0.05
-Success probability target: 0.95
-Discrete n_theory values: binomial 8,920, Zipfian 8,520, piecewise 8,520
-Continuous n_theory value: 60,520 on a 1 ms grid from 0 ms to 150 ms
-Continuous sample grid: 500, 1,000, 2,000, 5,000, 10,000, 20,000, 50,000, 60,520
-Adaptive stopping operating point: batch size 200 and threshold delta / 6
-Constant-rate single-link boundary: 0.925 load-grid point
-Endpoint cross-traffic loss in the constant-rate single-link run: 0.950 median load ratio
-Bursty average-load boundary: 0.475 median load ratio
-Multi-hop constant-rate boundary: 0.925 median load ratio across two to ten hops
-Multi-path modal result: upper-mode response recovers the 0.925 grid point
-```
-
-Profiler does not claim to measure exact physical capacity. The reported 0.925 boundary is the first satisfying point on the tested load grid under the report's queue model, traffic model, estimator, and decision rule.
+The monitor only uses receiver-side packet delays and the ordering of load conditions. The simulator knows the configured topology, delay family, random seed, and offered load, but those fields are used for experiment control and post-run scoring rather than for the monitoring decision.
 
 ## Repository Layout
 
 ```text
 .
 ├── delay-monitoring/
-│   ├── analysis/              Python experiment and plotting scripts
-│   ├── foundations/           Single-hop NS-3 model and monitoring support
+│   ├── analysis/              Python experiment, analysis, and plotting scripts
+│   ├── foundations/           Single-link NS-3 model and monitoring support
 │   ├── multihop_scratch/      Multi-hop NS-3 capacity model
 │   ├── results/               Selected summary data and generated figures
-│   ├── scripts/               Longer NS-3 batch-run helpers
+│   ├── scripts/               Batch helpers for earlier sample-complexity runs
 │   └── underlying_network_data/
-├── ns-3.46/                   NS-3 checkout used by the project
-└── report/                    Dissertation source and figures
+├── ns-3.46/                   Network Simulator 3 checkout used by Profiler
+└── report/                    Report source and figures
 ```
-
-The large raw experiment trees are not meant to live in Git. The repository keeps the code, report source, selected summary CSV files, and figures needed to inspect the dissertation results.
 
 ## Requirements
 
-The code was developed with NS-3.46 and Python 3. The Python scripts use NumPy, SciPy, pandas, matplotlib, and seaborn. The NS-3 checkout is included in this workspace.
+Profiler uses Network Simulator 3 (NS-3) 3.46 and Python 3. The Python analysis uses NumPy, SciPy, pandas, matplotlib, and seaborn.
 
-From the repository root, set up a Python environment with:
+From the repository root:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install -r delay-monitoring/analysis/requirements.txt
-```
-
-If `requirements.txt` is empty in your copy, install the analysis dependencies directly:
-
-```bash
 pip install numpy scipy pandas matplotlib seaborn
+pip install -r delay-monitoring/analysis/requirements.txt
 ```
 
 ## NS-3 Setup
 
-The NS-3 scratch directory must point at the project simulations. The expected links are:
-
-```text
-ns-3.46/scratch/delay-monitoring -> delay-monitoring/foundations
-ns-3.46/scratch/delay-monitoring-multihop -> delay-monitoring/multihop_scratch
-```
-
-Create or refresh them from the repository root:
+The project simulations are exposed to NS-3 through scratch links:
 
 ```bash
 ln -sfn ../../delay-monitoring/foundations ns-3.46/scratch/delay-monitoring
 ln -sfn ../../delay-monitoring/multihop_scratch ns-3.46/scratch/delay-monitoring-multihop
 ```
 
-Build the two simulation targets:
+Build the single-link and multi-hop simulation targets:
 
 ```bash
-rm -rf ns-3.46/cmake-cache ns-3.46/build
 cd ns-3.46
 ./ns3 configure --disable-examples --disable-tests
 ./ns3 build scratch/delay-monitoring/single-hop-underlying-network
@@ -93,11 +52,15 @@ cd ns-3.46
 cd ..
 ```
 
-The `rm -rf` line removes generated NS-3 cache directories. It is useful if CMake reports that the cache was created in a different checkout path.
+If CMake reports that its cache was created in another checkout path, remove the generated NS-3 cache directories and rerun the build commands:
 
-## Quick Reviewer Checks
+```bash
+rm -rf ns-3.46/cmake-cache ns-3.46/build
+```
 
-These commands are intended as lightweight checks. They write only to `/tmp`, so they do not add new result files to the repository.
+## Quick Checks
+
+These commands check the main code paths and write experiment output to `/tmp`.
 
 Compile the Python analysis scripts:
 
@@ -105,7 +68,7 @@ Compile the Python analysis scripts:
 python3 -m compileall -q delay-monitoring/analysis
 ```
 
-Run a tiny single-hop NS-3 simulation:
+Run a small single-link NS-3 simulation:
 
 ```bash
 cd ns-3.46
@@ -113,9 +76,7 @@ cd ns-3.46
 cd ..
 ```
 
-This smoke run uses `--no-build` so it does not regenerate NS-3 build files while reviewing the repository.
-
-Run a tiny observable-capacity experiment and place its output in `/tmp`:
+Run a small observable-capacity analysis:
 
 ```bash
 MPLCONFIGDIR=/tmp/profiler-matplotlib \
@@ -134,7 +95,7 @@ python3 delay-monitoring/analysis/observable_capacity_experiments.py \
   --quiet-progress
 ```
 
-Generate the statistical sample-complexity report figures into `/tmp`:
+Regenerate the statistical sample-complexity figures into `/tmp`:
 
 ```bash
 MPLCONFIGDIR=/tmp/profiler-matplotlib \
@@ -142,27 +103,28 @@ python3 delay-monitoring/analysis/statistical_sample_complexity_report.py \
   --results-dir /tmp/profiler-statistical-report
 ```
 
-The last command is computational rather than simulator-heavy. It may take a few minutes because it repeats the statistical sampling used for the dissertation figures.
-
 ## Reproducing Main Results
 
-The dissertation figures were produced from a mixture of NS-3 simulation outputs and pure Python statistical experiments.
+The commands below regenerate the main result families. Commands that call NS-3 write raw simulation files under the supplied `--results-dir`; use a different directory if you want to keep several runs side by side.
 
-The statistical sample-complexity figures in Chapter 4 can be regenerated with:
+### Statistical Reconstruction
 
 ```bash
 python3 delay-monitoring/analysis/statistical_sample_complexity_report.py
 ```
 
-By default this writes to:
+This regenerates `delay-monitoring/results/statistical-sample-complexity-report/` using the sample counts used in the report: 8,920 for binomial, 8,520 for Zipfian and piecewise, and 60,520 for the continuous one millisecond grid.
 
-```text
-delay-monitoring/results/statistical-sample-complexity-report/
+### Adaptive Stopping
+
+```bash
+python3 delay-monitoring/analysis/adaptive_stopping_v2.py
+python3 delay-monitoring/analysis/adaptive_stopping_report_plots.py
 ```
 
-This script uses the report's finite-domain reference counts: 8,920 for binomial, 8,520 for Zipfian and piecewise, and 60,520 for the continuous one millisecond grid.
+The first command runs the 100-seed stopping sweep. The second command derives the report plots from that sweep.
 
-For a single-link observable-capacity run, use:
+### Constant-Rate Single-Link Capacity
 
 ```bash
 python3 delay-monitoring/analysis/observable_capacity_experiments.py \
@@ -173,7 +135,23 @@ python3 delay-monitoring/analysis/observable_capacity_experiments.py \
   --workers 8
 ```
 
-For a multi-hop run, use:
+### Pareto On-Off Bursty Single-Link Capacity
+
+```bash
+python3 delay-monitoring/analysis/observable_capacity_experiments.py \
+  --topology single \
+  --results-dir delay-monitoring/results/observable-capacity-single-bursty-pareto-100 \
+  --scenario-label single_bursty_pareto \
+  --cross-traffic-pattern bursty \
+  --cross-traffic-on-time 'ns3::ParetoRandomVariable[Scale=0.02|Shape=1.5|Bound=0.5]' \
+  --cross-traffic-off-time 'ns3::ParetoRandomVariable[Scale=0.02|Shape=1.5|Bound=0.5]' \
+  --burst-rate-multiplier 2.0 \
+  --seed-start 1 \
+  --seed-end 100 \
+  --workers 8
+```
+
+### Uniform Multi-Hop Capacity
 
 ```bash
 python3 delay-monitoring/analysis/observable_capacity_experiments.py \
@@ -185,36 +163,94 @@ python3 delay-monitoring/analysis/observable_capacity_experiments.py \
   --workers 8
 ```
 
-These full runs produce many raw CSV files. For review, the quick checks above are usually the better way to confirm that the code path works.
+### Heterogeneous Five-Hop Capacity
 
-The saved dissertation figures report that TVD response rate selects the 0.925 load-grid point in the constant-rate single-link run and remains at that grid point across the two to ten hop path-wide multi-hop runs. The bursty run reports a lower average-load boundary because the on-period sending rate is twice the swept average.
+```bash
+python3 delay-monitoring/analysis/observable_capacity_experiments.py \
+  --topology multi \
+  --hop-counts 5 \
+  --capacity-mbps 10 \
+  --link-data-rates 10Mbps,20Mbps,20Mbps,20Mbps,20Mbps \
+  --bottleneck-hop 0 \
+  --scenario-label heterogeneous_start \
+  --results-dir delay-monitoring/results/observable-capacity-heterogeneous-start-100 \
+  --seed-start 1 \
+  --seed-end 100 \
+  --workers 8
 
-## What To Commit
+python3 delay-monitoring/analysis/observable_capacity_experiments.py \
+  --topology multi \
+  --hop-counts 5 \
+  --capacity-mbps 10 \
+  --link-data-rates 20Mbps,20Mbps,10Mbps,20Mbps,20Mbps \
+  --bottleneck-hop 2 \
+  --scenario-label heterogeneous_middle \
+  --results-dir delay-monitoring/results/observable-capacity-heterogeneous-middle-100 \
+  --seed-start 1 \
+  --seed-end 100 \
+  --workers 8
 
-Commit source code, report text, configuration files, summary CSV files, and final figures that are referenced by the dissertation.
-
-Do not commit NS-3 build products or full raw experiment trees. In particular, leave these out of normal Git commits:
-
-```text
-ns-3.46/build/
-ns-3.46/cmake-cache/
-delay-monitoring/results/**/raw/
-delay-monitoring/results/**/processed/
+python3 delay-monitoring/analysis/observable_capacity_experiments.py \
+  --topology multi \
+  --hop-counts 5 \
+  --capacity-mbps 10 \
+  --link-data-rates 20Mbps,20Mbps,20Mbps,20Mbps,10Mbps \
+  --bottleneck-hop 4 \
+  --scenario-label heterogeneous_end \
+  --results-dir delay-monitoring/results/observable-capacity-heterogeneous-end-100 \
+  --seed-start 1 \
+  --seed-end 100 \
+  --workers 8
 ```
 
-Large raw outputs should be archived outside the Git repository, for example in institutional storage, cloud storage, or a release archive.
+### Capacity Figures From Saved Runs
+
+```bash
+python3 delay-monitoring/analysis/plot_observable_capacity_results.py \
+  --single-dir delay-monitoring/results/observable-capacity-single-100-seed \
+  --multi-dir delay-monitoring/results/observable-capacity-multi-100-seed \
+  --out-dir report/figures/evaluation \
+  --plot-hop 10
+
+python3 delay-monitoring/analysis/capacity_robustness_plots.py \
+  --bursty-dir delay-monitoring/results/observable-capacity-single-bursty-pareto-100 \
+  --hetero-dir start=delay-monitoring/results/observable-capacity-heterogeneous-start-100 \
+  --hetero-dir middle=delay-monitoring/results/observable-capacity-heterogeneous-middle-100 \
+  --hetero-dir end=delay-monitoring/results/observable-capacity-heterogeneous-end-100 \
+  --report-figures report/figures/evaluation \
+  --summary-dir delay-monitoring/results/capacity-robustness-summary
+```
+
+### Multi-Path Modal Capacity
+
+The multi-path analysis uses the stopped distributions from the constant-rate single-link run.
+
+```bash
+python3 delay-monitoring/analysis/multipath_bimodal_capacity.py \
+  --single-results delay-monitoring/results/observable-capacity-single-100-seed \
+  --results-dir delay-monitoring/results/multipath-bimodal-capacity \
+  --upper-shares 0.10 0.25 0.50 0.75 \
+  --upper-path-offset-ms 30
+
+python3 delay-monitoring/analysis/multipath_offset_sensitivity.py \
+  --single-results delay-monitoring/results/observable-capacity-single-100-seed \
+  --results-dir delay-monitoring/results/multipath-offset-sensitivity \
+  --upper-shares 0.10 0.25 0.50 0.75 \
+  --offsets-ms 10 20 30 40 50
+```
 
 ## Useful Entry Points
-
-The most relevant files for a reviewer are:
 
 ```text
 delay-monitoring/foundations/single-hop-underlying-network.cc
 delay-monitoring/multihop_scratch/multi-hop-capacity-network.cc
-delay-monitoring/analysis/observable_capacity_experiments.py
-delay-monitoring/analysis/distributional_capacity_response.py
 delay-monitoring/analysis/statistical_sample_complexity_report.py
+delay-monitoring/analysis/adaptive_stopping_v2.py
+delay-monitoring/analysis/adaptive_stopping_report_plots.py
+delay-monitoring/analysis/observable_capacity_experiments.py
+delay-monitoring/analysis/plot_observable_capacity_results.py
+delay-monitoring/analysis/capacity_robustness_plots.py
+delay-monitoring/analysis/multipath_bimodal_capacity.py
+delay-monitoring/analysis/multipath_offset_sensitivity.py
 report/main.tex
 ```
-
-Together, these files show the simulator model, the endpoint-visible monitoring pipeline, the statistical reconstruction baseline, and the dissertation write-up.
