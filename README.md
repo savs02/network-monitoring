@@ -21,7 +21,7 @@ The monitor only uses receiver-side packet delays and the ordering of load condi
 
 ## Requirements
 
-Profiler uses Network Simulator 3 (NS-3) 3.46 and Python 3. The Python analysis uses NumPy, SciPy, pandas, matplotlib, and seaborn.
+Profiler uses Network Simulator 3 (NS-3) 3.46, C++, and Python 3. The Python analysis uses NumPy, SciPy, pandas, matplotlib, and seaborn.
 
 From the repository root:
 
