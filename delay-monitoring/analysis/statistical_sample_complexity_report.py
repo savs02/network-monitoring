@@ -30,9 +30,9 @@ RESULTS_DIR = os.path.join(
 EPSILON = 0.05
 DELTA = 0.05
 DISCRETE_N_THEORY = {
-    "binomial": 9599,
-    "zipf": 9199,
-    "piecewise": 9199,
+    "binomial": 8920,
+    "zipf": 8520,
+    "piecewise": 8520,
 }
 CONTINUOUS_N_THEORY = 60520
 GRID_MAX = 150.0
@@ -207,9 +207,9 @@ def plot_true_shapes():
 
 def run_discrete():
     ns_by_dist = {
-        "binomial": [480, 960, 2400, 4800, 9599, 19197, 38393],
-        "zipf": [460, 920, 2300, 4599, 9199, 18397, 36793],
-        "piecewise": [460, 920, 2300, 4599, 9199, 18397, 36793],
+        "binomial": [446, 892, 2230, 4460, 8920, 17840, 35680],
+        "zipf": [426, 852, 2130, 4260, 8520, 17040, 34080],
+        "piecewise": [426, 852, 2130, 4260, 8520, 17040, 34080],
     }
     results = {}
 
@@ -373,7 +373,7 @@ def run_discrete():
 
 
 def run_continuous():
-    ns = sorted({500, 1000, 2000, 5000, 10000, 20000, 50000, CONTINUOUS_N_THEORY, 61199})
+    ns = [500, 1000, 2000, 5000, 10000, 20000, 50000, CONTINUOUS_N_THEORY]
     results = {}
 
     for name, cfg in CONTINUOUS_DISTS.items():

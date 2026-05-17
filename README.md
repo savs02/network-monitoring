@@ -1,14 +1,34 @@
 # Profiler
 
-Profiler is the implementation used for my MEng Computer Science final year project at UCL. The project studies passive network monitoring through delay distribution analysis. Given packet delay observations at the endpoint, Profiler reconstructs the path delay distribution and evaluates when a distributional change becomes strong enough to identify a capacity boundary.
+Profiler is the implementation used for my MEng Computer Science final year project at UCL. The project studies passive network monitoring through delay distribution analysis. Given packet delay observations at the endpoint, Profiler reconstructs the path delay distribution and evaluates when the distributional response indicates a capacity boundary.
 
 The repository contains the NS-3 simulations, Python analysis code, and dissertation figures used for the evaluation. It is intended to be readable by a dissertation reviewer as well as runnable by someone who wants to reproduce the main experiments.
 
 ## Project Context
 
-The core setting is deliberately simple. A sender transmits packets to a receiver over one or more point-to-point links. The simulator samples per-packet delay from a chosen distribution, while the monitoring code only sees observed delays. The monitor does not receive the name or parameters of the distribution. This makes the reconstruction distribution agnostic.
+Profiler is evaluated through a staged set of controlled experiments. A sender transmits packets to a receiver over one or more point-to-point links. The simulator samples per-packet delay from a chosen distribution, while the monitoring code only sees observed delays. The monitor does not receive the name or parameters of the distribution. This makes the reconstruction distribution agnostic.
 
-The current experiments focus on three families: lognormal, Weibull, and normal. Accuracy is mainly measured with total variation distance, with related scripts for other distance measures and diagnostic plots.
+The current experiments focus on lognormal, Weibull, and normal continuous delay distributions, plus finite-support binomial, Zipfian, and piecewise distributions for the statistical reconstruction checks. Accuracy is mainly measured with total variation distance, with related scripts for other distance measures and diagnostic plots.
+
+## Report Alignment
+
+The README follows the submitted dissertation PDF dated 17 May 2026. The main numbers used by the code paths below are:
+
+```text
+Total variation distance target: 0.05
+Success probability target: 0.95
+Discrete n_theory values: binomial 8,920, Zipfian 8,520, piecewise 8,520
+Continuous n_theory value: 60,520 on a 1 ms grid from 0 ms to 150 ms
+Continuous sample grid: 500, 1,000, 2,000, 5,000, 10,000, 20,000, 50,000, 60,520
+Adaptive stopping operating point: batch size 200 and threshold delta / 6
+Constant-rate single-link boundary: 0.925 load-grid point
+Endpoint cross-traffic loss in the constant-rate single-link run: 0.950 median load ratio
+Bursty average-load boundary: 0.475 median load ratio
+Multi-hop constant-rate boundary: 0.925 median load ratio across two to ten hops
+Multi-path modal result: upper-mode response recovers the 0.925 grid point
+```
+
+Profiler does not claim to measure exact physical capacity. The reported 0.925 boundary is the first satisfying point on the tested load grid under the report's queue model, traffic model, estimator, and decision rule.
 
 ## Repository Layout
 
@@ -65,11 +85,15 @@ ln -sfn ../../delay-monitoring/multihop_scratch ns-3.46/scratch/delay-monitoring
 Build the two simulation targets:
 
 ```bash
+rm -rf ns-3.46/cmake-cache ns-3.46/build
 cd ns-3.46
+./ns3 configure --disable-examples --disable-tests
 ./ns3 build scratch/delay-monitoring/single-hop-underlying-network
 ./ns3 build scratch/delay-monitoring-multihop/multi-hop-capacity-network
 cd ..
 ```
+
+The `rm -rf` line removes generated NS-3 cache directories. It is useful if CMake reports that the cache was created in a different checkout path.
 
 ## Quick Reviewer Checks
 
@@ -88,6 +112,8 @@ cd ns-3.46
 ./ns3 run --no-build --quiet "scratch/delay-monitoring/single-hop-underlying-network --delayDist=normal --normal_mean=10 --normal_variance=4 --numPackets=25 --outputFile=/tmp/profiler-normal-smoke.csv"
 cd ..
 ```
+
+This smoke run uses `--no-build` so it does not regenerate NS-3 build files while reviewing the repository.
 
 Run a tiny observable-capacity experiment and place its output in `/tmp`:
 
@@ -122,7 +148,7 @@ The last command is computational rather than simulator-heavy. It may take a few
 
 The dissertation figures were produced from a mixture of NS-3 simulation outputs and pure Python statistical experiments.
 
-The statistical sample-complexity figures can be regenerated with:
+The statistical sample-complexity figures in Chapter 4 can be regenerated with:
 
 ```bash
 python3 delay-monitoring/analysis/statistical_sample_complexity_report.py
@@ -133,6 +159,8 @@ By default this writes to:
 ```text
 delay-monitoring/results/statistical-sample-complexity-report/
 ```
+
+This script uses the report's finite-domain reference counts: 8,920 for binomial, 8,520 for Zipfian and piecewise, and 60,520 for the continuous one millisecond grid.
 
 For a single-link observable-capacity run, use:
 
@@ -158,6 +186,8 @@ python3 delay-monitoring/analysis/observable_capacity_experiments.py \
 ```
 
 These full runs produce many raw CSV files. For review, the quick checks above are usually the better way to confirm that the code path works.
+
+The saved dissertation figures report that TVD response rate selects the 0.925 load-grid point in the constant-rate single-link run and remains at that grid point across the two to ten hop path-wide multi-hop runs. The bursty run reports a lower average-load boundary because the on-period sending rate is twice the swept average.
 
 ## What To Commit
 
